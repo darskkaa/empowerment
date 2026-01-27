@@ -871,7 +871,7 @@
                     standout_moment: data.standout_moment
                 };
 
-                const { error } = await supabaseClient.from('SurveyResponses').insert([dbData]);
+                const { error } = await supabaseClient.from('surveyresponses').insert([dbData]);
                 if (error) throw error;
 
                 console.log('✅ Submitted');
