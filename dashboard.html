@@ -232,6 +232,43 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- DEEP DIVE SECTION -->
+                <div class="mt-8">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">📊 Deep Dive Analytics</h2>
+
+                    <!-- Button Row -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                        <button onclick="showAgeBreakdown()"
+                            class="deep-dive-btn bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-xl text-sm font-medium hover:shadow-lg transition-all">
+                            👥 Age Demographics
+                        </button>
+                        <button onclick="showReferralSources()"
+                            class="deep-dive-btn bg-gradient-to-r from-purple-500 to-purple-600 text-white p-4 rounded-xl text-sm font-medium hover:shadow-lg transition-all">
+                            📣 Referral Sources
+                        </button>
+                        <button onclick="showProgramEffectiveness()"
+                            class="deep-dive-btn bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-xl text-sm font-medium hover:shadow-lg transition-all">
+                            🧘 Program Effectiveness
+                        </button>
+                        <button onclick="showStandoutMoments()"
+                            class="deep-dive-btn bg-gradient-to-r from-orange-500 to-orange-600 text-white p-4 rounded-xl text-sm font-medium hover:shadow-lg transition-all">
+                            ✨ Standout Moments
+                        </button>
+                    </div>
+
+                    <!-- Deep Dive Results Container -->
+                    <div id="deepDiveResults" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hidden">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 id="deepDiveTitle" class="font-semibold text-gray-800">Results</h3>
+                            <button onclick="closeDeepDive()"
+                                class="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+                        </div>
+                        <div id="deepDiveContent" class="overflow-x-auto">
+                            <!-- Dynamic content injected here -->
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
     </div>
@@ -492,6 +529,165 @@
             a.href = url;
             a.download = `empowerment_farm_responses_${new Date().toISOString().split('T')[0]}.csv`;
             a.click();
+        }
+        // ============================================
+        // DEEP DIVE ANALYTICS
+        // ============================================
+        function closeDeepDive() {
+            document.getElementById('deepDiveResults').classList.add('hidden');
+        }
+
+        function showDeepDive(title, content) {
+            document.getElementById('deepDiveTitle').textContent = title;
+            document.getElementById('deepDiveContent').innerHTML = content;
+            document.getElementById('deepDiveResults').classList.remove('hidden');
+            document.getElementById('deepDiveResults').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showAgeBreakdown() {
+            const ageCounts = {};
+            const ageScores = {};
+
+            allResponses.forEach(r => {
+                const age = r.age_range_bracket || 'Unknown';
+                ageCounts[age] = (ageCounts[age] || 0) + 1;
+                if (!ageScores[age]) ageScores[age] = { total: 0, count: 0, calm: 0, nature: 0 };
+                ageScores[age].total += (r.is_present_engaged || 0) + (r.connection_others_score || 0) +
+                    (r.connection_nature_score || 0) + (r.calmness_score || 0) +
+                    (r.learning_intent_score || 0) + (r.community_benefit_score || 0);
+                ageScores[age].count++;
+                ageScores[age].calm += r.calmness_score || 0;
+                ageScores[age].nature += r.connection_nature_score || 0;
+            });
+
+            let html = `<table class="w-full text-sm">
+                <thead class="bg-blue-50"><tr>
+                    <th class="px-4 py-3 text-left">Age Range</th>
+                    <th class="px-4 py-3 text-right">Count</th>
+                    <th class="px-4 py-3 text-right">% of Total</th>
+                    <th class="px-4 py-3 text-right">Avg Calmness</th>
+                    <th class="px-4 py-3 text-right">Avg Nature</th>
+                </tr></thead><tbody>`;
+
+            const total = allResponses.length;
+            const sorted = ['0-17', '18-25', '26-40', '41-60', '61+', 'Unknown'];
+            sorted.forEach(age => {
+                if (ageCounts[age]) {
+                    const pct = ((ageCounts[age] / total) * 100).toFixed(1);
+                    const avgCalm = (ageScores[age].calm / ageScores[age].count).toFixed(2);
+                    const avgNature = (ageScores[age].nature / ageScores[age].count).toFixed(2);
+                    html += `<tr class="border-b hover:bg-gray-50">
+                        <td class="px-4 py-3 font-medium">${age}</td>
+                        <td class="px-4 py-3 text-right">${ageCounts[age]}</td>
+                        <td class="px-4 py-3 text-right">${pct}%</td>
+                        <td class="px-4 py-3 text-right">${avgCalm}</td>
+                        <td class="px-4 py-3 text-right">${avgNature}</td>
+                    </tr>`;
+                }
+            });
+            html += '</tbody></table>';
+            showDeepDive('👥 Age Demographics Breakdown', html);
+        }
+
+        function showReferralSources() {
+            const refCounts = {};
+            allResponses.forEach(r => {
+                if (r.referral_source) {
+                    r.referral_source.split(',').forEach(ref => {
+                        const trimmed = ref.trim();
+                        if (trimmed) refCounts[trimmed] = (refCounts[trimmed] || 0) + 1;
+                    });
+                }
+            });
+
+            const total = Object.values(refCounts).reduce((a, b) => a + b, 0);
+            const sorted = Object.entries(refCounts).sort((a, b) => b[1] - a[1]);
+
+            let html = `<table class="w-full text-sm">
+                <thead class="bg-purple-50"><tr>
+                    <th class="px-4 py-3 text-left">Referral Source</th>
+                    <th class="px-4 py-3 text-right">Count</th>
+                    <th class="px-4 py-3 text-right">% of Total</th>
+                    <th class="px-4 py-3 text-left">Bar</th>
+                </tr></thead><tbody>`;
+
+            sorted.forEach(([source, count]) => {
+                const pct = ((count / total) * 100).toFixed(1);
+                const barWidth = Math.round((count / sorted[0][1]) * 100);
+                html += `<tr class="border-b hover:bg-gray-50">
+                    <td class="px-4 py-3 font-medium">${source}</td>
+                    <td class="px-4 py-3 text-right">${count}</td>
+                    <td class="px-4 py-3 text-right">${pct}%</td>
+                    <td class="px-4 py-3"><div class="bg-purple-200 rounded h-4" style="width:${barWidth}%"></div></td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            showDeepDive('📣 How Visitors Found Us', html);
+        }
+
+        function showProgramEffectiveness() {
+            const programs = {};
+            allResponses.forEach(r => {
+                const prog = r.experience_type || 'Unknown';
+                if (!programs[prog]) programs[prog] = { count: 0, calm: 0, nature: 0, people: 0, community: 0 };
+                programs[prog].count++;
+                programs[prog].calm += r.calmness_score || 0;
+                programs[prog].nature += r.connection_nature_score || 0;
+                programs[prog].people += r.connection_others_score || 0;
+                programs[prog].community += r.community_benefit_score || 0;
+            });
+
+            const sorted = Object.entries(programs).sort((a, b) =>
+                (b[1].calm / b[1].count) - (a[1].calm / a[1].count)
+            );
+
+            let html = `<table class="w-full text-sm">
+                <thead class="bg-green-50"><tr>
+                    <th class="px-4 py-3 text-left">Program</th>
+                    <th class="px-4 py-3 text-right">Responses</th>
+                    <th class="px-4 py-3 text-right">🧘 Calmness</th>
+                    <th class="px-4 py-3 text-right">🌿 Nature</th>
+                    <th class="px-4 py-3 text-right">👥 People</th>
+                    <th class="px-4 py-3 text-right">🏘️ Community</th>
+                </tr></thead><tbody>`;
+
+            sorted.forEach(([prog, data]) => {
+                const calm = (data.calm / data.count).toFixed(2);
+                const nature = (data.nature / data.count).toFixed(2);
+                const people = (data.people / data.count).toFixed(2);
+                const community = (data.community / data.count).toFixed(2);
+                html += `<tr class="border-b hover:bg-gray-50">
+                    <td class="px-4 py-3 font-medium">${prog}</td>
+                    <td class="px-4 py-3 text-right">${data.count}</td>
+                    <td class="px-4 py-3 text-right font-bold text-green-600">${calm}</td>
+                    <td class="px-4 py-3 text-right">${nature}</td>
+                    <td class="px-4 py-3 text-right">${people}</td>
+                    <td class="px-4 py-3 text-right">${community}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            html += '<p class="text-xs text-gray-500 mt-3">Sorted by highest Calmness score (The Zen Factor™)</p>';
+            showDeepDive('🧘 Program Effectiveness (The Zen Factor)', html);
+        }
+
+        function showStandoutMoments() {
+            const moments = allResponses.filter(r => r.standout_moment && r.standout_moment.trim());
+
+            if (moments.length === 0) {
+                showDeepDive('✨ Standout Moments', '<p class="text-gray-500">No standout moments recorded yet.</p>');
+                return;
+            }
+
+            let html = '<div class="space-y-4">';
+            moments.forEach(r => {
+                const date = new Date(r.created_at).toLocaleDateString();
+                html += `<div class="bg-orange-50 rounded-xl p-4 border-l-4 border-orange-400">
+                    <p class="text-gray-800 italic">"${r.standout_moment}"</p>
+                    <p class="text-xs text-gray-500 mt-2">${r.experience_type || 'Unknown Program'} • ${date} • Age: ${r.age_range_bracket || '?'}</p>
+                </div>`;
+            });
+            html += '</div>';
+            showDeepDive(`✨ Standout Moments (${moments.length} responses)`, html);
         }
 
         // Init
