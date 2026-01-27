@@ -790,18 +790,34 @@
         // ============================================
         // FORM HANDLERS
         // ============================================
-        function selectRole(role) {
+        // Explicitly attach to window to avoid scope issues
+        window.selectRole = function (role) {
+            console.log('Role selected:', role);
             state.role = role;
             document.querySelectorAll('[data-role]').forEach(b => b.classList.remove('selected'));
             document.querySelector(`[data-role="${role}"]`).classList.add('selected');
             validateStep1();
         }
 
-        function validateStep1() {
-            state.experienceType = document.getElementById('experienceType').value;
-            state.ageRange = document.getElementById('ageRange').value;
-            const valid = state.experienceType && state.ageRange && state.role;
-            document.getElementById('step1Next').disabled = !valid;
+        window.validateStep1 = function () {
+            const exp = document.getElementById('experienceType').value;
+            const age = document.getElementById('ageRange').value;
+
+            state.experienceType = exp;
+            state.ageRange = age;
+
+            console.log('Validating:', { exp, age, role: state.role });
+
+            const valid = exp && age && state.role;
+            const btn = document.getElementById('step1Next');
+
+            if (valid) {
+                btn.removeAttribute('disabled');
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                btn.setAttribute('disabled', 'true');
+                btn.classList.add('opacity-50', 'cursor-not-allowed'); // Ensure visual feedback
+            }
         }
 
         function setRating(question, value) {
