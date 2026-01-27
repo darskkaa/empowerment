@@ -755,17 +755,36 @@
         // INIT
         // ============================================
         async function initSupabase() {
+            // ==========================================
+            // 🔧 LOCAL TESTING CONFIG
+            // If running locally (file://), you can verify DB connection
+            // by adding your keys here. DO NOT COMMIT REAL KEYS!
+            // ==========================================
+            const LOCAL_URL = "";
+            const LOCAL_KEY = "";
+            // ==========================================
+
             try {
+                // 1. Try to fetch from Netlify function (PRODUCTION)
                 const res = await fetch('/api/get_config');
                 if (res.ok) {
                     const c = await res.json();
                     if (c.SUPABASE_URL && c.ANON_KEY) {
                         supabaseClient = window.supabase.createClient(c.SUPABASE_URL, c.ANON_KEY);
-                        console.log('✅ Supabase ready');
+                        console.log('✅ Supabase ready (Production Mode)');
+                        return;
                     }
                 }
+                throw new Error('Config fetch failed');
             } catch (e) {
-                console.error('Supabase init error', e);
+                // 2. Fallback to local keys if provided
+                if (LOCAL_URL && LOCAL_KEY) {
+                    console.warn('⚠️ Fetch failed. Using HARDCODED local keys for testing.');
+                    supabaseClient = window.supabase.createClient(LOCAL_URL, LOCAL_KEY);
+                } else {
+                    console.warn('⚠️ Could not initialize Supabase. Running in OFFLINE DEMO mode.', e);
+                    supabaseClient = null;
+                }
             }
         }
 
@@ -853,6 +872,7 @@
 
             if (!supabaseClient) {
                 console.warn('⚠️ No Supabase client - showing thank you anyway');
+                alert("⚠️ TEST METHOD WARNING:\n\nDetailed database saving is disabled because the app is running locally without a server.\n\nYour survey 'submission' was simulated. To save to the real database, please deploy to Netlify or run a local server.");
                 showScreen(totalScreens);
                 launchConfetti();
                 return;
@@ -891,6 +911,7 @@
                 launchConfetti();
             } catch (e) {
                 console.error('❌ Submit error:', e.message || e);
+                alert("❌ SUBMISSION ERROR:\n" + (e.message || JSON.stringify(e)) + "\n\nPlease take a screenshot of this and send it to support.");
                 // Still show thank you - don't block user experience
                 showScreen(totalScreens);
                 launchConfetti();
