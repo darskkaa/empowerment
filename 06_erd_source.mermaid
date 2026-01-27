@@ -1,0 +1,125 @@
+erDiagram
+    %% ============================================
+    %% EMPOWERMENT FARM - ERD (Audit-Compliant)
+    %% "Labels Stop at the Gate" - Privacy-by-Design
+    %% ============================================
+
+    ProgramCatalog {
+        uuid program_id PK
+        varchar program_name UK
+        varchar program_category
+        text description
+        varchar schedule_notes
+        varchar cost_notes
+        boolean is_active
+        timestamp created_at
+    }
+
+    FarmZones {
+        uuid zone_id PK
+        varchar zone_name UK
+        varchar zone_type
+        text description
+        boolean is_accessible
+        timestamp created_at
+    }
+
+    Animals {
+        uuid animal_id PK
+        varchar animal_name
+        varchar species
+        varchar breed
+        uuid home_zone_id FK
+        varchar temperament
+        boolean is_therapy_animal
+        boolean is_active
+        timestamp created_at
+    }
+
+    Constituents {
+        uuid constituent_id PK
+        varchar first_name
+        varchar last_name
+        varchar email UK
+        varchar role_type
+        date enrollment_date
+        boolean is_active
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    ConstituentProfiles {
+        uuid profile_id PK
+        uuid constituent_id FK,UK
+        date date_of_birth
+        varchar age_range
+        varchar emergency_contact
+        varchar emergency_phone
+        varchar referral_source
+        text notes
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    Experiences {
+        uuid experience_id PK
+        uuid constituent_id FK
+        uuid program_id FK
+        uuid zone_id FK
+        date experience_date
+        time start_time
+        varchar facilitator_name
+        varchar attendance_status
+        text notes
+        timestamp created_at
+    }
+
+    SurveyResponses {
+        uuid response_id PK
+        uuid experience_id FK
+        uuid constituent_id FK
+        varchar experience_type
+        int is_present_engaged
+        int connection_others_score
+        int connection_nature_score
+        int calmness_score
+        int learning_intent_score
+        int community_benefit_score
+        text referral_source
+        text standout_moment
+        boolean would_recommend
+        text additional_feedback
+        varchar age_range_bracket
+        varchar participant_name
+        varchar participant_email
+        text photo_url
+        boolean willing_to_review
+        timestamp submitted_at
+        varchar device_type
+        timestamp created_at
+    }
+
+    %% ============================================
+    %% RELATIONSHIPS
+    %% ============================================
+
+    %% Zone houses Animals
+    FarmZones ||--o{ Animals : "houses"
+
+    %% One Constituent has One Profile (Restricted 1:1)
+    Constituents ||--o| ConstituentProfiles : "has restricted profile"
+
+    %% Program has many Experiences
+    ProgramCatalog ||--o{ Experiences : "offered as"
+
+    %% Zone hosts Experiences
+    FarmZones ||--o{ Experiences : "hosts"
+
+    %% Constituent participates in Experiences
+    Constituents ||--o{ Experiences : "participates"
+
+    %% Experience generates Survey Response (optional 1:1)
+    Experiences ||--o| SurveyResponses : "generates"
+
+    %% Constituent submits Survey Responses (optional - anonymous allowed)
+    Constituents ||--o{ SurveyResponses : "submits"

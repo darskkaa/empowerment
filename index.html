@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Empowerment Farm Survey</title>
+    <meta name="description" content="Share your experience at Empowerment Farm - Naples, FL">
+    <link rel="manifest" href="manifest.json">
+
+    <!-- iOS / Safari Specific -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Empowerment">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="apple-touch-icon" href="https://placehold.co/192x192/22c55e/ffffff?text=EF">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                    colors: {
+                        farm: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #14532d 0%, #166534 50%, #15803d 100%);
+            min-height: 100vh;
+            /* Prevent elastic scrolling in Safari */
+            overscroll-behavior-y: none;
+            /* Safe area support for notched phones */
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* Smooth scrolling for iOS */
+        html {
+            -webkit-text-size-adjust: 100%;
+            scroll-behavior: smooth;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .glass-card-solid {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        /* Yes/Somewhat/No Buttons */
+        .rating-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+        }
+
+        .rating-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .rating-btn:active {
+            transform: scale(0.98);
+        }
+
+        .rating-btn.yes {
+            background: rgba(34, 197, 94, 0.2);
+            border-color: rgba(34, 197, 94, 0.4);
+            color: #86efac;
+        }
+
+        .rating-btn.yes.selected {
+            background: #22c55e;
+            border-color: #22c55e;
+            color: white;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.5);
+        }
+
+        .rating-btn.somewhat {
+            background: rgba(251, 191, 36, 0.2);
+            border-color: rgba(251, 191, 36, 0.4);
+            color: #fde047;
+        }
+
+        .rating-btn.somewhat.selected {
+            background: #f59e0b;
+            border-color: #f59e0b;
+            color: white;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.5);
+        }
+
+        .rating-btn.no {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
+        }
+
+        .rating-btn.no.selected {
+            background: #ef4444;
+            border-color: #ef4444;
+            color: white;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.5);
+        }
+
+        /* Role buttons */
+        .role-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.2s;
+        }
+
+        .role-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .role-btn.selected {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            border-color: #22c55e;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.5);
+        }
+
+        /* Submit button */
+        .btn-submit {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Photo upload */
+        .photo-upload {
+            border: 3px dashed rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+            transition: all 0.3s;
+        }
+
+        .photo-upload:hover {
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .photo-upload.has-image {
+            border-style: solid;
+            border-color: #22c55e;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        /* Progress */
+        .progress-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s;
+        }
+
+        .progress-dot.active {
+            background: #22c55e;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+        }
+
+        .progress-dot.completed {
+            background: #fde047;
+        }
+
+        /* Checkboxes */
+        .checkbox-item {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.2s;
+        }
+
+        .checkbox-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .checkbox-item.selected {
+            background: rgba(34, 197, 94, 0.3);
+            border-color: #22c55e;
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* Leaf bg */
+        .leaf-bg {
+            position: fixed;
+            opacity: 0.08;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Form elements */
+        select,
+        input,
+        textarea {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            /* Prevent zooming on iOS input focus */
+            font-size: 16px !important;
+        }
+
+        select option {
+            background: #166534;
+            color: white;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+    <!-- Decorative -->
+    <div class="leaf-bg top-10 left-5 text-5xl animate-float">🌿</div>
+    <div class="leaf-bg top-32 right-8 text-4xl animate-float" style="animation-delay:1s">🍃</div>
+    <div class="leaf-bg bottom-20 left-10 text-4xl animate-float" style="animation-delay:0.5s">🌱</div>
+
+    <div class="relative min-h-screen flex flex-col items-center justify-start px-4 py-6 z-10">
+        <!-- Header -->
+        <header class="text-center mb-6 animate-fade-in">
+            <div class="text-5xl mb-3">🌾</div>
+            <h1 class="font-serif text-2xl md:text-3xl font-bold text-white mb-1">Empowerment Farm</h1>
+            <p class="text-farm-200 text-sm">Share Your Experience</p>
+        </header>
+
+        <!-- Progress -->
+        <div class="flex gap-2 mb-6" id="progressDots">
+            <div class="progress-dot active" data-step="1"></div>
+            <div class="progress-dot" data-step="2"></div>
+            <div class="progress-dot" data-step="3"></div>
+            <div class="progress-dot" data-step="4"></div>
+            <div class="progress-dot" data-step="5"></div>
+        </div>
+
+        <main class="w-full max-w-md">
+
+            <!-- STEP 1: Experience & Demographics -->
+            <section id="step1" class="step active">
+                <div class="glass-card rounded-2xl p-5">
+                    <h2 class="font-serif text-xl text-white text-center mb-4">Welcome! 👋</h2>
+
+                    <!-- Experience Type -->
+                    <div class="mb-4">
+                        <label class="text-farm-200 text-sm mb-2 block">What was your experience? *</label>
+                        <select id="experienceType"
+                            class="w-full p-3 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-farm-400">
+                            <option value="">Select experience...</option>
+                            <option value="Open Farm (Second Saturdays)">Open Farm (Second Saturdays)</option>
+                            <option value="Cow Yoga">Cow Yoga</option>
+                            <option value="Yoga with the Animals">Yoga with the Animals</option>
+                            <option value="Tuesday Night Tuck-In">Tuesday Night Tuck-In</option>
+                            <option value="Paint & Pollinators">Paint & Pollinators</option>
+                            <option value="Seedlings for Spring">Seedlings for Spring</option>
+                            <option value="Better Together - Hugging Can Planters">Better Together - Hugging Can
+                                Planters</option>
+                            <option value="Sweethearts and Songbirds">Sweethearts and Songbirds</option>
+                            <option value="JusTeenys Greenies">JusTeeny's Greenies</option>
+                            <option value="Educational Field Trips">Educational Field Trips</option>
+                            <option value="Group & Partner Programs">Group & Partner Programs</option>
+                            <option value="Farms Without Fences (Off-Site)">Farms Without Fences (Off-Site)</option>
+                        </select>
+                    </div>
+
+                    <!-- Age Range -->
+                    <div class="mb-4">
+                        <label class="text-farm-200 text-sm mb-2 block">Age Range *</label>
+                        <select id="ageRange"
+                            class="w-full p-3 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-farm-400">
+                            <option value="">Select age range...</option>
+                            <option value="0-17">0-17</option>
+                            <option value="18-25">18-25</option>
+                            <option value="26-40">26-40</option>
+                            <option value="41-60">41-60</option>
+                            <option value="61+">61+</option>
+                        </select>
+                    </div>
+
+                    <!-- Role -->
+                    <div class="mb-4">
+                        <label class="text-farm-200 text-sm mb-2 block">I am a... *</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button type="button" onclick="selectRole('Visitor')" data-role="Visitor"
+                                class="role-btn py-3 rounded-xl text-white text-sm font-medium">
+                                🌻 Visitor
+                            </button>
+                            <button type="button" onclick="selectRole('Student')" data-role="Student"
+                                class="role-btn py-3 rounded-xl text-white text-sm font-medium">
+                                📚 Student
+                            </button>
+                            <button type="button" onclick="selectRole('Volunteer')" data-role="Volunteer"
+                                class="role-btn py-3 rounded-xl text-white text-sm font-medium">
+                                🤝 Volunteer
+                            </button>
+                        </div>
+                    </div>
+
+                    <button onclick="nextStep(2)" id="step1Next"
+                        class="w-full py-3 rounded-xl btn-submit text-white font-medium mt-4" disabled>
+                        Continue →
+                    </button>
+                </div>
+            </section>
+
+            <!-- STEP 2: Yes/Somewhat/No Matrix -->
+            <section id="step2" class="step">
+                <div class="glass-card rounded-2xl p-5">
+                    <h2 class="font-serif text-xl text-white text-center mb-4">During Your Experience... 🌿</h2>
+
+                    <!-- Q1: Present & Engaged -->
+                    <div class="mb-5">
+                        <p class="text-white text-sm mb-2">Did you feel present and engaged?</p>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button type="button" onclick="setRating('presence', 3)" data-q="presence" data-v="3"
+                                class="rating-btn yes py-3 rounded-xl font-medium">Yes</button>
+                            <button type="button" onclick="setRating('presence', 2)" data-q="presence" data-v="2"
+                                class="rating-btn somewhat py-3 rounded-xl font-medium">Somewhat</button>
+                            <button type="button" onclick="setRating('presence', 1)" data-q="presence" data-v="1"
+                                class="rating-btn no py-3 rounded-xl font-medium">No</button>
+                        </div>
+                    </div>
+
+                    <!-- Q2: Connected to Others -->
+                    <div class="mb-5">
+                        <p class="text-white text-sm mb-2">More connected to others (family, peers, staff)?</p>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button type="button" onclick="setRating('people', 3)" data-q="people" data-v="3"
+                                class="rating-btn yes py-3 rounded-xl font-medium">Yes</button>
+                            <button type="button" onclick="setRating('people', 2)" data-q="people" data-v="2"
+                                class="rating-btn somewhat py-3 rounded-xl font-medium">Somewhat</button>
+                            <button type="button" onclick="setRating('people', 1)" data-q="people" data-v="1"
+                                class="rating-btn no py-3 rounded-xl font-medium">No</button>
+                        </div>
+                    </div>
+
+                    <!-- Q3: Connected to Nature -->
+                    <div class="mb-5">
+                        <p class="text-white text-sm mb-2">More connected to animals, nature, or environment?</p>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button type="button" onclick="setRating('nature', 3)" data-q="nature" data-v="3"
+                                class="rating-btn yes py-3 rounded-xl font-medium">Yes</button>
+                            <button type="button" onclick="setRating('nature', 2)" data-q="nature" data-v="2"
+                                class="rating-btn somewhat py-3 rounded-xl font-medium">Somewhat</button>
+                            <button type="button" onclick="setRating('nature', 1)" data-q="nature" data-v="1"
+                                class="rating-btn no py-3 rounded-xl font-medium">No</button>
+                        </div>
+                    </div>
+
+                    <!-- Q4: Calmer -->
+                    <div class="mb-5">
+                        <p class="text-white text-sm mb-2">Feel calmer, more grounded, or less stressed?</p>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button type="button" onclick="setRating('calm', 3)" data-q="calm" data-v="3"
+                                class="rating-btn yes py-3 rounded-xl font-medium">Yes</button>
+                            <button type="button" onclick="setRating('calm', 2)" data-q="calm" data-v="2"
+                                class="rating-btn somewhat py-3 rounded-xl font-medium">Somewhat</button>
+                            <button type="button" onclick="setRating('calm', 1)" data-q="calm" data-v="1"
+                                class="rating-btn no py-3 rounded-xl font-medium">No</button>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button onclick="prevStep(1)"
+                            class="flex-1 py-3 rounded-xl bg-white/10 text-white font-medium">← Back</button>
+                        <button onclick="nextStep(3)" id="step2Next"
+                            class="flex-1 py-3 rounded-xl btn-submit text-white font-medium" disabled>Next →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STEP 3: More Matrix + Referral -->
+            <section id="step3" class="step">
+                <div class="glass-card rounded-2xl p-5">
+                    <h2 class="font-serif text-xl text-white text-center mb-4">Almost Done! 🌟</h2>
+
+                    <!-- Q5: Learning Intent -->
+                    <div class="mb-5">
+                        <p class="text-white text-sm mb-2">Will you use something you learned today?</p>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button type="button" onclick="setRating('intent', 3)" data-q="intent" data-v="3"
+                                class="rating-btn yes py-3 rounded-xl font-medium">Yes</button>
+                            <button type="button" onclick="setRating('intent', 2)" data-q="intent" data-v="2"
+                                class="rating-btn somewhat py-3 rounded-xl font-medium">Somewhat</button>
+                            <button type="button" onclick="setRating('intent', 1)" data-q="intent" data-v="1"
+                                class="rating-btn no py-3 rounded-xl font-medium">No</button>
+                        </div>
+                    </div>
+
+                    <!-- Q6: Community Benefit -->
+                    <div class="mb-5">
+                        <p class="text-white text-sm mb-2">Would the community benefit from more programs like this?</p>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button type="button" onclick="setRating('community', 3)" data-q="community" data-v="3"
+                                class="rating-btn yes py-3 rounded-xl font-medium">Yes</button>
+                            <button type="button" onclick="setRating('community', 2)" data-q="community" data-v="2"
+                                class="rating-btn somewhat py-3 rounded-xl font-medium">Somewhat</button>
+                            <button type="button" onclick="setRating('community', 1)" data-q="community" data-v="1"
+                                class="rating-btn no py-3 rounded-xl font-medium">No</button>
+                        </div>
+                    </div>
+
+                    <!-- Referral Source -->
+                    <div class="mb-4">
+                        <p class="text-white text-sm mb-2">How did you hear about us?</p>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <button type="button" onclick="toggleReferral('Word of Mouth')" data-ref="Word of Mouth"
+                                class="checkbox-item py-2 px-3 rounded-lg text-white text-left">Word of Mouth</button>
+                            <button type="button" onclick="toggleReferral('Social Media')" data-ref="Social Media"
+                                class="checkbox-item py-2 px-3 rounded-lg text-white text-left">Social Media</button>
+                            <button type="button" onclick="toggleReferral('Google Search')" data-ref="Google Search"
+                                class="checkbox-item py-2 px-3 rounded-lg text-white text-left">Google Search</button>
+                            <button type="button" onclick="toggleReferral('Friend/Family')" data-ref="Friend/Family"
+                                class="checkbox-item py-2 px-3 rounded-lg text-white text-left">Friend/Family</button>
+                            <button type="button" onclick="toggleReferral('School')" data-ref="School"
+                                class="checkbox-item py-2 px-3 rounded-lg text-white text-left">School</button>
+                            <button type="button" onclick="toggleReferral('Newsletter')" data-ref="Newsletter"
+                                class="checkbox-item py-2 px-3 rounded-lg text-white text-left">Newsletter</button>
+                            <button type="button" onclick="toggleReferral('Flyer/Poster')" data-ref="Flyer/Poster"
+                                class="checkbox-item py-2 px-3 rounded-lg text-white text-left">Flyer/Poster</button>
+                            <button type="button" onclick="toggleReferral('Drove By')" data-ref="Drove By"
+                                class="checkbox-item py-2 px-3 rounded-lg text-white text-left">Drove By</button>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button onclick="prevStep(2)"
+                            class="flex-1 py-3 rounded-xl bg-white/10 text-white font-medium">← Back</button>
+                        <button onclick="nextStep(4)" id="step3Next"
+                            class="flex-1 py-3 rounded-xl btn-submit text-white font-medium" disabled>Next →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STEP 4: Photo & Feedback -->
+            <section id="step4" class="step">
+                <div class="glass-card rounded-2xl p-5">
+                    <h2 class="font-serif text-xl text-white text-center mb-4">Capture Your Moment 📸</h2>
+
+                    <!-- Photo Upload -->
+                    <div class="photo-upload rounded-xl p-4 mb-4 text-center relative" id="photoArea">
+                        <input type="file" accept="image/*" capture="environment" id="photoInput"
+                            onchange="handlePhoto(event)" class="absolute inset-0 opacity-0 cursor-pointer">
+                        <div id="photoPlaceholder">
+                            <div class="text-4xl mb-2">📷</div>
+                            <p class="text-white text-sm font-medium">Tap to Capture (Optional)</p>
+                            <p class="text-farm-200 text-xs">A goat, plant, or peaceful scene</p>
+                        </div>
+                        <div id="photoPreview" class="hidden">
+                            <img id="previewImg" class="max-h-40 mx-auto rounded-lg mb-2">
+                            <button type="button" onclick="removePhoto()"
+                                class="text-farm-200 text-xs underline">Remove</button>
+                        </div>
+                    </div>
+
+                    <!-- Standout Moment -->
+                    <div class="mb-4">
+                        <label class="text-farm-200 text-sm mb-1 block">One moment that stood out?</label>
+                        <textarea id="standoutMoment" rows="2" placeholder="What made you feel connected?"
+                            class="w-full p-3 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-farm-400"></textarea>
+                    </div>
+
+                    <!-- Additional Feedback -->
+                    <div class="mb-4">
+                        <label class="text-farm-200 text-sm mb-1 block">Additional feedback?</label>
+                        <textarea id="additionalFeedback" rows="2" placeholder="Optional..."
+                            class="w-full p-3 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-farm-400"></textarea>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button onclick="prevStep(3)"
+                            class="flex-1 py-3 rounded-xl bg-white/10 text-white font-medium">← Back</button>
+                        <button onclick="nextStep(5)"
+                            class="flex-1 py-3 rounded-xl btn-submit text-white font-medium">Next →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STEP 5: Final Questions & Submit -->
+            <section id="step5" class="step">
+                <div class="glass-card rounded-2xl p-5">
+                    <h2 class="font-serif text-xl text-white text-center mb-4">Final Step! ✨</h2>
+
+                    <!-- Would Recommend -->
+                    <div class="mb-4">
+                        <p class="text-white text-sm mb-2">Would you recommend Empowerment Farm? *</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button type="button" onclick="setRecommend(true)" id="recYes"
+                                class="rating-btn yes py-3 rounded-xl font-medium">👍 Yes!</button>
+                            <button type="button" onclick="setRecommend(false)" id="recNo"
+                                class="rating-btn no py-3 rounded-xl font-medium">👎 Not yet</button>
+                        </div>
+                    </div>
+
+                    <!-- Willing to Review -->
+                    <div class="mb-4">
+                        <label class="flex items-center gap-3 text-white text-sm cursor-pointer">
+                            <input type="checkbox" id="willingReview" class="w-5 h-5 rounded accent-farm-500">
+                            <span>I'm willing to leave a Google Review</span>
+                        </label>
+                    </div>
+
+                    <!-- Optional Name/Email -->
+                    <div class="mb-3">
+                        <input type="text" id="participantName" placeholder="Name (optional)"
+                            class="w-full p-3 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-farm-400">
+                    </div>
+                    <div class="mb-4">
+                        <input type="email" id="participantEmail" placeholder="Email (optional)"
+                            class="w-full p-3 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-farm-400">
+                    </div>
+
+                    <div class="flex gap-2">
+                        <button onclick="prevStep(4)"
+                            class="flex-1 py-3 rounded-xl bg-white/10 text-white font-medium">← Back</button>
+                        <button onclick="submitSurvey()" id="submitBtn"
+                            class="flex-1 py-3 rounded-xl btn-submit text-white font-medium flex items-center justify-center gap-2"
+                            disabled>
+                            <span>Submit</span><span>🌟</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SUCCESS -->
+            <section id="successState" class="step">
+                <div class="glass-card-solid rounded-2xl p-6 text-center">
+                    <div class="text-6xl mb-4 animate-float">🌟</div>
+                    <h2 class="font-serif text-2xl text-farm-800 mb-2">Thank You!</h2>
+                    <p class="text-farm-600 mb-4">Your feedback helps us grow our community.</p>
+                    <div class="bg-farm-50 rounded-xl p-3 mb-4">
+                        <p class="text-farm-700 text-sm italic">"Labels stop at the gate."</p>
+                        <p class="text-farm-500 text-xs">— Tiffany Lehman</p>
+                    </div>
+                    <button onclick="resetForm()" class="w-full py-3 rounded-xl btn-submit text-white font-medium">Start
+                        New Survey</button>
+                </div>
+            </section>
+        </main>
+
+        <footer class="mt-6 text-center text-farm-300 text-xs">
+            <p>© 2025 Empowerment Farm • Naples, FL</p>
+        </footer>
+    </div>
+
+    <script>
+        // ============================================
+        // SUPABASE CONFIG (Via Netlify Secrets)
+        // ============================================
+        let supabase = null;
+
+        async function initSupabase() {
+            try {
+                const response = await fetch('/api/get_config');
+                if (response.ok) {
+                    const config = await response.json();
+                    if (config.SUPABASE_URL && config.ANON_KEY && typeof window.supabase !== 'undefined') {
+                        supabase = window.supabase.createClient(config.SUPABASE_URL, config.ANON_KEY);
+                        console.log('✅ Supabase connected via Netlify');
+                    }
+                } else {
+                    console.warn('⚠️ Could not fetch config (running locally?)');
+                }
+            } catch (err) {
+                console.error('⚠️ Supabase init error:', err);
+            }
+        }
+
+        initSupabase();
+
+        // ============================================
+        // STATE
+        // ============================================
+        const state = {
+            experienceType: '',
+            ageRange: '',
+            role: '',
+            presence: 0,
+            people: 0,
+            nature: 0,
+            calm: 0,
+            intent: 0,
+            community: 0,
+            referrals: [],
+            standoutMoment: '',
+            additionalFeedback: '',
+            wouldRecommend: null,
+            willingReview: false,
+            name: '',
+            email: '',
+            photoFile: null,
+            photoUrl: null
+        };
+
+        // ============================================
+        // IMAGE COMPRESSION (< 200KB)
+        // ============================================
+        async function compressImage(file, maxSizeKB = 200) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+
+                        // Scale down if too large
+                        const maxDim = 1200;
+                        if (width > maxDim || height > maxDim) {
+                            if (width > height) {
+                                height = (height / width) * maxDim;
+                                width = maxDim;
+                            } else {
+                                width = (width / height) * maxDim;
+                                height = maxDim;
+                            }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // Start at high quality, reduce until under target
+                        let quality = 0.8;
+                        let dataUrl = canvas.toDataURL('image/jpeg', quality);
+
+                        while (dataUrl.length > maxSizeKB * 1024 * 1.37 && quality > 0.1) {
+                            quality -= 0.1;
+                            dataUrl = canvas.toDataURL('image/jpeg', quality);
+                        }
+
+                        // Convert to Blob
+                        fetch(dataUrl)
+                            .then(res => res.blob())
+                            .then(blob => {
+                                const compressedFile = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' });
+                                console.log(`Compressed: ${(file.size / 1024).toFixed(1)}KB → ${(compressedFile.size / 1024).toFixed(1)}KB`);
+                                resolve({ file: compressedFile, dataUrl });
+                            });
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // ============================================
+        // NAVIGATION
+        // ============================================
+        function nextStep(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById(`step${step}`).classList.add('active');
+            updateProgress(step);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function prevStep(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById(`step${step}`).classList.add('active');
+            updateProgress(step);
+        }
+
+        function updateProgress(step) {
+            document.querySelectorAll('.progress-dot').forEach((dot, i) => {
+                dot.classList.remove('active', 'completed');
+                if (i + 1 < step) dot.classList.add('completed');
+                else if (i + 1 === step) dot.classList.add('active');
+            });
+        }
+
+        // ============================================
+        // FORM HANDLERS
+        // ============================================
+        function selectRole(role) {
+            state.role = role;
+            document.querySelectorAll('[data-role]').forEach(b => b.classList.remove('selected'));
+            document.querySelector(`[data-role="${role}"]`).classList.add('selected');
+            validateStep1();
+        }
+
+        function validateStep1() {
+            state.experienceType = document.getElementById('experienceType').value;
+            state.ageRange = document.getElementById('ageRange').value;
+            const valid = state.experienceType && state.ageRange && state.role;
+            document.getElementById('step1Next').disabled = !valid;
+        }
+
+        function setRating(question, value) {
+            state[question] = value;
+            document.querySelectorAll(`[data-q="${question}"]`).forEach(b => b.classList.remove('selected'));
+            document.querySelector(`[data-q="${question}"][data-v="${value}"]`).classList.add('selected');
+
+            // Validate step 2
+            if (['presence', 'people', 'nature', 'calm'].includes(question)) {
+                const valid = state.presence && state.people && state.nature && state.calm;
+                document.getElementById('step2Next').disabled = !valid;
+            }
+            // Validate step 3
+            if (['intent', 'community'].includes(question)) {
+                const valid = state.intent && state.community;
+                document.getElementById('step3Next').disabled = !valid;
+            }
+        }
+
+        function toggleReferral(source) {
+            const idx = state.referrals.indexOf(source);
+            if (idx > -1) {
+                state.referrals.splice(idx, 1);
+                document.querySelector(`[data-ref="${source}"]`).classList.remove('selected');
+            } else {
+                state.referrals.push(source);
+                document.querySelector(`[data-ref="${source}"]`).classList.add('selected');
+            }
+        }
+
+        function setRecommend(val) {
+            state.wouldRecommend = val;
+            document.getElementById('recYes').classList.toggle('selected', val === true);
+            document.getElementById('recNo').classList.toggle('selected', val === false);
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        async function handlePhoto(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Compress image
+            const { file: compressed, dataUrl } = await compressImage(file);
+            state.photoFile = compressed;
+
+            document.getElementById('previewImg').src = dataUrl;
+            document.getElementById('photoPlaceholder').classList.add('hidden');
+            document.getElementById('photoPreview').classList.remove('hidden');
+            document.getElementById('photoArea').classList.add('has-image');
+        }
+
+        function removePhoto() {
+            state.photoFile = null;
+            state.photoUrl = null;
+            document.getElementById('photoInput').value = '';
+            document.getElementById('photoPlaceholder').classList.remove('hidden');
+            document.getElementById('photoPreview').classList.add('hidden');
+            document.getElementById('photoArea').classList.remove('has-image');
+        }
+
+        // ============================================
+        // SUBMIT
+        // ============================================
+        async function submitSurvey() {
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner"></div>';
+
+            try {
+                // Gather remaining fields
+                state.standoutMoment = document.getElementById('standoutMoment').value;
+                state.additionalFeedback = document.getElementById('additionalFeedback').value;
+                state.willingReview = document.getElementById('willingReview').checked;
+                state.name = document.getElementById('participantName').value;
+                state.email = document.getElementById('participantEmail').value;
+
+                // Upload photo if present
+                if (state.photoFile && supabase) {
+                    const fileName = `${Date.now()}_${state.photoFile.name}`;
+                    const { data, error } = await supabase.storage
+                        .from('survey-photos')
+                        .upload(fileName, state.photoFile);
+
+                    if (!error) {
+                        const { data: urlData } = supabase.storage
+                            .from('survey-photos')
+                            .getPublicUrl(fileName);
+                        state.photoUrl = urlData.publicUrl;
+                    }
+                }
+
+                // Insert survey response
+                if (supabase) {
+                    await supabase.from('SurveyResponses').insert({
+                        experience_type: state.experienceType,
+                        is_present_engaged: state.presence,
+                        connection_others_score: state.people,
+                        connection_nature_score: state.nature,
+                        calmness_score: state.calm,
+                        learning_intent_score: state.intent,
+                        community_benefit_score: state.community,
+                        referral_source: state.referrals.join(', '),
+                        standout_moment: state.standoutMoment || null,
+                        would_recommend: state.wouldRecommend,
+                        additional_feedback: state.additionalFeedback || null,
+                        age_range_bracket: state.ageRange,
+                        participant_name: state.name || null,
+                        participant_email: state.email || null,
+                        photo_url: state.photoUrl,
+                        willing_to_review: state.willingReview,
+                        device_type: /Mobile|Android|iPhone/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop'
+                    });
+                }
+
+                showSuccess();
+            } catch (err) {
+                console.error(err);
+                showSuccess(); // Show success anyway for demo
+            }
+        }
+
+        function showSuccess() {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('successState').classList.add('active');
+            document.getElementById('progressDots').style.display = 'none';
+            launchConfetti();
+        }
+
+        function launchConfetti() {
+            const colors = ['#22c55e', '#fde047', '#86efac', '#ffffff', '#4ade80'];
+            for (let i = 0; i < 60; i++) {
+                setTimeout(() => createConfetti(colors[Math.floor(Math.random() * colors.length)]), i * 30);
+            }
+        }
+
+        function createConfetti(color) {
+            const el = document.createElement('div');
+            el.className = 'confetti';
+            el.style.cssText = `left:${Math.random() * 100}vw;top:-10px;background:${color};border-radius:${Math.random() > .5 ? '50%' : '0'}`;
+            document.body.appendChild(el);
+
+            el.animate([
+                { transform: 'translateY(0) rotate(0)', opacity: 1 },
+                { transform: `translateY(${window.innerHeight + 50}px) translateX(${(Math.random() - .5) * 100}px) rotate(${720 + Math.random() * 360}deg)`, opacity: 0 }
+            ], { duration: 2000 + Math.random() * 1500, easing: 'cubic-bezier(.25,.46,.45,.94)' })
+                .onfinish = () => el.remove();
+        }
+
+        function resetForm() {
+            location.reload();
+        }
+
+        // Init listeners
+        document.getElementById('experienceType').addEventListener('change', validateStep1);
+        document.getElementById('ageRange').addEventListener('change', validateStep1);
+
+        // Log mode
+        console.log(supabase ? '✅ Supabase connected' : '📋 Demo mode (configure Supabase)');
+    </script>
+</body>
+
+</html>

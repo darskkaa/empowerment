@@ -1,0 +1,168 @@
+================================================================================
+EMPOWERMENT FARM - SAMPLE QUERY RESULTS (AUDIT-ALIGNED)
+================================================================================
+Simulated output from JotForm-aligned business queries
+Scale: 3=Yes, 2=Somewhat, 1=No
+================================================================================
+
+================================================================================
+QUERY 1: Correlation Analysis - People vs Nature Connection
+================================================================================
+experience_type                    | responses | avg_nature | avg_people | gap   | correlation_insight
+-----------------------------------+-----------+------------+------------+-------+------------------------
+Educational Field Trips            | 4         | 3.00       | 2.75       | 0.25  | High Both - Mission Success!
+Tuesday Night Tuck-In              | 9         | 3.00       | 3.00       | 0.00  | High Both - Mission Success!
+Cow Yoga                           | 8         | 2.75       | 2.63       | 0.12  | High Both - Mission Success!
+Paint & Pollinators                | 5         | 3.00       | 3.00       | 0.00  | High Both - Mission Success!
+Yoga with the Animals              | 5         | 3.00       | 3.00       | 0.00  | High Both - Mission Success!
+Open Farm (Second Saturdays)       | 12        | 2.67       | 2.67       | 0.00  | High Both - Mission Success!
+JusTeenys Greenies                 | 3         | 3.00       | 3.00       | 0.00  | High Both - Mission Success!
+(7 programs)
+
+*** KEY INSIGHT: Nature connection correlates strongly with people connection! ***
+
+================================================================================
+QUERY 2: Marketing Attribution
+================================================================================
+referral_source     | total | percentage | avg_calmness | avg_impact | would_recommend
+--------------------+-------+------------+--------------+------------+----------------
+Word of Mouth       | 12    | 22.6%      | 2.83         | 2.79       | 12
+Social Media        | 9     | 17.0%      | 2.78         | 2.75       | 9
+Friend/Family       | 8     | 15.1%      | 2.88         | 2.84       | 8
+School              | 6     | 11.3%      | 3.00         | 3.00       | 6
+Google Search       | 5     | 9.4%       | 2.80         | 2.80       | 5
+Parent              | 4     | 7.5%       | 3.00         | 2.94       | 4
+Newsletter          | 4     | 7.5%       | 3.00         | 3.00       | 4
+Nonprofit Partner   | 3     | 5.7%       | 3.00         | 3.00       | 3
+Flyer/Poster        | 2     | 3.8%       | 2.50         | 2.50       | 2
+(9 sources)
+
+*** INSIGHT: Word of Mouth & Social Media drive 40% of participants ***
+
+================================================================================
+QUERY 3: Demographics by Age Range
+================================================================================
+age_range | count | percentage | avg_calmness | avg_nature | will_apply | photos
+----------+-------+------------+--------------+------------+------------+-------
+0-17      | 14    | 26.4%      | 3.00         | 3.00       | 13         | 4
+18-25     | 4     | 7.5%       | 2.75         | 2.75       | 3          | 1
+26-40     | 22    | 41.5%      | 2.86         | 2.77       | 19         | 10
+41-60     | 9     | 17.0%      | 2.78         | 2.67       | 7          | 2
+61+       | 4     | 7.5%       | 3.00         | 3.00       | 4          | 2
+(5 age brackets)
+
+*** INSIGHT: 26-40 age group is largest (41.5%), followed by 0-17 (26.4%) ***
+
+================================================================================
+QUERY 4: Visual Impact Report (Responses with Photos)
+================================================================================
+experience_type          | participant      | age_range | standout_moment                            | calm | nature | photo_url                                    | date
+-------------------------+------------------+-----------+--------------------------------------------+------+--------+----------------------------------------------+------------
+Cow Yoga                 | Michelle Thomas  | 26-40     | The cows are surprisingly calming          | 3    | 3      | https://placehold.co/400x300/228B22/...     | 2025-11-21
+Paint & Pollinators      | Maria Santos     | 26-40     | Painting surrounded by butterflies         | 3    | 3      | https://placehold.co/400x300/228B22/...     | 2025-11-15
+Sweethearts and Songbirds| (anonymous)      | 41-60     | Made a beautiful bird feeder               | 3    | 3      | https://placehold.co/400x300/228B22/...     | 2025-11-09
+Open Farm                | Charlotte Green  | 0-17      | Farm market had great snacks               | 3    | 3      | https://placehold.co/400x300/228B22/...     | 2025-11-09
+(17 rows with photos - ~30% of total)
+
+================================================================================
+QUERY 5: Intentionality - Learning Application Rate
+================================================================================
+experience_type                    | total | yes_count | somewhat | no_count | yes_% | positive_%
+-----------------------------------+-------+-----------+----------+----------+-------+-----------
+Educational Field Trips            | 4     | 4         | 0        | 0        | 100.0 | 100.0
+Tuesday Night Tuck-In              | 9     | 8         | 1        | 0        | 88.9  | 100.0
+JusTeenys Greenies                 | 3     | 3         | 0        | 0        | 100.0 | 100.0
+Paint & Pollinators                | 5     | 5         | 0        | 0        | 100.0 | 100.0
+Cow Yoga                           | 8     | 6         | 2        | 0        | 75.0  | 100.0
+Yoga with the Animals              | 5     | 5         | 0        | 0        | 100.0 | 100.0
+Open Farm (Second Saturdays)       | 12    | 9         | 3        | 0        | 75.0  | 100.0
+(7 programs)
+
+*** KEY METRIC: 87% answered "Yes" to applying learnings ***
+
+================================================================================
+QUERY 6: Program Effectiveness - The Zen Factor
+================================================================================
+experience_type                    | responses | avg_calm | avg_presence | community_value | impact_score | rank
+-----------------------------------+-----------+----------+--------------+-----------------+--------------+------
+Educational Field Trips            | 4         | 3.00     | 3.00         | 3.00            | 2.94         | 1
+Tuesday Night Tuck-In              | 9         | 3.00     | 3.00         | 3.00            | 3.00         | 1
+Paint & Pollinators                | 5         | 3.00     | 3.00         | 3.00            | 3.00         | 1
+Yoga with the Animals              | 5         | 3.00     | 3.00         | 3.00            | 3.00         | 1
+JusTeenys Greenies                 | 3         | 3.00     | 3.00         | 3.00            | 3.00         | 1
+Cow Yoga                           | 8         | 2.63     | 2.50         | 3.00            | 2.56         | 6
+Open Farm (Second Saturdays)       | 12        | 2.75     | 2.75         | 3.00            | 2.69         | 7
+(7 programs)
+
+*** INSIGHT: Tuesday Tuck-In & Field Trips have perfect 3.0 calmness scores ***
+
+================================================================================
+QUERY 7: Monthly Trend Analysis
+================================================================================
+month    | responses | avg_calm | avg_nature | avg_people | calm_change | photos | recommend
+---------+-----------+----------+------------+------------+-------------+--------+----------
+2025-07  | 2         | 2.00     | 1.50       | 2.00       | NULL        | 1      | 2
+2025-08  | 4         | 2.25     | 2.00       | 2.50       | +0.25       | 1      | 4
+2025-09  | 11        | 2.82     | 2.73       | 2.73       | +0.57       | 5      | 11
+2025-10  | 17        | 2.88     | 2.82       | 2.76       | +0.06       | 5      | 17
+2025-11  | 19        | 2.95     | 2.89       | 2.89       | +0.07       | 5      | 19
+(5 months)
+
+*** TREND: Calmness improved from 2.00 → 2.95 over 5 months! ***
+
+================================================================================
+QUERY 8: Recurring Participant Progress
+================================================================================
+participant      | visits | first_visit | last_visit  | avg_nature | first | latest | improvement | trend
+-----------------+--------+-------------+-------------+------------+-------+--------+-------------+-------------
+Maria Santos     | 5      | 2025-07-15  | 2025-11-15  | 2.20       | 1     | 3      | 2           | 📈 Improving
+James Wilson     | 4      | 2025-07-25  | 2025-10-04  | 2.50       | 2     | 3      | 1           | 📈 Improving
+Emily Chen       | 4      | 2025-08-05  | 2025-11-08  | 2.50       | 2     | 3      | 1           | 📈 Improving
+(3 participants with 2+ visits)
+
+*** EVIDENCE: Recurring volunteers show nature connection improvement! ***
+
+================================================================================
+QUERY 9: Community Benefit Perception
+================================================================================
+experience_type                    | responses | avg_score | yes_count | somewhat | no_count | advocate_%
+-----------------------------------+-----------+-----------+-----------+----------+----------+-----------
+Educational Field Trips            | 4         | 3.00      | 4         | 0        | 0        | 100.0
+Tuesday Night Tuck-In              | 9         | 3.00      | 9         | 0        | 0        | 100.0
+Cow Yoga                           | 8         | 3.00      | 8         | 0        | 0        | 100.0
+Paint & Pollinators                | 5         | 3.00      | 5         | 0        | 0        | 100.0
+Open Farm (Second Saturdays)       | 12        | 3.00      | 12        | 0        | 0        | 100.0
+(all programs)
+
+*** UNANIMOUS: 100% believe community would benefit from more programs ***
+
+================================================================================
+QUERY 10: Recommendation Rate & Standout Moments
+================================================================================
+experience_type                    | responses | would_rec | rate   | has_moment | sample_moment
+-----------------------------------+-----------+-----------+--------+------------+---------------------------------------
+Educational Field Trips            | 4         | 4         | 100.0% | 4          | "Learned about composting and plant cycles"
+Tuesday Night Tuck-In              | 9         | 9         | 100.0% | 9          | "Tucking in Henrietta the chicken was my favorite"
+Cow Yoga                           | 8         | 8         | 100.0% | 8          | "Daisy came right up to me during meditation"
+Paint & Pollinators                | 5         | 5         | 100.0% | 5          | "Painting while surrounded by butterflies was magical"
+Yoga with the Animals              | 5         | 5         | 100.0% | 5          | "Clover the goat joined my mat!"
+Open Farm (Second Saturdays)       | 12        | 12        | 100.0% | 12         | "The food forest tour was eye-opening"
+(all programs)
+
+*** SUCCESS: 100% recommendation rate across all programs ***
+
+================================================================================
+BONUS: Impact Dashboard View Summary
+================================================================================
+experience_type          | surveys | presence | people | nature | calm | intent | community | overall_impact | recommend_%
+-------------------------+---------+----------+--------+--------+------+--------+-----------+----------------+------------
+Tuesday Night Tuck-In    | 9       | 3.00     | 3.00   | 3.00   | 3.00 | 2.89   | 3.00      | 2.98           | 100.0
+Educational Field Trips  | 4       | 3.00     | 2.75   | 3.00   | 3.00 | 3.00   | 3.00      | 2.96           | 100.0
+Paint & Pollinators      | 5       | 3.00     | 3.00   | 3.00   | 3.00 | 3.00   | 3.00      | 3.00           | 100.0
+Yoga with the Animals    | 5       | 3.00     | 3.00   | 3.00   | 3.00 | 3.00   | 3.00      | 3.00           | 100.0
+Cow Yoga                 | 8       | 2.50     | 2.63   | 2.75   | 2.63 | 2.63   | 3.00      | 2.69           | 100.0
+Open Farm                | 12      | 2.75     | 2.67   | 2.67   | 2.75 | 2.58   | 3.00      | 2.74           | 100.0
+
+================================================================================
+END OF SAMPLE RESULTS
+================================================================================
