@@ -285,7 +285,43 @@
             }
         }
 
-        // ... (rest of functions)
+        async function sendMagicLink() {
+            // Check if Supabase is initialized
+            if (!supabaseClient) {
+                showError('Server connection not ready. Please refresh the page.');
+                return;
+            }
+
+            const email = document.getElementById('emailInput').value.trim();
+            if (!email) {
+                showError('Please enter your email');
+                return;
+            }
+
+            const btn = document.getElementById('loginBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+
+            try {
+                const { error } = await supabaseClient.auth.signInWithOtp({
+                    email,
+                    options: { emailRedirectTo: window.location.href }
+                });
+
+                if (error) throw error;
+
+                document.getElementById('loginForm').classList.add('hidden');
+                const msg = document.getElementById('loginMessage');
+                msg.classList.remove('hidden');
+                msg.innerHTML = `✅ Magic link sent to <strong>${email}</strong>.<br>Check your inbox and click the link to sign in.`;
+            } catch (err) {
+                console.error('Magic Link Error:', err);
+                showError(err.message || 'Failed to send link');
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
 
         // Init
         initSupabase();
