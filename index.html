@@ -3,206 +3,86 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Empowerment Farm Survey</title>
-    <meta name="description" content="Share your experience at Empowerment Farm - Naples, FL">
-    <link rel="manifest" href="manifest.json">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Empowerment Farm Feedback</title>
+    <meta name="description" content="Quick 2-minute feedback survey for Empowerment Farm">
 
-    <!-- iOS / Safari Specific -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Empowerment">
-    <meta name="format-detection" content="telephone=no">
-    <link rel="apple-touch-icon" href="logo.png">
-
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
-        rel="stylesheet">
-
-    <!-- Supabase JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        serif: ['Playfair Display', 'serif'],
-                    },
-                    colors: {
-                        farm: {
-                            50: '#f0fdf4',
-                            100: '#dcfce7',
-                            200: '#bbf7d0',
-                            300: '#86efac',
-                            400: '#4ade80',
-                            500: '#22c55e',
-                            600: '#16a34a',
-                            700: '#15803d',
-                            800: '#166534',
-                            900: '#14532d',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <style>
+        :root {
+            --farm-green: #22c55e;
+            --farm-dark: #166534;
+            --bg-cream: #fefce8;
+            --text-dark: #1f2937;
+        }
+
         * {
-            -webkit-tap-highlight-color: transparent;
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #14532d 0%, #166534 50%, #15803d 100%);
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #dcfce7 0%, #fefce8 50%, #fff7ed 100%);
             min-height: 100vh;
-            /* Prevent elastic scrolling in Safari */
-            overscroll-behavior-y: none;
-            /* Safe area support for notched phones */
-            padding-bottom: env(safe-area-inset-bottom);
+            color: var(--text-dark);
+            line-height: 1.6;
         }
 
-        /* Smooth scrolling for iOS */
-        html {
-            -webkit-text-size-adjust: 100%;
-            scroll-behavior: smooth;
+        /* Progress Bar */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.5);
+            z-index: 100;
         }
 
-        .glass-card {
-            background: rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        .progress-bar {
+            height: 100%;
+            background: var(--farm-green);
+            transition: width 0.3s ease;
         }
 
-        .glass-card-solid {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+        /* Survey Container */
+        .survey-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Yes/Somewhat/No Buttons */
-        .rating-btn {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 2px solid transparent;
+        /* Survey Screen */
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex: 1;
+            padding: 40px 20px;
+            animation: fadeIn 0.3s ease;
         }
 
-        .rating-btn:hover {
-            transform: scale(1.05);
+        .screen.active {
+            display: flex;
         }
 
-        .rating-btn:active {
-            transform: scale(0.98);
-        }
-
-        .rating-btn.yes {
-            background: rgba(34, 197, 94, 0.2);
-            border-color: rgba(34, 197, 94, 0.4);
-            color: #86efac;
-        }
-
-        .rating-btn.yes.selected {
-            background: #22c55e;
-            border-color: #22c55e;
-            color: white;
-            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.5);
-        }
-
-        .rating-btn.somewhat {
-            background: rgba(251, 191, 36, 0.2);
-            border-color: rgba(251, 191, 36, 0.4);
-            color: #fde047;
-        }
-
-        .rating-btn.somewhat.selected {
-            background: #f59e0b;
-            border-color: #f59e0b;
-            color: white;
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.5);
-        }
-
-        .rating-btn.no {
-            background: rgba(239, 68, 68, 0.2);
-            border-color: rgba(239, 68, 68, 0.4);
-            color: #fca5a5;
-        }
-
-        .rating-btn.no.selected {
-            background: #ef4444;
-            border-color: #ef4444;
-            color: white;
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.5);
-        }
-
-        /* Role buttons */
-        .role-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.2s;
-        }
-
-        .role-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-
-        .role-btn.selected {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-            border-color: #22c55e;
-            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.5);
-        }
-
-        /* Submit button */
-        .btn-submit {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
-        }
-
-        .btn-submit:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Photo upload */
-        .photo-upload {
-            border: 3px dashed rgba(255, 255, 255, 0.3);
-            background: rgba(255, 255, 255, 0.05);
-            transition: all 0.3s;
-        }
-
-        .photo-upload:hover {
-            border-color: rgba(255, 255, 255, 0.5);
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .photo-upload.has-image {
-            border-style: solid;
-            border-color: #22c55e;
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
+        @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(10px);
             }
 
             to {
@@ -211,788 +91,644 @@
             }
         }
 
-        @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-8px);
-            }
+        /* Typography */
+        h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--farm-dark);
+            margin-bottom: 1rem;
         }
 
-        .animate-fade-in {
-            animation: fadeInUp 0.5s ease-out;
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
         }
 
-        .animate-float {
-            animation: float 3s ease-in-out infinite;
+        .subtitle {
+            font-size: 1.1rem;
+            color: #6b7280;
+            margin-bottom: 2rem;
         }
 
-        .step {
-            display: none;
+        /* Emoji Scale */
+        .emoji-scale {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
         }
 
-        .step.active {
-            display: block;
-            animation: fadeInUp 0.4s ease-out;
-        }
-
-        /* Progress */
-        .progress-dot {
-            width: 10px;
-            height: 10px;
+        .emoji-btn {
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transition: all 0.3s;
+            border: 3px solid #e5e7eb;
+            background: white;
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .progress-dot.active {
-            background: #22c55e;
-            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+        .emoji-btn:hover,
+        .emoji-btn:focus {
+            transform: scale(1.1);
+            border-color: var(--farm-green);
+            box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3);
         }
 
-        .progress-dot.completed {
-            background: #fde047;
+        .emoji-btn.selected {
+            border-color: var(--farm-green);
+            background: #dcfce7;
+            transform: scale(1.15);
         }
 
-        /* Checkboxes */
-        .checkbox-item {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.2s;
+        .emoji-btn:focus {
+            outline: 3px solid var(--farm-green);
+            outline-offset: 2px;
         }
 
-        .checkbox-item:hover {
-            background: rgba(255, 255, 255, 0.15);
+        /* Program Buttons */
+        .program-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            width: 100%;
+            max-width: 400px;
         }
 
-        .checkbox-item.selected {
-            background: rgba(34, 197, 94, 0.3);
+        .program-btn {
+            padding: 18px 24px;
+            border-radius: 16px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .program-btn:hover,
+        .program-btn:focus {
+            border-color: var(--farm-green);
+            background: #f0fdf4;
+        }
+
+        .program-btn.selected {
+            border-color: var(--farm-green);
+            background: #dcfce7;
+        }
+
+        .program-btn:focus {
+            outline: 3px solid var(--farm-green);
+            outline-offset: 2px;
+        }
+
+        /* NPS Buttons */
+        .nps-group {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nps-btn {
+            padding: 20px 32px;
+            border-radius: 16px;
+            border: 3px solid #e5e7eb;
+            background: white;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nps-btn.no {
+            color: #ef4444;
+        }
+
+        .nps-btn.maybe {
+            color: #f59e0b;
+        }
+
+        .nps-btn.yes {
+            color: #22c55e;
+        }
+
+        .nps-btn:hover,
+        .nps-btn:focus {
+            transform: scale(1.05);
+        }
+
+        .nps-btn.selected {
+            transform: scale(1.1);
+        }
+
+        .nps-btn.no.selected {
+            background: #fef2f2;
+            border-color: #ef4444;
+        }
+
+        .nps-btn.maybe.selected {
+            background: #fffbeb;
+            border-color: #f59e0b;
+        }
+
+        .nps-btn.yes.selected {
+            background: #f0fdf4;
             border-color: #22c55e;
         }
 
-        /* Confetti */
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            pointer-events: none;
-            z-index: 1000;
+        /* Referral Grid */
+        .referral-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+            max-width: 400px;
         }
 
-        /* Leaf bg */
-        .leaf-bg {
-            position: fixed;
-            opacity: 0.08;
-            pointer-events: none;
-            z-index: 0;
+        /* Text Input */
+        .text-input {
+            width: 100%;
+            max-width: 400px;
+            padding: 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            font-size: 1rem;
+            font-family: inherit;
+            min-height: 120px;
+            resize: vertical;
         }
 
-        /* Form elements */
-        select,
-        input,
-        textarea {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .text-input:focus {
+            outline: none;
+            border-color: var(--farm-green);
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+        }
+
+        /* Navigation */
+        .nav-buttons {
+            display: flex;
+            gap: 16px;
+            margin-top: 40px;
+            width: 100%;
+            max-width: 400px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            min-width: 140px;
+        }
+
+        .btn-primary {
+            background: var(--farm-green);
             color: white;
-            /* Prevent zooming on iOS input focus */
-            font-size: 16px !important;
         }
 
-        select option {
-            background: #166534;
-            color: white;
+        .btn-primary:hover {
+            background: var(--farm-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4);
         }
 
-        .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-top: 3px solid white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
+        .btn-secondary {
+            background: white;
+            color: var(--text-dark);
+            border: 2px solid #e5e7eb;
         }
 
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
+        .btn-secondary:hover {
+            background: #f9fafb;
+        }
 
-            100% {
-                transform: rotate(360deg);
-            }
+        .btn:focus {
+            outline: 3px solid var(--farm-green);
+            outline-offset: 2px;
+        }
+
+        /* Skip Link */
+        .skip-link {
+            color: #9ca3af;
+            font-size: 0.9rem;
+            margin-top: 16px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .skip-link:hover {
+            color: #6b7280;
+        }
+
+        /* Thank You */
+        .thank-you-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Accessibility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        /* Error Message */
+        .error-msg {
+            color: #ef4444;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .error-msg.show {
+            display: block;
         }
     </style>
 </head>
 
-<body class="min-h-screen">
-    <!-- Decorative -->
-    <div class="leaf-bg top-10 left-5 text-5xl animate-float">🌿</div>
-    <div class="leaf-bg top-32 right-8 text-4xl animate-float" style="animation-delay:1s">🍃</div>
-    <div class="leaf-bg bottom-20 left-10 text-4xl animate-float" style="animation-delay:0.5s">🌱</div>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-container" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+    </div>
 
-    <div class="relative min-h-screen flex flex-col items-center justify-start px-4 py-6 z-10">
-        <!-- Header -->
-        <header class="text-center mb-6 animate-fade-in">
-            <img src="logo.png" alt="Empowerment Farm" class="h-24 mx-auto mb-3 drop-shadow-lg">
-            <h1 class="font-serif text-2xl md:text-3xl font-bold text-white mb-1">Empowerment Farm</h1>
-            <p class="text-farm-200 text-sm">Share Your Experience</p>
-        </header>
-
-        <!-- Progress -->
-        <div class="flex gap-2 mb-6" id="progressDots">
-            <div class="progress-dot active" data-step="1"></div>
-            <div class="progress-dot" data-step="2"></div>
-            <div class="progress-dot" data-step="3"></div>
-            <div class="progress-dot" data-step="4"></div>
-            <div class="progress-dot" data-step="5"></div>
+    <div class="survey-container">
+        <!-- Screen 1: Welcome -->
+        <div class="screen active" id="screen1" data-step="1">
+            <div class="thank-you-icon">🌻</div>
+            <h1>Welcome to Empowerment Farm!</h1>
+            <p class="subtitle">Thanks for visiting today.<br>This quick survey helps us improve.<br><strong>Takes about
+                    2 minutes.</strong></p>
+            <div class="nav-buttons">
+                <button class="btn btn-primary" onclick="nextScreen()" aria-label="Start the survey">Start Survey
+                    →</button>
+            </div>
         </div>
 
-        <main class="w-full max-w-md">
+        <!-- Screen 2: Program Selection -->
+        <div class="screen" id="screen2" data-step="2">
+            <h2>What did you do today?</h2>
+            <div class="program-grid" role="radiogroup" aria-label="Select your program">
+                <button class="program-btn" data-value="Cow Yoga" onclick="selectProgram(this)" role="radio"
+                    aria-checked="false">🐄 Cow Yoga</button>
+                <button class="program-btn" data-value="Yoga with the Animals" onclick="selectProgram(this)"
+                    role="radio" aria-checked="false">🧘 Yoga with the Animals</button>
+                <button class="program-btn" data-value="Seedlings for Spring" onclick="selectProgram(this)" role="radio"
+                    aria-checked="false">🌱 Seedlings for Spring</button>
+                <button class="program-btn" data-value="Open Farm (Second Saturdays)" onclick="selectProgram(this)"
+                    role="radio" aria-checked="false">🌾 Open Farm Day</button>
+                <button class="program-btn" data-value="Tuesday Night Tuck-In" onclick="selectProgram(this)"
+                    role="radio" aria-checked="false">🐓 Tuesday Tuck-In</button>
+                <button class="program-btn" data-value="JusTeenys Greenies" onclick="selectProgram(this)" role="radio"
+                    aria-checked="false">👶 JusTeenys Greenies</button>
+            </div>
+            <p class="skip-link" tabindex="0" onclick="nextScreen()" onkeypress="if(event.key==='Enter')nextScreen()">
+                Skip this question</p>
+        </div>
 
-            <!-- STEP 1: Experience & Demographics -->
-            <section id="step1" class="step active">
-                <div class="glass-card rounded-2xl p-5">
-                    <h2 class="font-serif text-xl text-white text-center mb-4">Welcome! 👋</h2>
+        <!-- Screen 3: Mood Before -->
+        <div class="screen" id="screen3" data-step="3">
+            <h2>How did you feel <strong>BEFORE</strong> your visit?</h2>
+            <p class="subtitle">Tap the face that matches</p>
+            <div class="emoji-scale" role="radiogroup" aria-label="Rate your mood before visiting">
+                <button class="emoji-btn" data-value="1" onclick="selectMood(this, 'before')" role="radio"
+                    aria-checked="false" aria-label="Very stressed">😢</button>
+                <button class="emoji-btn" data-value="2" onclick="selectMood(this, 'before')" role="radio"
+                    aria-checked="false" aria-label="A bit stressed">😕</button>
+                <button class="emoji-btn" data-value="3" onclick="selectMood(this, 'before')" role="radio"
+                    aria-checked="false" aria-label="Okay">😐</button>
+                <button class="emoji-btn" data-value="4" onclick="selectMood(this, 'before')" role="radio"
+                    aria-checked="false" aria-label="Good">🙂</button>
+                <button class="emoji-btn" data-value="5" onclick="selectMood(this, 'before')" role="radio"
+                    aria-checked="false" aria-label="Great">😄</button>
+            </div>
+            <p class="skip-link" tabindex="0" onclick="nextScreen()" onkeypress="if(event.key==='Enter')nextScreen()">
+                Skip this question</p>
+        </div>
 
-                    <!-- Experience Type -->
-                    <div class="mb-4">
-                        <label class="text-farm-200 text-sm mb-2 block">What was your experience? *</label>
-                        <select id="experienceType"
-                            class="w-full p-3 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-farm-400">
-                            <option value="">Select experience...</option>
-                            <option value="Open Farm (Second Saturdays)">Open Farm (Second Saturdays)</option>
-                            <option value="Cow Yoga">Cow Yoga</option>
-                            <option value="Yoga with the Animals">Yoga with the Animals</option>
-                            <option value="Tuesday Night Tuck-In">Tuesday Night Tuck-In</option>
-                            <option value="Paint & Pollinators">Paint & Pollinators</option>
-                            <option value="Seedlings for Spring">Seedlings for Spring</option>
-                            <option value="Better Together - Hugging Can Planters">Better Together - Hugging Can
-                                Planters</option>
-                            <option value="Sweethearts and Songbirds">Sweethearts and Songbirds</option>
-                            <option value="JusTeenys Greenies">JusTeeny's Greenies</option>
-                            <option value="Educational Field Trips">Educational Field Trips</option>
-                            <option value="Group & Partner Programs">Group & Partner Programs</option>
-                            <option value="Farms Without Fences (Off-Site)">Farms Without Fences (Off-Site)</option>
-                        </select>
-                    </div>
+        <!-- Screen 4: Mood After -->
+        <div class="screen" id="screen4" data-step="4">
+            <h2>How do you feel <strong>NOW</strong>?</h2>
+            <p class="subtitle">Tap the face that matches</p>
+            <div class="emoji-scale" role="radiogroup" aria-label="Rate your mood after visiting">
+                <button class="emoji-btn" data-value="1" onclick="selectMood(this, 'after')" role="radio"
+                    aria-checked="false" aria-label="Very stressed">😢</button>
+                <button class="emoji-btn" data-value="2" onclick="selectMood(this, 'after')" role="radio"
+                    aria-checked="false" aria-label="A bit stressed">😕</button>
+                <button class="emoji-btn" data-value="3" onclick="selectMood(this, 'after')" role="radio"
+                    aria-checked="false" aria-label="Okay">😐</button>
+                <button class="emoji-btn" data-value="4" onclick="selectMood(this, 'after')" role="radio"
+                    aria-checked="false" aria-label="Good">🙂</button>
+                <button class="emoji-btn" data-value="5" onclick="selectMood(this, 'after')" role="radio"
+                    aria-checked="false" aria-label="Great">😄</button>
+            </div>
+            <p class="skip-link" tabindex="0" onclick="nextScreen()" onkeypress="if(event.key==='Enter')nextScreen()">
+                Skip this question</p>
+        </div>
 
-                    <!-- Age Range -->
-                    <div class="mb-4">
-                        <label class="text-farm-200 text-sm mb-2 block">Age Range *</label>
-                        <select id="ageRange"
-                            class="w-full p-3 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-farm-400">
-                            <option value="">Select age range...</option>
-                            <option value="0-17">0-17</option>
-                            <option value="18-25">18-25</option>
-                            <option value="26-40">26-40</option>
-                            <option value="41-60">41-60</option>
-                            <option value="61+">61+</option>
-                        </select>
-                    </div>
+        <!-- Screen 5: Nature Connection -->
+        <div class="screen" id="screen5" data-step="5">
+            <h2>Did you feel connected to nature or animals?</h2>
+            <div class="emoji-scale" role="radiogroup" aria-label="Rate your connection to nature">
+                <button class="emoji-btn" data-value="1" onclick="selectConnection(this)" role="radio"
+                    aria-checked="false" aria-label="Not really">💔</button>
+                <button class="emoji-btn" data-value="2" onclick="selectConnection(this)" role="radio"
+                    aria-checked="false" aria-label="A little">💛</button>
+                <button class="emoji-btn" data-value="3" onclick="selectConnection(this)" role="radio"
+                    aria-checked="false" aria-label="Yes">💚</button>
+                <button class="emoji-btn" data-value="4" onclick="selectConnection(this)" role="radio"
+                    aria-checked="false" aria-label="Very much">💚</button>
+            </div>
+            <p class="skip-link" tabindex="0" onclick="nextScreen()" onkeypress="if(event.key==='Enter')nextScreen()">
+                Skip this question</p>
+        </div>
 
-                    <!-- Role -->
-                    <div class="mb-4">
-                        <label class="text-farm-200 text-sm mb-2 block">I am a... *</label>
-                        <div class="grid grid-cols-3 gap-2">
-                            <button type="button" onclick="selectRole('Visitor')" data-role="Visitor"
-                                class="role-btn py-3 rounded-xl text-white text-sm font-medium">
-                                🌻 Visitor
-                            </button>
-                            <button type="button" onclick="selectRole('Student')" data-role="Student"
-                                class="role-btn py-3 rounded-xl text-white text-sm font-medium">
-                                📚 Student
-                            </button>
-                            <button type="button" onclick="selectRole('Volunteer')" data-role="Volunteer"
-                                class="role-btn py-3 rounded-xl text-white text-sm font-medium">
-                                🤝 Volunteer
-                            </button>
-                        </div>
-                    </div>
+        <!-- Screen 6: Would Recommend (NPS) -->
+        <div class="screen" id="screen6" data-step="6">
+            <h2>Would you tell a friend about us?</h2>
+            <div class="nps-group" role="radiogroup" aria-label="Would you recommend us">
+                <button class="nps-btn no" data-value="no" onclick="selectNPS(this)" role="radio"
+                    aria-checked="false">👎 No</button>
+                <button class="nps-btn maybe" data-value="maybe" onclick="selectNPS(this)" role="radio"
+                    aria-checked="false">🤷 Maybe</button>
+                <button class="nps-btn yes" data-value="yes" onclick="selectNPS(this)" role="radio"
+                    aria-checked="false">👍 Yes!</button>
+            </div>
+            <p class="skip-link" tabindex="0" onclick="nextScreen()" onkeypress="if(event.key==='Enter')nextScreen()">
+                Skip this question</p>
+        </div>
 
-                    <button onclick="nextStep(2)" id="step1Next"
-                        class="w-full py-3 rounded-xl btn-submit text-white font-medium mt-4" disabled>
-                        Continue →
-                    </button>
-                </div>
-            </section>
+        <!-- Screen 7: Referral Source -->
+        <div class="screen" id="screen7" data-step="7">
+            <h2>How did you hear about us?</h2>
+            <div class="referral-grid" role="radiogroup" aria-label="How did you find us">
+                <button class="program-btn" data-value="Friends/Family" onclick="selectReferral(this)" role="radio"
+                    aria-checked="false">👨‍👩‍👧 Friends</button>
+                <button class="program-btn" data-value="Social Media" onclick="selectReferral(this)" role="radio"
+                    aria-checked="false">📱 Social Media</button>
+                <button class="program-btn" data-value="Google Search" onclick="selectReferral(this)" role="radio"
+                    aria-checked="false">🔍 Google</button>
+                <button class="program-btn" data-value="Event/Fair" onclick="selectReferral(this)" role="radio"
+                    aria-checked="false">🎪 Event/Fair</button>
+                <button class="program-btn" data-value="School/Therapist" onclick="selectReferral(this)" role="radio"
+                    aria-checked="false">🏫 School</button>
+                <button class="program-btn" data-value="Other" onclick="selectReferral(this)" role="radio"
+                    aria-checked="false">💬 Other</button>
+            </div>
+            <p class="skip-link" tabindex="0" onclick="nextScreen()" onkeypress="if(event.key==='Enter')nextScreen()">
+                Skip this question</p>
+        </div>
 
-            <!-- STEP 2: Yes/Somewhat/No Matrix -->
-            <section id="step2" class="step">
-                <div class="glass-card rounded-2xl p-5">
-                    <h2 class="font-serif text-xl text-white text-center mb-4">During Your Experience... 🌿</h2>
+        <!-- Screen 8: Age Range -->
+        <div class="screen" id="screen8" data-step="8">
+            <h2>What's your age range?</h2>
+            <p class="subtitle">This helps us understand who we're reaching</p>
+            <div class="program-grid" role="radiogroup" aria-label="Select your age range">
+                <button class="program-btn" data-value="0-17" onclick="selectAge(this)" role="radio"
+                    aria-checked="false">👧 Under 18</button>
+                <button class="program-btn" data-value="18-25" onclick="selectAge(this)" role="radio"
+                    aria-checked="false">🧑 18-25</button>
+                <button class="program-btn" data-value="26-40" onclick="selectAge(this)" role="radio"
+                    aria-checked="false">👨 26-40</button>
+                <button class="program-btn" data-value="41-60" onclick="selectAge(this)" role="radio"
+                    aria-checked="false">🧔 41-60</button>
+                <button class="program-btn" data-value="61+" onclick="selectAge(this)" role="radio"
+                    aria-checked="false">👴 61+</button>
+            </div>
+            <p class="skip-link" tabindex="0" onclick="nextScreen()" onkeypress="if(event.key==='Enter')nextScreen()">
+                Skip this question</p>
+        </div>
 
-                    <!-- Q1: Present & Engaged -->
-                    <div class="mb-5">
-                        <p class="text-white text-sm mb-2">Did you feel present and engaged?</p>
-                        <div class="grid grid-cols-3 gap-2">
-                            <button type="button" onclick="setRating('presence', 3)" data-q="presence" data-v="3"
-                                class="rating-btn yes py-3 rounded-xl font-medium">Yes</button>
-                            <button type="button" onclick="setRating('presence', 2)" data-q="presence" data-v="2"
-                                class="rating-btn somewhat py-3 rounded-xl font-medium">Somewhat</button>
-                            <button type="button" onclick="setRating('presence', 1)" data-q="presence" data-v="1"
-                                class="rating-btn no py-3 rounded-xl font-medium">No</button>
-                        </div>
-                    </div>
+        <!-- Screen 9: Standout Moment -->
+        <div class="screen" id="screen9" data-step="9">
+            <h2>What was your favorite part?</h2>
+            <p class="subtitle">Optional - share a special moment</p>
+            <textarea class="text-input" id="standoutMoment" placeholder="Example: Meeting the baby goats was magical!"
+                aria-label="Describe your favorite moment"></textarea>
+            <div class="nav-buttons">
+                <button class="btn btn-primary" onclick="submitSurvey()" aria-label="Submit the survey">Submit
+                    🌻</button>
+            </div>
+            <p class="skip-link" tabindex="0" onclick="submitSurvey()"
+                onkeypress="if(event.key==='Enter')submitSurvey()">Skip and submit</p>
+            <p id="errorMsg" class="error-msg">Something went wrong. Please try again.</p>
+        </div>
 
-                    <!-- Q2: Connected to Others -->
-                    <div class="mb-5">
-                        <p class="text-white text-sm mb-2">More connected to others (family, peers, staff)?</p>
-                        <div class="grid grid-cols-3 gap-2">
-                            <button type="button" onclick="setRating('people', 3)" data-q="people" data-v="3"
-                                class="rating-btn yes py-3 rounded-xl font-medium">Yes</button>
-                            <button type="button" onclick="setRating('people', 2)" data-q="people" data-v="2"
-                                class="rating-btn somewhat py-3 rounded-xl font-medium">Somewhat</button>
-                            <button type="button" onclick="setRating('people', 1)" data-q="people" data-v="1"
-                                class="rating-btn no py-3 rounded-xl font-medium">No</button>
-                        </div>
-                    </div>
-
-                    <!-- Q3: Connected to Nature -->
-                    <div class="mb-5">
-                        <p class="text-white text-sm mb-2">More connected to animals, nature, or environment?</p>
-                        <div class="grid grid-cols-3 gap-2">
-                            <button type="button" onclick="setRating('nature', 3)" data-q="nature" data-v="3"
-                                class="rating-btn yes py-3 rounded-xl font-medium">Yes</button>
-                            <button type="button" onclick="setRating('nature', 2)" data-q="nature" data-v="2"
-                                class="rating-btn somewhat py-3 rounded-xl font-medium">Somewhat</button>
-                            <button type="button" onclick="setRating('nature', 1)" data-q="nature" data-v="1"
-                                class="rating-btn no py-3 rounded-xl font-medium">No</button>
-                        </div>
-                    </div>
-
-                    <!-- Q4: Calmer -->
-                    <div class="mb-5">
-                        <p class="text-white text-sm mb-2">Feel calmer, more grounded, or less stressed?</p>
-                        <div class="grid grid-cols-3 gap-2">
-                            <button type="button" onclick="setRating('calm', 3)" data-q="calm" data-v="3"
-                                class="rating-btn yes py-3 rounded-xl font-medium">Yes</button>
-                            <button type="button" onclick="setRating('calm', 2)" data-q="calm" data-v="2"
-                                class="rating-btn somewhat py-3 rounded-xl font-medium">Somewhat</button>
-                            <button type="button" onclick="setRating('calm', 1)" data-q="calm" data-v="1"
-                                class="rating-btn no py-3 rounded-xl font-medium">No</button>
-                        </div>
-                    </div>
-
-                    <div class="flex gap-2">
-                        <button onclick="prevStep(1)"
-                            class="flex-1 py-3 rounded-xl bg-white/10 text-white font-medium">← Back</button>
-                        <button onclick="nextStep(3)" id="step2Next"
-                            class="flex-1 py-3 rounded-xl btn-submit text-white font-medium" disabled>Next →</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- STEP 3: More Matrix + Referral -->
-            <section id="step3" class="step">
-                <div class="glass-card rounded-2xl p-5">
-                    <h2 class="font-serif text-xl text-white text-center mb-4">Almost Done! 🌟</h2>
-
-                    <!-- Q5: Learning Intent -->
-                    <div class="mb-5">
-                        <p class="text-white text-sm mb-2">Will you use something you learned today?</p>
-                        <div class="grid grid-cols-3 gap-2">
-                            <button type="button" onclick="setRating('intent', 3)" data-q="intent" data-v="3"
-                                class="rating-btn yes py-3 rounded-xl font-medium">Yes</button>
-                            <button type="button" onclick="setRating('intent', 2)" data-q="intent" data-v="2"
-                                class="rating-btn somewhat py-3 rounded-xl font-medium">Somewhat</button>
-                            <button type="button" onclick="setRating('intent', 1)" data-q="intent" data-v="1"
-                                class="rating-btn no py-3 rounded-xl font-medium">No</button>
-                        </div>
-                    </div>
-
-                    <!-- Q6: Community Benefit -->
-                    <div class="mb-5">
-                        <p class="text-white text-sm mb-2">Would the community benefit from more programs like this?</p>
-                        <div class="grid grid-cols-3 gap-2">
-                            <button type="button" onclick="setRating('community', 3)" data-q="community" data-v="3"
-                                class="rating-btn yes py-3 rounded-xl font-medium">Yes</button>
-                            <button type="button" onclick="setRating('community', 2)" data-q="community" data-v="2"
-                                class="rating-btn somewhat py-3 rounded-xl font-medium">Somewhat</button>
-                            <button type="button" onclick="setRating('community', 1)" data-q="community" data-v="1"
-                                class="rating-btn no py-3 rounded-xl font-medium">No</button>
-                        </div>
-                    </div>
-
-                    <!-- Referral Source -->
-                    <div class="mb-4">
-                        <p class="text-white text-sm mb-2">How did you hear about us?</p>
-                        <div class="grid grid-cols-2 gap-2 text-sm">
-                            <button type="button" onclick="toggleReferral('Word of Mouth')" data-ref="Word of Mouth"
-                                class="checkbox-item py-2 px-3 rounded-lg text-white text-left">Word of Mouth</button>
-                            <button type="button" onclick="toggleReferral('Social Media')" data-ref="Social Media"
-                                class="checkbox-item py-2 px-3 rounded-lg text-white text-left">Social Media</button>
-                            <button type="button" onclick="toggleReferral('Google Search')" data-ref="Google Search"
-                                class="checkbox-item py-2 px-3 rounded-lg text-white text-left">Google Search</button>
-                            <button type="button" onclick="toggleReferral('Friend/Family')" data-ref="Friend/Family"
-                                class="checkbox-item py-2 px-3 rounded-lg text-white text-left">Friend/Family</button>
-                            <button type="button" onclick="toggleReferral('School')" data-ref="School"
-                                class="checkbox-item py-2 px-3 rounded-lg text-white text-left">School</button>
-                            <button type="button" onclick="toggleReferral('Newsletter')" data-ref="Newsletter"
-                                class="checkbox-item py-2 px-3 rounded-lg text-white text-left">Newsletter</button>
-                            <button type="button" onclick="toggleReferral('Flyer/Poster')" data-ref="Flyer/Poster"
-                                class="checkbox-item py-2 px-3 rounded-lg text-white text-left">Flyer/Poster</button>
-                            <button type="button" onclick="toggleReferral('Drove By')" data-ref="Drove By"
-                                class="checkbox-item py-2 px-3 rounded-lg text-white text-left">Drove By</button>
-                        </div>
-                    </div>
-
-                    <div class="flex gap-2">
-                        <button onclick="prevStep(2)"
-                            class="flex-1 py-3 rounded-xl bg-white/10 text-white font-medium">← Back</button>
-                        <button onclick="nextStep(4)" id="step3Next"
-                            class="flex-1 py-3 rounded-xl btn-submit text-white font-medium" disabled>Next →</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- STEP 4: Photo & Feedback -->
-            <section id="step4" class="step">
-                <div class="glass-card rounded-2xl p-5">
-                    <h2 class="font-serif text-xl text-white text-center mb-4">Capture Your Moment 📸</h2>
-
-                    <!-- Photo Upload -->
-                    <div class="photo-upload rounded-xl p-4 mb-4 text-center relative" id="photoArea">
-                        <input type="file" accept="image/*" capture="environment" id="photoInput"
-                            onchange="handlePhoto(event)" class="absolute inset-0 opacity-0 cursor-pointer">
-                        <div id="photoPlaceholder">
-                            <div class="text-4xl mb-2">📷</div>
-                            <p class="text-white text-sm font-medium">Tap to Capture (Optional)</p>
-                            <p class="text-farm-200 text-xs">A goat, plant, or peaceful scene</p>
-                        </div>
-                        <div id="photoPreview" class="hidden">
-                            <img id="previewImg" class="max-h-40 mx-auto rounded-lg mb-2">
-                            <button type="button" onclick="removePhoto()"
-                                class="text-farm-200 text-xs underline">Remove</button>
-                        </div>
-                    </div>
-
-                    <!-- Standout Moment -->
-                    <div class="mb-4">
-                        <label class="text-farm-200 text-sm mb-1 block">One moment that stood out?</label>
-                        <textarea id="standoutMoment" rows="2" placeholder="What made you feel connected?"
-                            class="w-full p-3 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-farm-400"></textarea>
-                    </div>
-
-                    <!-- Additional Feedback -->
-                    <div class="mb-4">
-                        <label class="text-farm-200 text-sm mb-1 block">Additional feedback?</label>
-                        <textarea id="additionalFeedback" rows="2" placeholder="Optional..."
-                            class="w-full p-3 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-farm-400"></textarea>
-                    </div>
-
-                    <div class="flex gap-2">
-                        <button onclick="prevStep(3)"
-                            class="flex-1 py-3 rounded-xl bg-white/10 text-white font-medium">← Back</button>
-                        <button onclick="nextStep(5)"
-                            class="flex-1 py-3 rounded-xl btn-submit text-white font-medium">Next →</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- STEP 5: Final Questions & Submit -->
-            <section id="step5" class="step">
-                <div class="glass-card rounded-2xl p-5">
-                    <h2 class="font-serif text-xl text-white text-center mb-4">Final Step! ✨</h2>
-
-                    <!-- Would Recommend -->
-                    <div class="mb-4">
-                        <p class="text-white text-sm mb-2">Would you recommend Empowerment Farm? *</p>
-                        <div class="grid grid-cols-2 gap-3">
-                            <button type="button" onclick="setRecommend(true)" id="recYes"
-                                class="rating-btn yes py-3 rounded-xl font-medium">👍 Yes!</button>
-                            <button type="button" onclick="setRecommend(false)" id="recNo"
-                                class="rating-btn no py-3 rounded-xl font-medium">👎 Not yet</button>
-                        </div>
-                    </div>
-
-                    <!-- Willing to Review -->
-                    <div class="mb-4">
-                        <label class="flex items-center gap-3 text-white text-sm cursor-pointer">
-                            <input type="checkbox" id="willingReview" class="w-5 h-5 rounded accent-farm-500">
-                            <span>I'm willing to leave a Google Review</span>
-                        </label>
-                    </div>
-
-                    <!-- Optional Name/Email -->
-                    <div class="mb-3">
-                        <input type="text" id="participantName" placeholder="Name (optional)"
-                            class="w-full p-3 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-farm-400">
-                    </div>
-                    <div class="mb-4">
-                        <input type="email" id="participantEmail" placeholder="Email (optional)"
-                            class="w-full p-3 rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-farm-400">
-                    </div>
-
-                    <div class="flex gap-2">
-                        <button onclick="prevStep(4)"
-                            class="flex-1 py-3 rounded-xl bg-white/10 text-white font-medium">← Back</button>
-                        <button onclick="submitSurvey()" id="submitBtn"
-                            class="flex-1 py-3 rounded-xl btn-submit text-white font-medium flex items-center justify-center gap-2"
-                            disabled>
-                            <span>Submit</span><span>🌟</span>
-                        </button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- SUCCESS -->
-            <section id="successState" class="step">
-                <div class="glass-card-solid rounded-2xl p-6 text-center">
-                    <div class="text-6xl mb-4 animate-float">🌟</div>
-                    <h2 class="font-serif text-2xl text-farm-800 mb-2">Thank You!</h2>
-                    <p class="text-farm-600 mb-4">Your feedback helps us grow our community.</p>
-                    <div class="bg-farm-50 rounded-xl p-3 mb-4">
-                        <p class="text-farm-700 text-sm italic">"Labels stop at the gate."</p>
-                        <p class="text-farm-500 text-xs">— Tiffany Lehman</p>
-                    </div>
-
-                    <!-- Action Links -->
-                    <div class="grid grid-cols-2 gap-2 mb-4">
-                        <a href="https://form.jotform.com/EFForms/general-inquiry-contact-form" target="_blank"
-                            class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-farm-100 hover:bg-farm-200 text-farm-700 text-sm font-medium transition-colors">
-                            🤝 Volunteer
-                        </a>
-                        <a href="https://empowerment-farm.givecloud.co/fundraising/forms/G2EXWJD6" target="_blank"
-                            class="flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-farm-100 hover:bg-farm-200 text-farm-700 text-sm font-medium transition-colors">
-                            💚 Donate
-                        </a>
-                    </div>
-                    <a href="tel:239-330-2777"
-                        class="block w-full py-2 text-farm-500 text-xs hover:text-farm-700 transition-colors mb-4">
-                        📞 Emergency: <span class="underline">239-330-2777</span>
-                    </a>
-
-                    <button onclick="resetForm()" class="w-full py-3 rounded-xl btn-submit text-white font-medium">Start
-                        New Survey</button>
-                </div>
-            </section>
-        </main>
-
-        <footer class="mt-6 text-center text-farm-300 text-xs">
-            <p>© 2025 Empowerment Farm • Naples, FL</p>
-        </footer>
+        <!-- Screen 10: Thank You -->
+        <div class="screen" id="screen10" data-step="10">
+            <div class="thank-you-icon">🌻</div>
+            <h1>Thank You!</h1>
+            <p class="subtitle">Your feedback helps us grow.<br>We hope to see you again soon!</p>
+            <div class="nav-buttons">
+                <a href="https://empowermentfarm.org" class="btn btn-primary" aria-label="Visit website">Visit Our
+                    Website</a>
+            </div>
+        </div>
     </div>
 
     <script>
         // ============================================
-        // SUPABASE CONFIG (Via Netlify Secrets)
+        // SURVEY STATE
         // ============================================
+        let currentScreen = 1;
+        const totalScreens = 10;
+        const surveyData = {
+            program_name: null,
+            mood_before: null,
+            mood_after: null,
+            nature_connection: null,
+            would_recommend: null,
+            referral_source: null,
+            age_range: null,
+            standout_moment: null
+        };
+
         let supabaseClient = null;
 
+        // ============================================
+        // INIT SUPABASE
+        // ============================================
         async function initSupabase() {
             try {
                 const response = await fetch('/api/get_config');
                 if (response.ok) {
                     const config = await response.json();
-                    if (config.SUPABASE_URL && config.ANON_KEY && typeof window.supabase !== 'undefined') {
+                    if (config.SUPABASE_URL && config.ANON_KEY) {
                         supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.ANON_KEY);
-                        console.log('✅ Supabase connected via Netlify');
+                        console.log('✅ Supabase connected');
                     }
-                } else {
-                    console.warn('⚠️ Could not fetch config (running locally?)');
                 }
             } catch (err) {
-                console.error('⚠️ Supabase init error:', err);
+                console.error('Supabase init error:', err);
             }
-        }
-
-        initSupabase();
-
-        // ============================================
-        // STATE
-        // ============================================
-        const state = {
-            experienceType: '',
-            ageRange: '',
-            role: '',
-            presence: 0,
-            people: 0,
-            nature: 0,
-            calm: 0,
-            intent: 0,
-            community: 0,
-            referrals: [],
-            standoutMoment: '',
-            additionalFeedback: '',
-            wouldRecommend: null,
-            willingReview: false,
-            name: '',
-            email: '',
-            photoFile: null,
-            photoUrl: null
-        };
-
-        // ============================================
-        // IMAGE COMPRESSION (< 200KB)
-        // ============================================
-        async function compressImage(file, maxSizeKB = 200) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-
-                        // Scale down if too large
-                        const maxDim = 1200;
-                        if (width > maxDim || height > maxDim) {
-                            if (width > height) {
-                                height = (height / width) * maxDim;
-                                width = maxDim;
-                            } else {
-                                width = (width / height) * maxDim;
-                                height = maxDim;
-                            }
-                        }
-
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-
-                        // Start at high quality, reduce until under target
-                        let quality = 0.8;
-                        let dataUrl = canvas.toDataURL('image/jpeg', quality);
-
-                        while (dataUrl.length > maxSizeKB * 1024 * 1.37 && quality > 0.1) {
-                            quality -= 0.1;
-                            dataUrl = canvas.toDataURL('image/jpeg', quality);
-                        }
-
-                        // Convert to Blob
-                        fetch(dataUrl)
-                            .then(res => res.blob())
-                            .then(blob => {
-                                const compressedFile = new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), { type: 'image/jpeg' });
-                                console.log(`Compressed: ${(file.size / 1024).toFixed(1)}KB → ${(compressedFile.size / 1024).toFixed(1)}KB`);
-                                resolve({ file: compressedFile, dataUrl });
-                            });
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
         }
 
         // ============================================
         // NAVIGATION
         // ============================================
-        function nextStep(step) {
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            document.getElementById(`step${step}`).classList.add('active');
-            updateProgress(step);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        function updateProgress() {
+            const progress = ((currentScreen - 1) / (totalScreens - 2)) * 100;
+            document.getElementById('progressBar').style.width = Math.min(progress, 100) + '%';
         }
 
-        function prevStep(step) {
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            document.getElementById(`step${step}`).classList.add('active');
-            updateProgress(step);
+        function showScreen(num) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('screen' + num).classList.add('active');
+            currentScreen = num;
+            updateProgress();
         }
 
-        function updateProgress(step) {
-            document.querySelectorAll('.progress-dot').forEach((dot, i) => {
-                dot.classList.remove('active', 'completed');
-                if (i + 1 < step) dot.classList.add('completed');
-                else if (i + 1 === step) dot.classList.add('active');
+        function nextScreen() {
+            if (currentScreen < totalScreens) {
+                showScreen(currentScreen + 1);
+            }
+        }
+
+        // ============================================
+        // SELECTION HANDLERS
+        // ============================================
+        function selectProgram(btn) {
+            document.querySelectorAll('#screen2 .program-btn').forEach(b => {
+                b.classList.remove('selected');
+                b.setAttribute('aria-checked', 'false');
             });
+            btn.classList.add('selected');
+            btn.setAttribute('aria-checked', 'true');
+            surveyData.program_name = btn.dataset.value;
+            setTimeout(nextScreen, 300);
         }
 
-        // ============================================
-        // FORM HANDLERS
-        // ============================================
-        // Explicitly attach to window to avoid scope issues
-        window.selectRole = function (role) {
-            console.log('Role selected:', role);
-            state.role = role;
-            document.querySelectorAll('[data-role]').forEach(b => b.classList.remove('selected'));
-            document.querySelector(`[data-role="${role}"]`).classList.add('selected');
-            validateStep1();
-        }
+        function selectMood(btn, type) {
+            const screen = btn.closest('.screen');
+            screen.querySelectorAll('.emoji-btn').forEach(b => {
+                b.classList.remove('selected');
+                b.setAttribute('aria-checked', 'false');
+            });
+            btn.classList.add('selected');
+            btn.setAttribute('aria-checked', 'true');
 
-        window.validateStep1 = function () {
-            const exp = document.getElementById('experienceType').value;
-            const age = document.getElementById('ageRange').value;
-
-            state.experienceType = exp;
-            state.ageRange = age;
-
-            console.log('Validating:', { exp, age, role: state.role });
-
-            const valid = exp && age && state.role;
-            const btn = document.getElementById('step1Next');
-
-            if (valid) {
-                btn.removeAttribute('disabled');
-                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            if (type === 'before') {
+                surveyData.mood_before = parseInt(btn.dataset.value);
             } else {
-                btn.setAttribute('disabled', 'true');
-                btn.classList.add('opacity-50', 'cursor-not-allowed'); // Ensure visual feedback
+                surveyData.mood_after = parseInt(btn.dataset.value);
             }
+            setTimeout(nextScreen, 300);
         }
 
-        function setRating(question, value) {
-            state[question] = value;
-            document.querySelectorAll(`[data-q="${question}"]`).forEach(b => b.classList.remove('selected'));
-            document.querySelector(`[data-q="${question}"][data-v="${value}"]`).classList.add('selected');
-
-            // Validate step 2
-            if (['presence', 'people', 'nature', 'calm'].includes(question)) {
-                const valid = state.presence && state.people && state.nature && state.calm;
-                document.getElementById('step2Next').disabled = !valid;
-            }
-            // Validate step 3
-            if (['intent', 'community'].includes(question)) {
-                const valid = state.intent && state.community;
-                document.getElementById('step3Next').disabled = !valid;
-            }
+        function selectConnection(btn) {
+            document.querySelectorAll('#screen5 .emoji-btn').forEach(b => {
+                b.classList.remove('selected');
+                b.setAttribute('aria-checked', 'false');
+            });
+            btn.classList.add('selected');
+            btn.setAttribute('aria-checked', 'true');
+            surveyData.nature_connection = parseInt(btn.dataset.value);
+            setTimeout(nextScreen, 300);
         }
 
-        function toggleReferral(source) {
-            const idx = state.referrals.indexOf(source);
-            if (idx > -1) {
-                state.referrals.splice(idx, 1);
-                document.querySelector(`[data-ref="${source}"]`).classList.remove('selected');
-            } else {
-                state.referrals.push(source);
-                document.querySelector(`[data-ref="${source}"]`).classList.add('selected');
-            }
+        function selectNPS(btn) {
+            document.querySelectorAll('.nps-btn').forEach(b => {
+                b.classList.remove('selected');
+                b.setAttribute('aria-checked', 'false');
+            });
+            btn.classList.add('selected');
+            btn.setAttribute('aria-checked', 'true');
+            surveyData.would_recommend = btn.dataset.value;
+            setTimeout(nextScreen, 300);
         }
 
-        function setRecommend(val) {
-            state.wouldRecommend = val;
-            document.getElementById('recYes').classList.toggle('selected', val === true);
-            document.getElementById('recNo').classList.toggle('selected', val === false);
-            document.getElementById('submitBtn').disabled = false;
+        function selectReferral(btn) {
+            document.querySelectorAll('#screen7 .program-btn').forEach(b => {
+                b.classList.remove('selected');
+                b.setAttribute('aria-checked', 'false');
+            });
+            btn.classList.add('selected');
+            btn.setAttribute('aria-checked', 'true');
+            surveyData.referral_source = btn.dataset.value;
+            setTimeout(nextScreen, 300);
         }
 
-        async function handlePhoto(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            // Compress image
-            const { file: compressed, dataUrl } = await compressImage(file);
-            state.photoFile = compressed;
-
-            document.getElementById('previewImg').src = dataUrl;
-            document.getElementById('photoPlaceholder').classList.add('hidden');
-            document.getElementById('photoPreview').classList.remove('hidden');
-            document.getElementById('photoArea').classList.add('has-image');
-        }
-
-        function removePhoto() {
-            state.photoFile = null;
-            state.photoUrl = null;
-            document.getElementById('photoInput').value = '';
-            document.getElementById('photoPlaceholder').classList.remove('hidden');
-            document.getElementById('photoPreview').classList.add('hidden');
-            document.getElementById('photoArea').classList.remove('has-image');
+        function selectAge(btn) {
+            document.querySelectorAll('#screen8 .program-btn').forEach(b => {
+                b.classList.remove('selected');
+                b.setAttribute('aria-checked', 'false');
+            });
+            btn.classList.add('selected');
+            btn.setAttribute('aria-checked', 'true');
+            surveyData.age_range = btn.dataset.value;
+            setTimeout(nextScreen, 300);
         }
 
         // ============================================
         // SUBMIT
         // ============================================
         async function submitSurvey() {
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<div class="spinner"></div>';
+            surveyData.standout_moment = document.getElementById('standoutMoment').value.trim() || null;
+
+            console.log('Submitting:', surveyData);
+
+            if (!supabaseClient) {
+                console.error('Supabase not initialized');
+                showScreen(totalScreens); // Show thank you anyway
+                return;
+            }
 
             try {
-                // Gather remaining fields
-                state.standoutMoment = document.getElementById('standoutMoment').value;
-                state.additionalFeedback = document.getElementById('additionalFeedback').value;
-                state.willingReview = document.getElementById('willingReview').checked;
-                state.name = document.getElementById('participantName').value;
-                state.email = document.getElementById('participantEmail').value;
+                // Map to existing table structure for compatibility
+                const dbData = {
+                    experience_type: surveyData.program_name,
+                    age_range_bracket: surveyData.age_range,
+                    is_present_engaged: surveyData.mood_after || 3,
+                    connection_others_score: surveyData.nature_connection || 3,
+                    connection_nature_score: surveyData.nature_connection || 3,
+                    calmness_score: surveyData.mood_after || 3,
+                    learning_intent_score: 3,
+                    community_benefit_score: surveyData.would_recommend === 'yes' ? 3 : surveyData.would_recommend === 'maybe' ? 2 : 1,
+                    would_recommend: surveyData.would_recommend === 'yes',
+                    referral_source: surveyData.referral_source,
+                    standout_moment: surveyData.standout_moment
+                };
 
-                // Upload photo if present
-                if (state.photoFile && supabaseClient) {
-                    const fileName = `${Date.now()}_${state.photoFile.name}`;
-                    const { data, error } = await supabaseClient.storage
-                        .from('survey-photos')
-                        .upload(fileName, state.photoFile);
+                const { error } = await supabaseClient
+                    .from('surveyresponses')
+                    .insert([dbData]);
 
-                    if (!error) {
-                        const { data: urlData } = supabaseClient.storage
-                            .from('survey-photos')
-                            .getPublicUrl(fileName);
-                        state.photoUrl = urlData.publicUrl;
-                    }
-                }
+                if (error) throw error;
 
-                // Insert survey response
-                if (supabaseClient) {
-                    await supabaseClient.from('SurveyResponses').insert({
-                        experience_type: state.experienceType,
-                        is_present_engaged: state.presence,
-                        connection_others_score: state.people,
-                        connection_nature_score: state.nature,
-                        calmness_score: state.calm,
-                        learning_intent_score: state.intent,
-                        community_benefit_score: state.community,
-                        referral_source: state.referrals.join(', '),
-                        standout_moment: state.standoutMoment || null,
-                        would_recommend: state.wouldRecommend,
-                        additional_feedback: state.additionalFeedback || null,
-                        age_range_bracket: state.ageRange,
-                        participant_name: state.name || null,
-                        participant_email: state.email || null,
-                        photo_url: state.photoUrl,
-                        willing_to_review: state.willingReview,
-                        device_type: /Mobile|Android|iPhone/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop'
-                    });
-                }
-
-                showSuccess();
+                console.log('✅ Survey submitted successfully');
+                showScreen(totalScreens);
             } catch (err) {
-                console.error(err);
-                showSuccess(); // Show success anyway for demo
+                console.error('Submit error:', err);
+                document.getElementById('errorMsg').classList.add('show');
+                // Still show thank you after brief delay
+                setTimeout(() => showScreen(totalScreens), 2000);
             }
         }
 
-        function showSuccess() {
-            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-            document.getElementById('successState').classList.add('active');
-            document.getElementById('progressDots').style.display = 'none';
-            launchConfetti();
-        }
-
-        function launchConfetti() {
-            const colors = ['#22c55e', '#fde047', '#86efac', '#ffffff', '#4ade80'];
-            for (let i = 0; i < 60; i++) {
-                setTimeout(() => createConfetti(colors[Math.floor(Math.random() * colors.length)]), i * 30);
-            }
-        }
-
-        function createConfetti(color) {
-            const el = document.createElement('div');
-            el.className = 'confetti';
-            el.style.cssText = `left:${Math.random() * 100}vw;top:-10px;background:${color};border-radius:${Math.random() > .5 ? '50%' : '0'}`;
-            document.body.appendChild(el);
-
-            el.animate([
-                { transform: 'translateY(0) rotate(0)', opacity: 1 },
-                { transform: `translateY(${window.innerHeight + 50}px) translateX(${(Math.random() - .5) * 100}px) rotate(${720 + Math.random() * 360}deg)`, opacity: 0 }
-            ], { duration: 2000 + Math.random() * 1500, easing: 'cubic-bezier(.25,.46,.45,.94)' })
-                .onfinish = () => el.remove();
-        }
-
-        function resetForm() {
-            location.reload();
-        }
-
-        // Init listeners
-        document.getElementById('experienceType').addEventListener('change', validateStep1);
-        document.getElementById('ageRange').addEventListener('change', validateStep1);
-
-        // Log mode
-        console.log(supabaseClient ? '✅ Supabase connected' : '📋 Demo mode (configure Supabase)');
+        // Init
+        initSupabase();
+        updateProgress();
     </script>
 </body>
 
