@@ -327,7 +327,7 @@
         async function loadData() {
             try {
                 const { data, error } = await supabaseClient
-                    .from('SurveyResponses')
+                    .from('surveyresponses')
                     .select('*')
                     .order('created_at', { ascending: false });
 
