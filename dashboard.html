@@ -57,10 +57,12 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: #fafaf9;
-            /* Warm Soil-50 */
-            color: #57534e;
-            /* Warm Soil-800 */
+            background: #fdfdfc;
+            color: #44403c;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(132, 204, 22, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(251, 146, 60, 0.05) 0px, transparent 50%);
+            background-attachment: fixed;
         }
 
         h1,
@@ -70,11 +72,26 @@
             font-family: 'Outfit', sans-serif;
         }
 
+        /* SOTA Glass Cards */
         .card {
-            background: white;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-radius: 1.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.05);
-            border: 1px solid #f0fdf4;
+            box-shadow:
+                0 4px 6px -1px rgba(0, 0, 0, 0.02),
+                0 10px 15px -3px rgba(0, 0, 0, 0.04),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 10px 20px -5px rgba(0, 0, 0, 0.05),
+                0 4px 6px -2px rgba(0, 0, 0, 0.02);
+            background: rgba(255, 255, 255, 0.85);
         }
 
         #loginScreen,
@@ -112,8 +129,10 @@
 
     <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="active min-h-screen flex items-center justify-center bg-farm-50 p-4">
-        <div class="card p-8 w-full max-w-md text-center">
-            <div class="text-4xl mb-4">🌻</div>
+        <div class="card p-10 w-full max-w-md text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-farm-400 to-farm-600"></div>
+            <img src="logo.png" alt="Empowerment Farm"
+                class="h-20 mx-auto mb-6 transform hover:scale-105 transition-transform duration-500">
             <h1 class="text-3xl font-bold text-farm-800 mb-2">Welcome Back!</h1>
             <p class="text-gray-500 mb-8">Sign in to see how the farm is doing.</p>
 
@@ -134,13 +153,14 @@
     <!-- DASHBOARD -->
     <div id="dashboard" class="min-h-screen">
         <!-- Friendly Header -->
-        <header class="bg-white sticky top-0 z-50 border-b border-farm-100 shadow-sm">
-            <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="bg-farm-100 p-2 rounded-lg text-2xl">🚜</div>
-                    <div>
-                        <h1 class="font-bold text-farm-900 text-xl md:text-2xl leading-none">Empowerment Farm</h1>
-                        <p class="text-sm text-farm-600 font-medium">Community Impact Dashboard</p>
+        <!-- Friendly Header -->
+        <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100/50">
+            <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <img src="logo.png" alt="Logo" class="h-10 w-auto">
+                    <div class="hidden md:block">
+                        <h1 class="font-bold text-gray-900 text-lg leading-none">Empowerment Farm</h1>
+                        <p class="text-xs text-gray-500 font-medium tracking-wide uppercase mt-0.5">Analytic Suite</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-4">
@@ -293,6 +313,44 @@
                 </div>
             </div>
         </main>
+
+        <!-- SOTA Footer -->
+        <footer class="border-t border-gray-100 mt-auto bg-white/50 backdrop-blur-sm">
+            <div class="max-w-7xl mx-auto px-4 py-6">
+                <div
+                    class="flex flex-col md:flex-row items-center justify-between text-xs text-gray-400 font-medium uppercase tracking-wider">
+                    <div class="flex flex-col md:flex-row items-center gap-4 text-center md:text-left">
+                        <span>Empowerment Farm</span>
+                        <span class="hidden md:inline text-gray-300">|</span>
+                        <span>2600 Garland Road, Naples, FL 34117</span>
+                        <span class="hidden md:inline text-gray-300">|</span>
+                        <span>(239) 330-2777</span>
+                    </div>
+                    <div class="mt-4 md:mt-0 opacity-50">
+                        &copy; 2026 Dashboard v7.0
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <!-- SOTA Footer -->
+        <footer class="border-t border-gray-100 mt-auto bg-white/50 backdrop-blur-sm">
+            <div class="max-w-7xl mx-auto px-4 py-6">
+                <div
+                    class="flex flex-col md:flex-row items-center justify-between text-xs text-gray-400 font-medium uppercase tracking-wider">
+                    <div class="flex flex-col md:flex-row items-center gap-4 text-center md:text-left">
+                        <span>Empowerment Farm</span>
+                        <span class="hidden md:inline text-gray-300">|</span>
+                        <span>2600 Garland Road, Naples, FL 34117</span>
+                        <span class="hidden md:inline text-gray-300">|</span>
+                        <span>(239) 330-2777</span>
+                    </div>
+                    <div class="mt-4 md:mt-0 opacity-50">
+                        &copy; 2026 Dashboard v7.0
+                    </div>
+                </div>
+            </div>
+        </footer>
     </div>
 
     <script>
