@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Empowerment Farm Intelligence</title>
+    <title>Empowerment Farm Dashboard</title>
     <meta name="robots" content="noindex, nofollow">
 
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS (Warm Theme) -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Chart.js -->
@@ -16,25 +16,37 @@
     <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- Google Fonts: Inter for Professional Look -->
+    <!-- Google Fonts: Inter & Outfit for friendly vibe -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700&display=swap"
         rel="stylesheet">
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif']
+                    },
                     colors: {
-                        brand: {
-                            50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1',
-                            400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155',
-                            800: '#1e293b', 900: '#0f172a',
+                        farm: {
+                            50: '#f7fee7',  // Very light lime/green (Warm background)
+                            100: '#ecfccb',
+                            200: '#d9f99d',
+                            300: '#bef264',
+                            400: '#a3e635',
+                            500: '#84cc16', // Main Brand Green
+                            600: '#65a30d',
+                            700: '#4d7c0f', // Dark Text
+                            800: '#3f6212',
+                            900: '#365314',
                         },
-                        accent: {
-                            500: '#3b82f6', 600: '#2563eb', // Professional Blue
+                        soil: {
+                            50: '#fafaf9',
+                            100: '#f5f5f4',
+                            800: '#57534e', // Warm Gray/Brown Text
                         }
                     }
                 }
@@ -45,18 +57,24 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: #0f172a;
-            color: #f8fafc;
+            background: #fafaf9;
+            /* Warm Soil-50 */
+            color: #57534e;
+            /* Warm Soil-800 */
         }
 
-        .glass-panel {
-            background: #1e293b;
-            border: 1px solid #334155;
+        h1,
+        h2,
+        h3,
+        .metric-val {
+            font-family: 'Outfit', sans-serif;
         }
 
-        .kpi-value {
-            font-feature-settings: "tnum";
-            font-variant-numeric: tabular-nums;
+        .card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #f0fdf4;
         }
 
         #loginScreen,
@@ -70,11 +88,11 @@
         }
 
         .spinner {
-            border: 3px solid #334155;
-            border-top: 3px solid #3b82f6;
+            border: 4px solid #ecfccb;
+            border-top: 4px solid #84cc16;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
         }
 
@@ -90,188 +108,199 @@
     </style>
 </head>
 
-<body class="min-h-screen">
+<body class="min-h-screen pb-12">
 
     <!-- LOGIN SCREEN -->
-    <div id="loginScreen" class="active min-h-screen flex items-center justify-center bg-brand-900 p-4">
-        <div class="glass-panel rounded-lg p-8 w-full max-w-md text-center shadow-2xl">
-            <h1 class="text-2xl font-bold text-white mb-1">Empowerment Farm</h1>
-            <p class="text-brand-400 text-sm mb-6 uppercase tracking-widest font-semibold">Intelligence Portal</p>
+    <div id="loginScreen" class="active min-h-screen flex items-center justify-center bg-farm-50 p-4">
+        <div class="card p-8 w-full max-w-md text-center">
+            <div class="text-4xl mb-4">🌻</div>
+            <h1 class="text-3xl font-bold text-farm-800 mb-2">Welcome Back!</h1>
+            <p class="text-gray-500 mb-8">Sign in to see how the farm is doing.</p>
 
             <div id="loginForm">
-                <input type="email" id="emailInput" placeholder="Email"
-                    class="w-full p-3 rounded bg-brand-800 border border-brand-700 text-white focus:border-accent-500 focus:outline-none mb-3 placeholder-brand-500 transition-colors">
+                <input type="email" id="emailInput" placeholder="Email Address"
+                    class="w-full p-4 rounded-xl bg-gray-50 border border-farm-200 text-lg mb-3 focus:outline-none focus:ring-2 focus:ring-farm-400">
                 <input type="password" id="passwordInput" placeholder="Password"
-                    class="w-full p-3 rounded bg-brand-800 border border-brand-700 text-white focus:border-accent-500 focus:outline-none mb-6 placeholder-brand-500 transition-colors">
+                    class="w-full p-4 rounded-xl bg-gray-50 border border-farm-200 text-lg mb-6 focus:outline-none focus:ring-2 focus:ring-farm-400">
                 <button onclick="signInWithPassword()" id="loginBtn"
-                    class="w-full py-3 rounded bg-accent-600 hover:bg-accent-500 text-white font-semibold transition-colors shadow-lg shadow-blue-900/20">
-                    Authenticate
+                    class="w-full py-4 rounded-xl bg-farm-600 hover:bg-farm-700 text-white font-bold text-lg shadow-lg shadow-farm-200 transition-transform active:scale-95">
+                    Sign In
                 </button>
             </div>
-            <div id="loginError" class="hidden mt-4 text-red-400 text-sm"></div>
+            <div id="loginError" class="hidden mt-4 text-red-500 font-medium"></div>
         </div>
     </div>
 
     <!-- DASHBOARD -->
-    <div id="dashboard" class="min-h-screen pb-12">
-        <!-- Header -->
-        <header class="bg-brand-900 border-b border-brand-800 sticky top-0 z-50">
-            <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <div class="h-8 w-8 bg-accent-600 rounded flex items-center justify-center font-bold">E</div>
+    <div id="dashboard" class="min-h-screen">
+        <!-- Friendly Header -->
+        <header class="bg-white sticky top-0 z-50 border-b border-farm-100 shadow-sm">
+            <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="bg-farm-100 p-2 rounded-lg text-2xl">🚜</div>
                     <div>
-                        <h1 class="font-bold text-white leading-tight">Empowerment Farm</h1>
-                        <p class="text-xs text-brand-400 uppercase tracking-wider">Enterprise Intelligence</p>
+                        <h1 class="font-bold text-farm-900 text-xl md:text-2xl leading-none">Empowerment Farm</h1>
+                        <p class="text-sm text-farm-600 font-medium">Community Impact Dashboard</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-6">
-                    <div class="text-right hidden sm:block">
-                        <p id="userEmail" class="text-sm font-medium text-white"></p>
-                        <p class="text-xs text-brand-500">Administrator</p>
-                    </div>
-                    <button onclick="signOut()" class="text-sm text-brand-400 hover:text-white transition-colors">Sign
-                        Out</button>
+                <div class="flex items-center gap-4">
+                    <span id="userEmail" class="hidden md:block text-sm font-medium text-gray-500"></span>
+                    <button onclick="signOut()"
+                        class="text-farm-700 hover:text-farm-900 font-medium text-sm bg-farm-50 px-4 py-2 rounded-full hover:bg-farm-100 transition-colors">
+                        Sign Out
+                    </button>
                 </div>
             </div>
         </header>
 
-        <main class="max-w-7xl mx-auto px-6 py-8">
+        <main class="max-w-6xl mx-auto px-4 py-8">
             <!-- Loading -->
-            <div id="loadingState" class="flex items-center justify-center py-20">
-                <div class="text-center">
-                    <div class="spinner mx-auto mb-4"></div>
-                    <p class="text-brand-500 text-sm tracking-wide">INITIALIZING DATA STREAMS...</p>
-                </div>
+            <div id="loadingState" class="flex flex-col items-center justify-center py-20">
+                <div class="spinner mb-4"></div>
+                <p class="text-farm-600 font-medium">Gathering the harvest...</p>
             </div>
 
             <!-- Content -->
             <div id="dashboardContent" class="hidden animate-fade-in">
 
-                <!-- KPI GRID -->
-                <div id="metrics" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <!-- NPS Score -->
-                    <div class="glass-panel rounded-lg p-5">
-                        <p class="text-xs text-brand-400 uppercase font-semibold mb-2">Net Promoter Score</p>
-                        <div class="flex items-end justify-between">
-                            <h2 id="npsScore" class="text-3xl font-bold text-white kpi-value">--</h2>
-                            <span id="npsTrend"
-                                class="text-xs font-medium px-2 py-1 rounded bg-brand-800 text-brand-300">--</span>
+                <!-- TOP METRICS: SIMPLE & BIG -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <!-- Happiness Score -->
+                    <div class="card p-6 flex items-center justify-between bg-gradient-to-br from-white to-farm-50">
+                        <div>
+                            <p class="text-farm-600 font-medium mb-1">Happiness Score</p>
+                            <h2 id="happinessScore" class="text-4xl font-bold text-farm-900 metric-val">--%</h2>
+                            <p class="text-xs text-gray-400 mt-2">Based on recommendations</p>
                         </div>
+                        <div class="text-5xl">😊</div>
                     </div>
 
-                    <!-- Zen Factor (Efficacy) -->
-                    <div class="glass-panel rounded-lg p-5">
-                        <p class="text-xs text-brand-400 uppercase font-semibold mb-2">Net Calmness Impact</p>
-                        <div class="flex items-end justify-between">
-                            <h2 id="calmImpact" class="text-3xl font-bold text-white kpi-value">--</h2>
-                            <span class="text-xs text-brand-500">Avg Delta (1-5)</span>
+                    <!-- Visitor Count -->
+                    <div class="card p-6 flex items-center justify-between bg-gradient-to-br from-white to-orange-50">
+                        <div>
+                            <p class="text-orange-800 font-medium mb-1">Total Visitors</p>
+                            <h2 id="totalVisitors" class="text-4xl font-bold text-gray-800 metric-val">--</h2>
+                            <p class="text-xs text-gray-400 mt-2">Survey responses</p>
                         </div>
+                        <div class="text-5xl">👋</div>
                     </div>
 
-                    <!-- Retention Rate -->
-                    <div class="glass-panel rounded-lg p-5">
-                        <p class="text-xs text-brand-400 uppercase font-semibold mb-2">Retention Rate</p>
-                        <div class="flex items-end justify-between">
-                            <h2 id="retentionRate" class="text-3xl font-bold text-white kpi-value">--</h2>
-                            <span class="text-xs text-brand-500">Returning Visitors</span>
+                    <!-- Returning Neighbors -->
+                    <div class="card p-6 flex items-center justify-between bg-gradient-to-br from-white to-blue-50">
+                        <div>
+                            <p class="text-blue-800 font-medium mb-1">Returning Neighbors</p>
+                            <h2 id="returningRate" class="text-4xl font-bold text-gray-800 metric-val">--%</h2>
+                            <p class="text-xs text-gray-400 mt-2">Have visited before</p>
                         </div>
-                    </div>
-
-                    <!-- Volume -->
-                    <div class="glass-panel rounded-lg p-5">
-                        <p class="text-xs text-brand-400 uppercase font-semibold mb-2">Total Touchpoints</p>
-                        <div class="flex items-end justify-between">
-                            <h2 id="totalVolume" class="text-3xl font-bold text-white kpi-value">--</h2>
-                            <span class="text-xs text-brand-500">Survey Responses</span>
-                        </div>
+                        <div class="text-5xl">🏡</div>
                     </div>
                 </div>
 
-                <!-- MAIN CHARTS ROW -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                    <!-- Scatter Matrix (2 cols) -->
-                    <div class="lg:col-span-2 glass-panel rounded-lg p-6">
-                        <div class="flex items-center justify-between mb-6">
-                            <h3 class="font-semibold text-white">Program Performance Matrix</h3>
-                            <span class="text-xs text-brand-400 bg-brand-800 px-2 py-1 rounded">Volume vs.
-                                Efficacy</span>
+                <!-- MAIN SECTION: IMPACT & FEED -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                    <!-- LEFT COL (2/3): Impact & Charts -->
+                    <div class="lg:col-span-2 space-y-8">
+
+                        <!-- HUMAN IMPACT CARD (Simple Before/After) -->
+                        <div class="card p-8 bg-gradient-to-r from-gray-50 to-green-50 border-l-8 border-farm-500">
+                            <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                                ✨ The Human Impact
+                                <span
+                                    class="text-sm font-normal text-gray-500 ml-2 bg-white px-3 py-1 rounded-full shadow-sm">How
+                                    people feel Before vs After</span>
+                            </h3>
+
+                            <div class="flex items-center justify-around text-center">
+                                <div class="relative group">
+                                    <div
+                                        class="text-5xl mb-3 grayscale opacity-70 group-hover:grayscale-0 transition-all">
+                                        😫</div>
+                                    <p class="font-bold text-gray-400 uppercase text-xs tracking-wider">Before Arriving
+                                    </p>
+                                    <p id="avgBefore" class="text-2xl font-bold text-gray-500 mt-1">--</p>
+                                </div>
+
+                                <div class="flex-1 px-8">
+                                    <div class="h-4 bg-gray-200 rounded-full overflow-hidden relative">
+                                        <div
+                                            class="absolute inset-0 bg-gradient-to-r from-gray-300 to-farm-500 opacity-50">
+                                        </div>
+                                        <div class="absolute inset-0 flex items-center justify-center">
+                                            <span class="text-xs font-bold text-white drop-shadow-md">Improving
+                                                Lives</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-center mt-3">
+                                        <span id="impactDelta"
+                                            class="inline-block bg-farm-100 text-farm-800 px-3 py-1 rounded-full font-bold text-sm">
+                                            +-- Improvement
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="relative group">
+                                    <div class="text-6xl mb-3 transform group-hover:scale-110 transition-transform">🥰
+                                    </div>
+                                    <p class="font-bold text-farm-600 uppercase text-xs tracking-wider">After Leaving
+                                    </p>
+                                    <p id="avgAfter" class="text-3xl font-bold text-farm-700 mt-1">--</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="h-80">
-                            <canvas id="matrixChart"></canvas>
+
+                        <!-- SIMPLE CHARTS -->
+                        <div class="card p-6">
+                            <h3 class="font-bold text-gray-800 mb-4">Recent Visits</h3>
+                            <div class="h-64">
+                                <canvas id="visitsChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Programs List -->
+                        <div class="card p-6">
+                            <h3 class="font-bold text-gray-800 mb-4">Most Popular Programs</h3>
+                            <div class="space-y-4" id="programList">
+                                <!-- Injected JS -->
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- RIGHT COL (1/3): Good Vibes Feed -->
+                    <div class="lg:col-span-1">
+                        <div class="card h-full flex flex-col bg-orange-50 border-orange-100">
+                            <div class="p-6 border-b border-orange-100 bg-white rounded-t-[1.5rem]">
+                                <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                                    💌 Good Vibes
+                                </h3>
+                                <p class="text-sm text-gray-500">What people are saying</p>
+                            </div>
+
+                            <div id="vibesFeed" class="flex-1 overflow-y-auto p-4 space-y-4 max-h-[600px]">
+                                <!-- Feed Items -->
+                                <div class="text-center text-gray-400 py-10">Loading comments...</div>
+                            </div>
+
+                            <div class="p-4 bg-white rounded-b-[1.5rem] border-t border-orange-100 text-center">
+                                <button onclick="exportCSV()" class="text-farm-600 font-medium hover:underline text-sm">
+                                    Download All Data (CSV)
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Trend Line (1 col) -->
-                    <div class="glass-panel rounded-lg p-6">
-                        <div class="mb-6">
-                            <h3 class="font-semibold text-white">Sentiment Velocity</h3>
-                            <p class="text-xs text-brand-500">M/o/M Calmness Trend</p>
-                        </div>
-                        <div class="h-80">
-                            <canvas id="trendChart"></canvas>
-                        </div>
-                    </div>
                 </div>
-
-                <!-- DATA TABLE & RETENTION -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Retention Cohorts -->
-                    <div class="glass-panel rounded-lg p-6">
-                        <h3 class="font-semibold text-white mb-6">Loyalty Cohorts</h3>
-                        <div class="h-64">
-                            <canvas id="loyaltyChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Ledger -->
-                    <div class="lg:col-span-2 glass-panel rounded-lg overflow-hidden">
-                        <div class="p-6 border-b border-brand-800 flex justify-between items-center">
-                            <h3 class="font-semibold text-white">Recent Transactions</h3>
-                            <button onclick="exportCSV()"
-                                class="text-xs text-accent-500 hover:text-white transition-colors font-medium cursor-pointer uppercase tracking-wider">
-                                Download CSV
-                            </button>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-sm text-left">
-                                <thead class="bg-brand-800 text-brand-400 uppercase text-xs">
-                                    <tr>
-                                        <th class="px-6 py-4 font-semibold">Timestamp</th>
-                                        <th class="px-6 py-4 font-semibold">Program</th>
-                                        <th class="px-6 py-4 font-semibold text-right">Efficacy</th>
-                                        <th class="px-6 py-4 font-semibold text-right">Loyalty</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="ledgerBody" class="divide-y divide-brand-800 text-brand-200">
-                                    <!-- Injected -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </main>
     </div>
 
     <script>
         // CONFIG
-        const THEME = {
-            colors: {
-                grid: '#334155',
-                text: '#94a3b8',
-                primary: '#3b82f6',
-                success: '#10b981',
-                warning: '#f59e0b',
-                danger: '#ef4444'
-            },
-            font: 'Inter'
-        };
+        Chart.defaults.font.family = 'Inter';
+        Chart.defaults.color = '#78716c';
 
-        Chart.defaults.color = THEME.colors.text;
-        Chart.defaults.borderColor = THEME.colors.grid;
-        Chart.defaults.font.family = THEME.font;
-
+        // GLOBAL VARS
         let supabaseClient = null;
         let currentUser = null;
         let allResponses = [];
@@ -294,8 +323,8 @@
                         });
                         checkSession();
                     }
-                } else showError('Config Error');
-            } catch (err) { console.error(err); showError('Connection Failed'); }
+                } else showError('Could not reach server');
+            } catch (err) { console.error(err); showError('Connection Error'); }
         }
 
         async function checkSession() {
@@ -307,16 +336,16 @@
             if (!supabaseClient) return showError('System Offline');
             const email = document.getElementById('emailInput').value.trim();
             const password = document.getElementById('passwordInput').value;
-            if (!email || !password) return showError('Credentials Required');
+            if (!email || !password) return showError('Please enter email & password');
 
             const btn = document.getElementById('loginBtn');
-            btn.textContent = 'Authenticating...';
+            btn.textContent = 'Opening gateway...';
             btn.disabled = true;
 
             const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
             if (error) {
-                showError(error.message);
-                btn.textContent = 'Authenticate';
+                showError('Incorrect email or password');
+                btn.textContent = 'Sign In';
                 btn.disabled = false;
             }
         }
@@ -324,7 +353,7 @@
         function signOut() { supabaseClient.auth.signOut(); }
         function showError(msg) {
             const el = document.getElementById('loginError');
-            el.textContent = 'Error: ' + msg; el.classList.remove('hidden');
+            el.textContent = msg; el.classList.remove('hidden');
         }
 
         // ============================================
@@ -335,6 +364,7 @@
             document.getElementById('dashboard').classList.add('active');
             document.getElementById('userEmail').textContent = currentUser.email;
 
+            // Fetch everything
             const { data, error } = await supabaseClient
                 .from('surveyresponses')
                 .select('*')
@@ -343,200 +373,118 @@
             if (error) return console.error(error);
             allResponses = data || [];
 
-            calculateMetrics();
+            renderDashboard();
             document.getElementById('loadingState').classList.add('hidden');
             document.getElementById('dashboardContent').classList.remove('hidden');
         }
 
-        function calculateMetrics() {
+        function renderDashboard() {
             if (!allResponses.length) return;
 
-            // 1. NPS Calculation (Proxy using would_recommend)
-            // Promoter (Yes) vs Detractor (No). Passive (Somewhat -> logic mapping?)
-            // Mapping: Yes=Promoter, No=Detractor.
-            const promoters = allResponses.filter(r => r.would_recommend === true).length;
-            const detractors = allResponses.filter(r => r.would_recommend === false).length;
-            const total = allResponses.length;
-            const nps = Math.round(((promoters - detractors) / total) * 100);
+            // 1. Happiness Score (Recommend %)
+            const recs = allResponses.filter(r => r.would_recommend === true).length;
+            const happiness = Math.round((recs / allResponses.length) * 100);
+            document.getElementById('happinessScore').textContent = happiness + '%';
 
-            document.getElementById('npsScore').textContent = nps;
-            document.getElementById('npsScore').className = `text-3xl font-bold kpi-value ${nps > 50 ? 'text-green-400' : nps > 0 ? 'text-yellow-400' : 'text-red-400'}`;
-            document.getElementById('npsTrend').textContent = nps > 0 ? 'Positive' : 'Action Req';
+            // 2. Visitors
+            document.getElementById('totalVisitors').textContent = allResponses.length.toLocaleString();
 
-            // 2. Net Calmness Impact (Delta)
-            let totalDelta = 0;
-            let deltaCount = 0;
+            // 3. Returning Neighbors
+            const people = {};
             allResponses.forEach(r => {
-                if (r.mood_after_raw && r.mood_before_raw) {
-                    totalDelta += (r.mood_after_raw - r.mood_before_raw);
-                    deltaCount++;
-                }
+                const id = r.participant_email || r.participant_name || 'anon';
+                if (id !== 'anon') people[id] = (people[id] || 0) + 1;
             });
-            const avgDelta = deltaCount ? (totalDelta / deltaCount).toFixed(2) : '--';
-            document.getElementById('calmImpact').textContent = (avgDelta > 0 ? '+' : '') + avgDelta;
-            document.getElementById('calmImpact').className = `text-3xl font-bold kpi-value ${avgDelta >= 1 ? 'text-green-400' : 'text-brand-200'}`;
+            const returning = Object.values(people).filter(c => c > 1).length;
+            const totalPeople = Object.keys(people).length;
+            const returnRate = totalPeople ? Math.round((returning / totalPeople) * 100) : 0;
+            document.getElementById('returningRate').textContent = returnRate + '%';
 
-            // 3. Volume
-            document.getElementById('totalVolume').textContent = total.toLocaleString();
-
-            // 4. Matrix & Loyalty Data Prep
-            const programs = {};
-            const customers = {};
-
+            // 4. Human Impact (Before/After)
+            let sumBefore = 0, sumAfter = 0, count = 0;
             allResponses.forEach(r => {
-                // Programs
-                const p = r.experience_type || 'Unknown';
-                if (!programs[p]) programs[p] = { count: 0, totalImpact: 0 };
-                programs[p].count++;
-                // Impact Logic: (Calm Raw + Nature Raw) / 2
-                const impact = ((r.calmness_score || 0) + (r.connection_nature_score || 0)) / 2; // Using mapped 1-3 for simplicity or raw if avail?
-                // Let's use Raw if available for higher fidelity
-                const rawImpact = ((r.mood_after_raw || r.calmness_score * 1.66) + (r.nature_connection_raw || r.connection_nature_score * 1.66)) / 2;
-                programs[p].totalImpact += rawImpact;
-
-                // Loyalty
-                const email = r.participant_email || r.participant_name || 'Anonymous';
-                if (email !== 'Anonymous') {
-                    customers[email] = (customers[email] || 0) + 1;
+                if (r.mood_before_raw && r.mood_after_raw) {
+                    sumBefore += r.mood_before_raw;
+                    sumAfter += r.mood_after_raw;
+                    count++;
                 }
             });
+            if (count > 0) {
+                const avgB = (sumBefore / count).toFixed(1);
+                const avgA = (sumAfter / count).toFixed(1);
+                const diff = (avgA - avgB).toFixed(1);
+                document.getElementById('avgBefore').textContent = avgB;
+                document.getElementById('avgAfter').textContent = avgA;
+                document.getElementById('impactDelta').textContent = `+${diff} Improvement`;
+            }
 
-            // Retention Rate
-            const returningCusts = Object.values(customers).filter(c => c > 1).length;
-            const totalCusts = Object.keys(customers).length;
-            const retRate = totalCusts ? Math.round((returningCusts / totalCusts) * 100) : 0;
-            document.getElementById('retentionRate').textContent = retRate + '%';
-
-            renderCharts(programs, customers);
-            renderLedger();
-        }
-
-        function renderCharts(programs, customers) {
-            // SCATTER MATRIX
-            const matrixData = Object.entries(programs).map(([name, data]) => ({
-                x: data.count,
-                y: (data.totalImpact / data.count).toFixed(2),
-                program: name
-            }));
-
-            new Chart(document.getElementById('matrixChart'), {
-                type: 'scatter',
-                data: {
-                    datasets: [{
-                        label: 'Programs',
-                        data: matrixData,
-                        backgroundColor: '#3b82f6',
-                        borderColor: '#60a5fa',
-                        pointRadius: 6,
-                        pointHoverRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { title: { display: true, text: 'Volume (Responses)' }, grid: { color: '#1e293b' } },
-                        y: { title: { display: true, text: 'Avg Impact Score (1-5)' }, grid: { color: '#1e293b' }, min: 1, max: 5 }
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: (ctx) => `${ctx.raw.program}: ${ctx.raw.y} Impact / ${ctx.raw.x} Vol`
-                            }
-                        }
-                    }
-                }
-            });
-
-            // RETENTION (Simulated Cohorts for visual)
-            const loyalCounts = { '1 Visit': 0, '2 Visits': 0, '3+ Visits': 0 };
-            Object.values(customers).forEach(c => {
-                if (c === 1) loyalCounts['1 Visit']++;
-                else if (c === 2) loyalCounts['2 Visits']++;
-                else loyalCounts['3+ Visits']++;
-            });
-
-            new Chart(document.getElementById('loyaltyChart'), {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(loyalCounts),
-                    datasets: [{
-                        label: 'Participants',
-                        data: Object.values(loyalCounts),
-                        backgroundColor: ['#64748b', '#3b82f6', '#10b981'],
-                        borderRadius: 4,
-                        barThickness: 20
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { x: { grid: { display: false } }, y: { grid: { display: false } } }
-                }
-            });
-
-            // TREND (Mocked monthly data for SOTA demo if barely any data)
-            // Real calc:
+            // 5. Visits Chart (Monthly)
             const months = {};
             allResponses.forEach(r => {
                 const m = new Date(r.created_at).toLocaleString('default', { month: 'short' });
-                if (!months[m]) months[m] = { sum: 0, count: 0 };
-                months[m].sum += (r.mood_after_raw || 3);
-                months[m].count++;
+                months[m] = (months[m] || 0) + 1;
             });
-            const labels = Object.keys(months);
-            const data = Object.values(months).map(v => (v.sum / v.count).toFixed(2));
-
-            new Chart(document.getElementById('trendChart'), {
-                type: 'line',
+            new Chart(document.getElementById('visitsChart'), {
+                type: 'bar',
                 data: {
-                    labels: labels.length ? labels : ['Jan', 'Feb', 'Mar'], // Fallback
+                    labels: Object.keys(months),
                     datasets: [{
-                        label: 'Avg Calmness',
-                        data: data.length ? data : [3.5, 3.8, 4.2],
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        fill: true,
-                        tension: 0.4
+                        label: 'Visitors',
+                        data: Object.values(months),
+                        backgroundColor: '#a3e635',
+                        borderRadius: 8
                     }]
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: { y: { min: 1, max: 5, grid: { color: '#1e293b' } }, x: { grid: { Display: false } } }
+                    scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }
                 }
             });
-        }
 
-        function renderLedger() {
-            const tbody = document.getElementById('ledgerBody');
-            tbody.innerHTML = allResponses.slice(0, 10).map(r => `
-                <tr class="hover:bg-brand-800 transition-colors">
-                    <td class="px-6 py-4">${new Date(r.created_at).toLocaleDateString()}</td>
-                    <td class="px-6 py-4 font-medium text-white">${r.experience_type || 'N/A'}</td>
-                    <td class="px-6 py-4 text-right font-mono text-accent-500">${(r.mood_after_raw || r.calmness_score || 0).toFixed(1)}</td>
-                    <td class="px-6 py-4 text-right">
-                        <span class="px-2 py-1 rounded text-xs bg-brand-800 text-brand-400">
-                            ${r.would_recommend ? 'PROMOTER' : 'PASSIVE'}
-                        </span>
-                    </td>
-                </tr>
+            // 6. Popular Programs
+            const progs = {};
+            allResponses.forEach(r => {
+                const p = r.experience_type || 'General Visit';
+                progs[p] = (progs[p] || 0) + 1;
+            });
+            const sortedProgs = Object.entries(progs).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            document.getElementById('programList').innerHTML = sortedProgs.map(([name, count]) => `
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span class="font-medium text-gray-700">${name}</span>
+                    <span class="bg-white px-3 py-1 rounded-full text-sm font-bold text-farm-600 shadow-sm">${count}</span>
+                </div>
             `).join('');
+
+            // 7. Good Vibes Feed (Standout Moments)
+            const comments = allResponses
+                .filter(r => r.standout_moment && r.standout_moment.length > 3)
+                .slice(0, 20);
+
+            document.getElementById('vibesFeed').innerHTML = comments.map(c => `
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                    <p class="text-gray-700 italic">"${c.standout_moment}"</p>
+                    <div class="mt-2 flex items-center gap-2 text-xs text-gray-400">
+                        <span>${new Date(c.created_at).toLocaleDateString()}</span>
+                        <span>•</span>
+                        <span>${c.experience_type || 'Farm Visit'}</span>
+                    </div>
+                </div>
+            `).join('') || '<p class="text-center text-gray-400">No comments yet.</p>';
         }
 
         function exportCSV() {
-            const headers = ['Date', 'Program', 'Raw Impact', 'Promoter Status'];
+            const headers = ['Date', 'Program', 'Happiness', 'Feedback'];
             const rows = allResponses.map(r => [
                 new Date(r.created_at).toLocaleDateString(),
                 r.experience_type,
-                r.mood_after_raw || 0,
-                r.would_recommend ? 'Yes' : 'No'
+                r.would_recommend ? 'Happy' : 'Unhappy',
+                (r.standout_moment || '').replace(/,/g, ' ')
             ]);
             const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
             const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
             const a = document.createElement('a');
-            a.href = url; a.download = 'farm_intelligence.csv'; a.click();
+            a.href = url; a.download = 'farm_data.csv'; a.click();
         }
 
         initSupabase();
