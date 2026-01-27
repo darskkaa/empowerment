@@ -1,5 +1,8 @@
 # Empowerment Farm Digital Ecosystem 🌿
 
+**Live Demo:** [https://empfarm.netlify.app/](https://empfarm.netlify.app/)  
+**Admin:** [https://empfarm.netlify.app/dashboard.html](https://empfarm.netlify.app/dashboard.html)
+
 A secure, mobile-optimized digital survey and analytics platform for Empowerment Farm.
 
 ## 🌟 Features
