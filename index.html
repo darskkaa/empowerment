@@ -5,84 +5,121 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Empowerment Farm Feedback</title>
-    <meta name="description" content="Quick 2-minute feedback survey for Empowerment Farm">
+    <meta name="description" content="Share your experience at Empowerment Farm">
+    <meta name="theme-color" content="#166534">
+
+    <!-- PWA / iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="logo.png">
 
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --farm-green: #22c55e;
-            --farm-dark: #166534;
-            --bg-cream: #fefce8;
-            --text-dark: #1f2937;
+            --primary: #22c55e;
+            --primary-dark: #166534;
+            --primary-light: #dcfce7;
+            --accent: #fbbf24;
+            --bg-start: #f0fdf4;
+            --bg-end: #fef3c7;
+            --text: #1f2937;
+            --text-muted: #6b7280;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overscroll-behavior: none;
         }
 
         body {
-            font-family: 'Nunito', sans-serif;
-            background: linear-gradient(135deg, #dcfce7 0%, #fefce8 50%, #fff7ed 100%);
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(160deg, var(--bg-start) 0%, var(--bg-end) 100%);
             min-height: 100vh;
-            color: var(--text-dark);
-            line-height: 1.6;
+            min-height: -webkit-fill-available;
+            color: var(--text);
+            line-height: 1.5;
         }
 
-        /* Progress Bar */
-        .progress-container {
+        /* ============================================
+           PROGRESS BAR (Top)
+        ============================================ */
+        .progress-wrap {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.5);
             z-index: 100;
+            padding: 12px 16px 8px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0));
         }
 
-        .progress-bar {
+        .progress-track {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
             height: 100%;
-            background: var(--farm-green);
-            transition: width 0.3s ease;
+            background: linear-gradient(90deg, var(--primary), #4ade80);
+            border-radius: 999px;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
         }
 
-        /* Survey Container */
-        .survey-container {
-            max-width: 500px;
+        .progress-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-top: 4px;
+        }
+
+        /* ============================================
+           CONTAINER & SCREENS
+        ============================================ */
+        .survey-wrap {
+            max-width: 440px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 80px 20px 40px;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        /* Survey Screen */
         .screen {
             display: none;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             text-align: center;
             flex: 1;
-            padding: 40px 20px;
-            animation: fadeIn 0.3s ease;
+            animation: slideIn 0.4s ease-out;
         }
 
         .screen.active {
             display: flex;
         }
 
-        @keyframes fadeIn {
+        @keyframes slideIn {
             from {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(20px);
             }
 
             to {
@@ -91,125 +128,198 @@
             }
         }
 
-        /* Typography */
+        /* ============================================
+           TYPOGRAPHY
+        ============================================ */
+        .hero-emoji {
+            font-size: 4.5rem;
+            margin-bottom: 16px;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
         h1 {
-            font-size: 2rem;
-            font-weight: 800;
-            color: var(--farm-dark);
-            margin-bottom: 1rem;
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
         }
 
         h2 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 1.5rem;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 8px;
         }
 
         .subtitle {
-            font-size: 1.1rem;
-            color: #6b7280;
-            margin-bottom: 2rem;
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            max-width: 300px;
         }
 
-        /* Emoji Scale */
-        .emoji-scale {
+        /* ============================================
+           EMOJI RATING (5-point scale with labels)
+        ============================================ */
+        .rating-group {
             display: flex;
-            gap: 12px;
             justify-content: center;
-            flex-wrap: wrap;
-            margin: 20px 0;
+            gap: 8px;
+            margin: 16px 0 24px;
+            width: 100%;
         }
 
-        .emoji-btn {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
+        .rating-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+            max-width: 72px;
+        }
+
+        .rating-btn {
+            width: 64px;
+            height: 64px;
+            border-radius: 20px;
             border: 3px solid #e5e7eb;
             background: white;
-            font-size: 2.5rem;
+            font-size: 2rem;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
-        .emoji-btn:hover,
-        .emoji-btn:focus {
+        .rating-btn:hover {
+            transform: scale(1.08);
+            border-color: var(--primary);
+        }
+
+        .rating-btn:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2);
+        }
+
+        .rating-btn.selected {
+            border-color: var(--primary);
+            background: var(--primary-light);
             transform: scale(1.1);
-            border-color: var(--farm-green);
-            box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3);
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3);
         }
 
-        .emoji-btn.selected {
-            border-color: var(--farm-green);
-            background: #dcfce7;
-            transform: scale(1.15);
+        .rating-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
         }
 
-        .emoji-btn:focus {
-            outline: 3px solid var(--farm-green);
-            outline-offset: 2px;
+        .rating-item.selected .rating-label {
+            color: var(--primary-dark);
         }
 
-        /* Program Buttons */
-        .program-grid {
+        /* ============================================
+           PROGRAM CARDS
+        ============================================ */
+        .card-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 12px;
+            gap: 10px;
             width: 100%;
-            max-width: 400px;
+            margin-bottom: 16px;
         }
 
-        .program-btn {
-            padding: 18px 24px;
+        .card-btn {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 20px;
             border-radius: 16px;
             border: 2px solid #e5e7eb;
             background: white;
-            font-size: 1.1rem;
-            font-weight: 600;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
             cursor: pointer;
             transition: all 0.2s ease;
             text-align: left;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
 
-        .program-btn:hover,
-        .program-btn:focus {
-            border-color: var(--farm-green);
+        .card-btn .card-emoji {
+            font-size: 1.6rem;
+            width: 40px;
+            text-align: center;
+        }
+
+        .card-btn:hover {
+            border-color: var(--primary);
             background: #f0fdf4;
+            transform: translateY(-2px);
         }
 
-        .program-btn.selected {
-            border-color: var(--farm-green);
-            background: #dcfce7;
+        .card-btn:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.15);
         }
 
-        .program-btn:focus {
-            outline: 3px solid var(--farm-green);
-            outline-offset: 2px;
+        .card-btn.selected {
+            border-color: var(--primary);
+            background: var(--primary-light);
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.2);
         }
 
-        /* NPS Buttons */
-        .nps-group {
+        /* ============================================
+           NPS BUTTONS (3 options)
+        ============================================ */
+        .nps-row {
             display: flex;
-            gap: 16px;
+            gap: 12px;
             justify-content: center;
-            flex-wrap: wrap;
+            margin: 16px 0 24px;
         }
 
         .nps-btn {
-            padding: 20px 32px;
+            padding: 18px 28px;
             border-radius: 16px;
             border: 3px solid #e5e7eb;
             background: white;
-            font-size: 1.2rem;
-            font-weight: 700;
+            font-size: 1.1rem;
+            font-weight: 800;
             cursor: pointer;
             transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nps-btn .nps-emoji {
+            font-size: 1.8rem;
+        }
+
+        .nps-btn .nps-text {
+            font-size: 0.85rem;
         }
 
         .nps-btn.no {
@@ -224,125 +334,190 @@
             color: #22c55e;
         }
 
-        .nps-btn:hover,
-        .nps-btn:focus {
+        .nps-btn:hover {
             transform: scale(1.05);
         }
 
-        .nps-btn.selected {
-            transform: scale(1.1);
-        }
-
-        .nps-btn.no.selected {
+        .nps-btn.selected.no {
             background: #fef2f2;
             border-color: #ef4444;
         }
 
-        .nps-btn.maybe.selected {
+        .nps-btn.selected.maybe {
             background: #fffbeb;
             border-color: #f59e0b;
         }
 
-        .nps-btn.yes.selected {
+        .nps-btn.selected.yes {
             background: #f0fdf4;
             border-color: #22c55e;
         }
 
-        /* Referral Grid */
-        .referral-grid {
+        /* ============================================
+           REFERRAL GRID (2 columns)
+        ============================================ */
+        .ref-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 10px;
             width: 100%;
-            max-width: 400px;
+            margin-bottom: 16px;
         }
 
-        /* Text Input */
-        .text-input {
+        .ref-grid .card-btn {
+            padding: 14px 16px;
+            font-size: 0.9rem;
+        }
+
+        .ref-grid .card-emoji {
+            font-size: 1.3rem;
+            width: 32px;
+        }
+
+        /* ============================================
+           TEXT INPUT
+        ============================================ */
+        .text-box {
             width: 100%;
-            max-width: 400px;
             padding: 16px;
             border: 2px solid #e5e7eb;
             border-radius: 16px;
             font-size: 1rem;
             font-family: inherit;
             min-height: 120px;
-            resize: vertical;
+            resize: none;
+            background: white;
+            transition: all 0.2s ease;
         }
 
-        .text-input:focus {
+        .text-box:focus {
             outline: none;
-            border-color: var(--farm-green);
-            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.15);
         }
 
-        /* Navigation */
-        .nav-buttons {
+        .text-box::placeholder {
+            color: #9ca3af;
+        }
+
+        /* ============================================
+           BUTTONS
+        ============================================ */
+        .btn-row {
             display: flex;
-            gap: 16px;
-            margin-top: 40px;
+            gap: 12px;
+            margin-top: 24px;
             width: 100%;
-            max-width: 400px;
             justify-content: center;
         }
 
         .btn {
-            padding: 16px 32px;
+            padding: 16px 40px;
             border-radius: 50px;
             font-size: 1.1rem;
-            font-weight: 700;
+            font-weight: 800;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
             border: none;
-            min-width: 140px;
         }
 
         .btn-primary {
-            background: var(--farm-green);
+            background: linear-gradient(135deg, var(--primary), #4ade80);
             color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--farm-dark);
-            transform: translateY(-2px);
             box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4);
         }
 
-        .btn-secondary {
-            background: white;
-            color: var(--text-dark);
-            border: 2px solid #e5e7eb;
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 30px rgba(34, 197, 94, 0.5);
         }
 
-        .btn-secondary:hover {
-            background: #f9fafb;
+        .btn-primary:active {
+            transform: translateY(0);
         }
 
         .btn:focus {
-            outline: 3px solid var(--farm-green);
-            outline-offset: 2px;
+            outline: 3px solid var(--primary);
+            outline-offset: 3px;
         }
 
-        /* Skip Link */
-        .skip-link {
-            color: #9ca3af;
-            font-size: 0.9rem;
+        /* ============================================
+           SKIP LINK
+        ============================================ */
+        .skip {
+            color: var(--text-muted);
+            font-size: 0.85rem;
             margin-top: 16px;
             cursor: pointer;
             text-decoration: underline;
+            background: none;
+            border: none;
+            font-family: inherit;
         }
 
-        .skip-link:hover {
-            color: #6b7280;
+        .skip:hover {
+            color: var(--text);
         }
 
-        /* Thank You */
-        .thank-you-icon {
+        /* ============================================
+           THANK YOU SCREEN
+        ============================================ */
+        .confetti {
+            position: fixed;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .thank-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 32px 24px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .thank-emoji {
             font-size: 5rem;
-            margin-bottom: 1rem;
+            margin-bottom: 16px;
         }
 
-        /* Accessibility */
+        .quote {
+            background: var(--primary-light);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 20px 0;
+            font-style: italic;
+            color: var(--primary-dark);
+        }
+
+        .link-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .link-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .link-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* ============================================
+           ACCESSIBILITY
+        ============================================ */
         .sr-only {
             position: absolute;
             width: 1px;
@@ -354,206 +529,217 @@
             border: 0;
         }
 
-        /* Error Message */
-        .error-msg {
+        /* Error */
+        .error {
             color: #ef4444;
+            font-size: 0.9rem;
             margin-top: 12px;
             display: none;
         }
 
-        .error-msg.show {
+        .error.show {
             display: block;
         }
     </style>
 </head>
 
 <body>
-    <!-- Progress Bar -->
-    <div class="progress-container" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-        <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+    <!-- Progress -->
+    <div class="progress-wrap">
+        <div class="progress-track">
+            <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+        </div>
+        <div class="progress-text" id="progressText">Question 1 of 8</div>
     </div>
 
-    <div class="survey-container">
-        <!-- Screen 1: Welcome -->
-        <div class="screen active" id="screen1" data-step="1">
-            <div class="thank-you-icon">🌻</div>
-            <h1>Welcome to Empowerment Farm!</h1>
-            <p class="subtitle">Thanks for visiting today.<br>This quick survey helps us improve.<br><strong>Takes about
-                    2 minutes.</strong></p>
-            <div class="nav-buttons">
-                <button class="btn btn-primary" onclick="nextScreen()" aria-label="Start the survey">Start Survey
+    <div class="survey-wrap">
+
+        <!-- SCREEN 1: Welcome -->
+        <div class="screen active" id="screen1">
+            <div class="hero-emoji">🌻</div>
+            <h1>Welcome!</h1>
+            <p class="subtitle">Thanks for visiting Empowerment Farm today. Your feedback helps us grow.</p>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 24px;"><strong>⏱ Takes about 2
+                    minutes</strong></p>
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="nextScreen()" aria-label="Start the survey">Let's Go!
                     →</button>
             </div>
         </div>
 
-        <!-- Screen 2: Program Selection -->
-        <div class="screen" id="screen2" data-step="2">
+        <!-- SCREEN 2: Program -->
+        <div class="screen" id="screen2">
             <h2>What did you do today?</h2>
-            <div class="program-grid" role="radiogroup" aria-label="Select your program">
-                <button class="program-btn" data-value="Cow Yoga" onclick="selectProgram(this)" role="radio"
-                    aria-checked="false">🐄 Cow Yoga</button>
-                <button class="program-btn" data-value="Yoga with the Animals" onclick="selectProgram(this)"
-                    role="radio" aria-checked="false">🧘 Yoga with the Animals</button>
-                <button class="program-btn" data-value="Seedlings for Spring" onclick="selectProgram(this)" role="radio"
-                    aria-checked="false">🌱 Seedlings for Spring</button>
-                <button class="program-btn" data-value="Open Farm (Second Saturdays)" onclick="selectProgram(this)"
-                    role="radio" aria-checked="false">🌾 Open Farm Day</button>
-                <button class="program-btn" data-value="Tuesday Night Tuck-In" onclick="selectProgram(this)"
-                    role="radio" aria-checked="false">🐓 Tuesday Tuck-In</button>
-                <button class="program-btn" data-value="JusTeenys Greenies" onclick="selectProgram(this)" role="radio"
-                    aria-checked="false">👶 JusTeenys Greenies</button>
+            <p class="subtitle">Select your experience</p>
+            <div class="card-grid" role="radiogroup" aria-label="Select program">
+                <button class="card-btn" data-value="Cow Yoga" onclick="selectProgram(this)"><span
+                        class="card-emoji">🐄</span> Cow Yoga</button>
+                <button class="card-btn" data-value="Yoga with the Animals" onclick="selectProgram(this)"><span
+                        class="card-emoji">🧘</span> Yoga with Animals</button>
+                <button class="card-btn" data-value="Seedlings for Spring" onclick="selectProgram(this)"><span
+                        class="card-emoji">🌱</span> Seedlings for Spring</button>
+                <button class="card-btn" data-value="Open Farm (Second Saturdays)" onclick="selectProgram(this)"><span
+                        class="card-emoji">🌾</span> Open Farm Day</button>
+                <button class="card-btn" data-value="Tuesday Night Tuck-In" onclick="selectProgram(this)"><span
+                        class="card-emoji">🐓</span> Tuesday Tuck-In</button>
+                <button class="card-btn" data-value="JusTeenys Greenies" onclick="selectProgram(this)"><span
+                        class="card-emoji">👶</span> JusTeenys Greenies</button>
             </div>
-            <p class="skip-link" tabindex="0" onclick="nextScreen()" onkeypress="if(event.key==='Enter')nextScreen()">
-                Skip this question</p>
+            <button class="skip" onclick="nextScreen()">Skip this question</button>
         </div>
 
-        <!-- Screen 3: Mood Before -->
-        <div class="screen" id="screen3" data-step="3">
-            <h2>How did you feel <strong>BEFORE</strong> your visit?</h2>
-            <p class="subtitle">Tap the face that matches</p>
-            <div class="emoji-scale" role="radiogroup" aria-label="Rate your mood before visiting">
-                <button class="emoji-btn" data-value="1" onclick="selectMood(this, 'before')" role="radio"
-                    aria-checked="false" aria-label="Very stressed">😢</button>
-                <button class="emoji-btn" data-value="2" onclick="selectMood(this, 'before')" role="radio"
-                    aria-checked="false" aria-label="A bit stressed">😕</button>
-                <button class="emoji-btn" data-value="3" onclick="selectMood(this, 'before')" role="radio"
-                    aria-checked="false" aria-label="Okay">😐</button>
-                <button class="emoji-btn" data-value="4" onclick="selectMood(this, 'before')" role="radio"
-                    aria-checked="false" aria-label="Good">🙂</button>
-                <button class="emoji-btn" data-value="5" onclick="selectMood(this, 'before')" role="radio"
-                    aria-checked="false" aria-label="Great">😄</button>
+        <!-- SCREEN 3: Mood Before -->
+        <div class="screen" id="screen3">
+            <h2>How did you feel <em>before</em> your visit?</h2>
+            <p class="subtitle">Tap the face that best matches</p>
+            <div class="rating-group" role="radiogroup" aria-label="Mood before visit">
+                <div class="rating-item"><button class="rating-btn" data-value="1" onclick="selectMood(this, 'before')"
+                        aria-label="Very stressed">😫</button><span class="rating-label">Awful</span></div>
+                <div class="rating-item"><button class="rating-btn" data-value="2" onclick="selectMood(this, 'before')"
+                        aria-label="Stressed">😕</button><span class="rating-label">Meh</span></div>
+                <div class="rating-item"><button class="rating-btn" data-value="3" onclick="selectMood(this, 'before')"
+                        aria-label="Neutral">😐</button><span class="rating-label">Okay</span></div>
+                <div class="rating-item"><button class="rating-btn" data-value="4" onclick="selectMood(this, 'before')"
+                        aria-label="Good">🙂</button><span class="rating-label">Good</span></div>
+                <div class="rating-item"><button class="rating-btn" data-value="5" onclick="selectMood(this, 'before')"
+                        aria-label="Amazing">🤩</button><span class="rating-label">Great!</span></div>
             </div>
-            <p class="skip-link" tabindex="0" onclick="nextScreen()" onkeypress="if(event.key==='Enter')nextScreen()">
-                Skip this question</p>
+            <button class="skip" onclick="nextScreen()">Skip this question</button>
         </div>
 
-        <!-- Screen 4: Mood After -->
-        <div class="screen" id="screen4" data-step="4">
-            <h2>How do you feel <strong>NOW</strong>?</h2>
-            <p class="subtitle">Tap the face that matches</p>
-            <div class="emoji-scale" role="radiogroup" aria-label="Rate your mood after visiting">
-                <button class="emoji-btn" data-value="1" onclick="selectMood(this, 'after')" role="radio"
-                    aria-checked="false" aria-label="Very stressed">😢</button>
-                <button class="emoji-btn" data-value="2" onclick="selectMood(this, 'after')" role="radio"
-                    aria-checked="false" aria-label="A bit stressed">😕</button>
-                <button class="emoji-btn" data-value="3" onclick="selectMood(this, 'after')" role="radio"
-                    aria-checked="false" aria-label="Okay">😐</button>
-                <button class="emoji-btn" data-value="4" onclick="selectMood(this, 'after')" role="radio"
-                    aria-checked="false" aria-label="Good">🙂</button>
-                <button class="emoji-btn" data-value="5" onclick="selectMood(this, 'after')" role="radio"
-                    aria-checked="false" aria-label="Great">😄</button>
+        <!-- SCREEN 4: Mood After -->
+        <div class="screen" id="screen4">
+            <h2>How do you feel <em>now</em>?</h2>
+            <p class="subtitle">After your experience</p>
+            <div class="rating-group" role="radiogroup" aria-label="Mood after visit">
+                <div class="rating-item"><button class="rating-btn" data-value="1" onclick="selectMood(this, 'after')"
+                        aria-label="Very stressed">😫</button><span class="rating-label">Awful</span></div>
+                <div class="rating-item"><button class="rating-btn" data-value="2" onclick="selectMood(this, 'after')"
+                        aria-label="Stressed">😕</button><span class="rating-label">Meh</span></div>
+                <div class="rating-item"><button class="rating-btn" data-value="3" onclick="selectMood(this, 'after')"
+                        aria-label="Neutral">😐</button><span class="rating-label">Okay</span></div>
+                <div class="rating-item"><button class="rating-btn" data-value="4" onclick="selectMood(this, 'after')"
+                        aria-label="Good">🙂</button><span class="rating-label">Good</span></div>
+                <div class="rating-item"><button class="rating-btn" data-value="5" onclick="selectMood(this, 'after')"
+                        aria-label="Amazing">🤩</button><span class="rating-label">Amazing!</span></div>
             </div>
-            <p class="skip-link" tabindex="0" onclick="nextScreen()" onkeypress="if(event.key==='Enter')nextScreen()">
-                Skip this question</p>
+            <button class="skip" onclick="nextScreen()">Skip this question</button>
         </div>
 
-        <!-- Screen 5: Nature Connection -->
-        <div class="screen" id="screen5" data-step="5">
-            <h2>Did you feel connected to nature or animals?</h2>
-            <div class="emoji-scale" role="radiogroup" aria-label="Rate your connection to nature">
-                <button class="emoji-btn" data-value="1" onclick="selectConnection(this)" role="radio"
-                    aria-checked="false" aria-label="Not really">💔</button>
-                <button class="emoji-btn" data-value="2" onclick="selectConnection(this)" role="radio"
-                    aria-checked="false" aria-label="A little">💛</button>
-                <button class="emoji-btn" data-value="3" onclick="selectConnection(this)" role="radio"
-                    aria-checked="false" aria-label="Yes">💚</button>
-                <button class="emoji-btn" data-value="4" onclick="selectConnection(this)" role="radio"
-                    aria-checked="false" aria-label="Very much">💚</button>
+        <!-- SCREEN 5: Nature Connection -->
+        <div class="screen" id="screen5">
+            <h2>Did you feel connected to nature?</h2>
+            <p class="subtitle">Animals, plants, the outdoors...</p>
+            <div class="rating-group" role="radiogroup" aria-label="Nature connection">
+                <div class="rating-item"><button class="rating-btn" data-value="1" onclick="selectConnection(this)"
+                        aria-label="Not at all">💔</button><span class="rating-label">Nope</span></div>
+                <div class="rating-item"><button class="rating-btn" data-value="2" onclick="selectConnection(this)"
+                        aria-label="A little">🤏</button><span class="rating-label">A bit</span></div>
+                <div class="rating-item"><button class="rating-btn" data-value="3" onclick="selectConnection(this)"
+                        aria-label="Yes">💚</button><span class="rating-label">Yes!</span></div>
+                <div class="rating-item"><button class="rating-btn" data-value="4" onclick="selectConnection(this)"
+                        aria-label="Very much">🌟</button><span class="rating-label">So much!</span></div>
+                <div class="rating-item"><button class="rating-btn" data-value="5" onclick="selectConnection(this)"
+                        aria-label="Totally transformed">🥹</button><span class="rating-label">Moved</span></div>
             </div>
-            <p class="skip-link" tabindex="0" onclick="nextScreen()" onkeypress="if(event.key==='Enter')nextScreen()">
-                Skip this question</p>
+            <button class="skip" onclick="nextScreen()">Skip this question</button>
         </div>
 
-        <!-- Screen 6: Would Recommend (NPS) -->
-        <div class="screen" id="screen6" data-step="6">
-            <h2>Would you tell a friend about us?</h2>
-            <div class="nps-group" role="radiogroup" aria-label="Would you recommend us">
-                <button class="nps-btn no" data-value="no" onclick="selectNPS(this)" role="radio"
-                    aria-checked="false">👎 No</button>
-                <button class="nps-btn maybe" data-value="maybe" onclick="selectNPS(this)" role="radio"
-                    aria-checked="false">🤷 Maybe</button>
-                <button class="nps-btn yes" data-value="yes" onclick="selectNPS(this)" role="radio"
-                    aria-checked="false">👍 Yes!</button>
+        <!-- SCREEN 6: Recommend -->
+        <div class="screen" id="screen6">
+            <h2>Would you tell a friend?</h2>
+            <p class="subtitle">"Hey, you should check out this place!"</p>
+            <div class="nps-row" role="radiogroup" aria-label="Recommendation">
+                <button class="nps-btn no" data-value="no" onclick="selectNPS(this)"><span
+                        class="nps-emoji">😬</span><span class="nps-text">Nah</span></button>
+                <button class="nps-btn maybe" data-value="maybe" onclick="selectNPS(this)"><span
+                        class="nps-emoji">🤔</span><span class="nps-text">Maybe</span></button>
+                <button class="nps-btn yes" data-value="yes" onclick="selectNPS(this)"><span
+                        class="nps-emoji">🙌</span><span class="nps-text">Yes!</span></button>
             </div>
-            <p class="skip-link" tabindex="0" onclick="nextScreen()" onkeypress="if(event.key==='Enter')nextScreen()">
-                Skip this question</p>
+            <button class="skip" onclick="nextScreen()">Skip this question</button>
         </div>
 
-        <!-- Screen 7: Referral Source -->
-        <div class="screen" id="screen7" data-step="7">
-            <h2>How did you hear about us?</h2>
-            <div class="referral-grid" role="radiogroup" aria-label="How did you find us">
-                <button class="program-btn" data-value="Friends/Family" onclick="selectReferral(this)" role="radio"
-                    aria-checked="false">👨‍👩‍👧 Friends</button>
-                <button class="program-btn" data-value="Social Media" onclick="selectReferral(this)" role="radio"
-                    aria-checked="false">📱 Social Media</button>
-                <button class="program-btn" data-value="Google Search" onclick="selectReferral(this)" role="radio"
-                    aria-checked="false">🔍 Google</button>
-                <button class="program-btn" data-value="Event/Fair" onclick="selectReferral(this)" role="radio"
-                    aria-checked="false">🎪 Event/Fair</button>
-                <button class="program-btn" data-value="School/Therapist" onclick="selectReferral(this)" role="radio"
-                    aria-checked="false">🏫 School</button>
-                <button class="program-btn" data-value="Other" onclick="selectReferral(this)" role="radio"
-                    aria-checked="false">💬 Other</button>
+        <!-- SCREEN 7: Referral -->
+        <div class="screen" id="screen7">
+            <h2>How did you find us?</h2>
+            <p class="subtitle">Select one</p>
+            <div class="ref-grid" role="radiogroup" aria-label="Referral source">
+                <button class="card-btn" data-value="Friends/Family" onclick="selectReferral(this)"><span
+                        class="card-emoji">👨‍👩‍👧</span> Friends</button>
+                <button class="card-btn" data-value="Social Media" onclick="selectReferral(this)"><span
+                        class="card-emoji">📱</span> Social</button>
+                <button class="card-btn" data-value="Google Search" onclick="selectReferral(this)"><span
+                        class="card-emoji">🔍</span> Google</button>
+                <button class="card-btn" data-value="Event/Fair" onclick="selectReferral(this)"><span
+                        class="card-emoji">🎪</span> Event</button>
+                <button class="card-btn" data-value="School/Therapist" onclick="selectReferral(this)"><span
+                        class="card-emoji">🏫</span> School</button>
+                <button class="card-btn" data-value="Other" onclick="selectReferral(this)"><span
+                        class="card-emoji">💬</span> Other</button>
             </div>
-            <p class="skip-link" tabindex="0" onclick="nextScreen()" onkeypress="if(event.key==='Enter')nextScreen()">
-                Skip this question</p>
+            <button class="skip" onclick="nextScreen()">Skip this question</button>
         </div>
 
-        <!-- Screen 8: Age Range -->
-        <div class="screen" id="screen8" data-step="8">
+        <!-- SCREEN 8: Age -->
+        <div class="screen" id="screen8">
             <h2>What's your age range?</h2>
-            <p class="subtitle">This helps us understand who we're reaching</p>
-            <div class="program-grid" role="radiogroup" aria-label="Select your age range">
-                <button class="program-btn" data-value="0-17" onclick="selectAge(this)" role="radio"
-                    aria-checked="false">👧 Under 18</button>
-                <button class="program-btn" data-value="18-25" onclick="selectAge(this)" role="radio"
-                    aria-checked="false">🧑 18-25</button>
-                <button class="program-btn" data-value="26-40" onclick="selectAge(this)" role="radio"
-                    aria-checked="false">👨 26-40</button>
-                <button class="program-btn" data-value="41-60" onclick="selectAge(this)" role="radio"
-                    aria-checked="false">🧔 41-60</button>
-                <button class="program-btn" data-value="61+" onclick="selectAge(this)" role="radio"
-                    aria-checked="false">👴 61+</button>
+            <p class="subtitle">Helps us understand our visitors</p>
+            <div class="card-grid" role="radiogroup" aria-label="Age range">
+                <button class="card-btn" data-value="0-17" onclick="selectAge(this)"><span class="card-emoji">🧒</span>
+                    Under 18</button>
+                <button class="card-btn" data-value="18-25" onclick="selectAge(this)"><span class="card-emoji">🧑</span>
+                    18-25</button>
+                <button class="card-btn" data-value="26-40" onclick="selectAge(this)"><span class="card-emoji">👨</span>
+                    26-40</button>
+                <button class="card-btn" data-value="41-60" onclick="selectAge(this)"><span
+                        class="card-emoji">👩‍🦳</span> 41-60</button>
+                <button class="card-btn" data-value="61+" onclick="selectAge(this)"><span class="card-emoji">👴</span>
+                    61+</button>
             </div>
-            <p class="skip-link" tabindex="0" onclick="nextScreen()" onkeypress="if(event.key==='Enter')nextScreen()">
-                Skip this question</p>
+            <button class="skip" onclick="nextScreen()">Skip this question</button>
         </div>
 
-        <!-- Screen 9: Standout Moment -->
-        <div class="screen" id="screen9" data-step="9">
+        <!-- SCREEN 9: Standout Moment -->
+        <div class="screen" id="screen9">
             <h2>What was your favorite part?</h2>
-            <p class="subtitle">Optional - share a special moment</p>
-            <textarea class="text-input" id="standoutMoment" placeholder="Example: Meeting the baby goats was magical!"
-                aria-label="Describe your favorite moment"></textarea>
-            <div class="nav-buttons">
-                <button class="btn btn-primary" onclick="submitSurvey()" aria-label="Submit the survey">Submit
-                    🌻</button>
+            <p class="subtitle">A moment, animal, or feeling... (optional)</p>
+            <textarea class="text-box" id="standoutMoment" placeholder="The baby goats made my day! 🐐"
+                aria-label="Your favorite moment"></textarea>
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="submitSurvey()">Submit 🌻</button>
             </div>
-            <p class="skip-link" tabindex="0" onclick="submitSurvey()"
-                onkeypress="if(event.key==='Enter')submitSurvey()">Skip and submit</p>
-            <p id="errorMsg" class="error-msg">Something went wrong. Please try again.</p>
+            <button class="skip" onclick="submitSurvey()">Skip & submit</button>
+            <p id="errorMsg" class="error">Oops! Something went wrong. Trying again...</p>
         </div>
 
-        <!-- Screen 10: Thank You -->
-        <div class="screen" id="screen10" data-step="10">
-            <div class="thank-you-icon">🌻</div>
-            <h1>Thank You!</h1>
-            <p class="subtitle">Your feedback helps us grow.<br>We hope to see you again soon!</p>
-            <div class="nav-buttons">
-                <a href="https://empowermentfarm.org" class="btn btn-primary" aria-label="Visit website">Visit Our
-                    Website</a>
+        <!-- SCREEN 10: Thank You -->
+        <div class="screen" id="screen10">
+            <div class="thank-card">
+                <div class="thank-emoji">🎉</div>
+                <h1>Thank You!</h1>
+                <p class="subtitle">Your feedback helps us grow our community.</p>
+                <div class="quote">
+                    "Labels stop at the gate."<br>
+                    <small>— Tiffany Lehman, Founder</small>
+                </div>
+                <div class="link-row">
+                    <a href="https://empowermentfarm.org" class="link-btn">🌻 Visit Website</a>
+                    <a href="https://empowerment-farm.givecloud.co/fundraising/forms/G2EXWJD6" class="link-btn">💚
+                        Donate</a>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         // ============================================
-        // SURVEY STATE
+        // STATE
         // ============================================
         let currentScreen = 1;
         const totalScreens = 10;
-        const surveyData = {
+        const totalQuestions = 8;
+        const data = {
             program_name: null,
             mood_before: null,
             mood_after: null,
@@ -563,24 +749,23 @@
             age_range: null,
             standout_moment: null
         };
-
         let supabaseClient = null;
 
         // ============================================
-        // INIT SUPABASE
+        // INIT
         // ============================================
         async function initSupabase() {
             try {
-                const response = await fetch('/api/get_config');
-                if (response.ok) {
-                    const config = await response.json();
-                    if (config.SUPABASE_URL && config.ANON_KEY) {
-                        supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.ANON_KEY);
-                        console.log('✅ Supabase connected');
+                const res = await fetch('/api/get_config');
+                if (res.ok) {
+                    const c = await res.json();
+                    if (c.SUPABASE_URL && c.ANON_KEY) {
+                        supabaseClient = window.supabase.createClient(c.SUPABASE_URL, c.ANON_KEY);
+                        console.log('✅ Supabase ready');
                     }
                 }
-            } catch (err) {
-                console.error('Supabase init error:', err);
+            } catch (e) {
+                console.error('Supabase init error', e);
             }
         }
 
@@ -588,142 +773,141 @@
         // NAVIGATION
         // ============================================
         function updateProgress() {
-            const progress = ((currentScreen - 1) / (totalScreens - 2)) * 100;
-            document.getElementById('progressBar').style.width = Math.min(progress, 100) + '%';
+            const pct = ((currentScreen - 1) / totalQuestions) * 100;
+            document.getElementById('progressBar').style.width = Math.min(pct, 100) + '%';
+            const q = Math.min(currentScreen - 1, totalQuestions);
+            document.getElementById('progressText').textContent = q === 0 ? 'Ready to start' : `Question ${q} of ${totalQuestions}`;
         }
 
-        function showScreen(num) {
+        function showScreen(n) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('screen' + num).classList.add('active');
-            currentScreen = num;
+            document.getElementById('screen' + n).classList.add('active');
+            currentScreen = n;
             updateProgress();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function nextScreen() {
-            if (currentScreen < totalScreens) {
-                showScreen(currentScreen + 1);
-            }
+            if (currentScreen < totalScreens) showScreen(currentScreen + 1);
         }
 
         // ============================================
         // SELECTION HANDLERS
         // ============================================
         function selectProgram(btn) {
-            document.querySelectorAll('#screen2 .program-btn').forEach(b => {
-                b.classList.remove('selected');
-                b.setAttribute('aria-checked', 'false');
-            });
+            document.querySelectorAll('#screen2 .card-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
-            btn.setAttribute('aria-checked', 'true');
-            surveyData.program_name = btn.dataset.value;
-            setTimeout(nextScreen, 300);
+            data.program_name = btn.dataset.value;
+            setTimeout(nextScreen, 250);
         }
 
         function selectMood(btn, type) {
             const screen = btn.closest('.screen');
-            screen.querySelectorAll('.emoji-btn').forEach(b => {
-                b.classList.remove('selected');
-                b.setAttribute('aria-checked', 'false');
-            });
+            screen.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+            screen.querySelectorAll('.rating-item').forEach(i => i.classList.remove('selected'));
             btn.classList.add('selected');
-            btn.setAttribute('aria-checked', 'true');
+            btn.closest('.rating-item').classList.add('selected');
 
-            if (type === 'before') {
-                surveyData.mood_before = parseInt(btn.dataset.value);
-            } else {
-                surveyData.mood_after = parseInt(btn.dataset.value);
-            }
-            setTimeout(nextScreen, 300);
+            if (type === 'before') data.mood_before = parseInt(btn.dataset.value);
+            else data.mood_after = parseInt(btn.dataset.value);
+            setTimeout(nextScreen, 250);
         }
 
         function selectConnection(btn) {
-            document.querySelectorAll('#screen5 .emoji-btn').forEach(b => {
-                b.classList.remove('selected');
-                b.setAttribute('aria-checked', 'false');
-            });
+            document.querySelectorAll('#screen5 .rating-btn').forEach(b => b.classList.remove('selected'));
+            document.querySelectorAll('#screen5 .rating-item').forEach(i => i.classList.remove('selected'));
             btn.classList.add('selected');
-            btn.setAttribute('aria-checked', 'true');
-            surveyData.nature_connection = parseInt(btn.dataset.value);
-            setTimeout(nextScreen, 300);
+            btn.closest('.rating-item').classList.add('selected');
+            data.nature_connection = parseInt(btn.dataset.value);
+            setTimeout(nextScreen, 250);
         }
 
         function selectNPS(btn) {
-            document.querySelectorAll('.nps-btn').forEach(b => {
-                b.classList.remove('selected');
-                b.setAttribute('aria-checked', 'false');
-            });
+            document.querySelectorAll('.nps-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
-            btn.setAttribute('aria-checked', 'true');
-            surveyData.would_recommend = btn.dataset.value;
-            setTimeout(nextScreen, 300);
+            data.would_recommend = btn.dataset.value;
+            setTimeout(nextScreen, 250);
         }
 
         function selectReferral(btn) {
-            document.querySelectorAll('#screen7 .program-btn').forEach(b => {
-                b.classList.remove('selected');
-                b.setAttribute('aria-checked', 'false');
-            });
+            document.querySelectorAll('#screen7 .card-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
-            btn.setAttribute('aria-checked', 'true');
-            surveyData.referral_source = btn.dataset.value;
-            setTimeout(nextScreen, 300);
+            data.referral_source = btn.dataset.value;
+            setTimeout(nextScreen, 250);
         }
 
         function selectAge(btn) {
-            document.querySelectorAll('#screen8 .program-btn').forEach(b => {
-                b.classList.remove('selected');
-                b.setAttribute('aria-checked', 'false');
-            });
+            document.querySelectorAll('#screen8 .card-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
-            btn.setAttribute('aria-checked', 'true');
-            surveyData.age_range = btn.dataset.value;
-            setTimeout(nextScreen, 300);
+            data.age_range = btn.dataset.value;
+            setTimeout(nextScreen, 250);
         }
 
         // ============================================
         // SUBMIT
         // ============================================
         async function submitSurvey() {
-            surveyData.standout_moment = document.getElementById('standoutMoment').value.trim() || null;
-
-            console.log('Submitting:', surveyData);
+            data.standout_moment = document.getElementById('standoutMoment').value.trim() || null;
 
             if (!supabaseClient) {
-                console.error('Supabase not initialized');
-                showScreen(totalScreens); // Show thank you anyway
+                console.warn('No Supabase, showing thank you anyway');
+                showScreen(totalScreens);
+                launchConfetti();
                 return;
             }
 
             try {
-                // Map to existing table structure for compatibility
                 const dbData = {
-                    experience_type: surveyData.program_name,
-                    age_range_bracket: surveyData.age_range,
-                    is_present_engaged: surveyData.mood_after || 3,
-                    connection_others_score: surveyData.nature_connection || 3,
-                    connection_nature_score: surveyData.nature_connection || 3,
-                    calmness_score: surveyData.mood_after || 3,
+                    experience_type: data.program_name,
+                    age_range_bracket: data.age_range,
+                    is_present_engaged: data.mood_after || 3,
+                    connection_others_score: data.nature_connection || 3,
+                    connection_nature_score: data.nature_connection || 3,
+                    calmness_score: data.mood_after || 3,
                     learning_intent_score: 3,
-                    community_benefit_score: surveyData.would_recommend === 'yes' ? 3 : surveyData.would_recommend === 'maybe' ? 2 : 1,
-                    would_recommend: surveyData.would_recommend === 'yes',
-                    referral_source: surveyData.referral_source,
-                    standout_moment: surveyData.standout_moment
+                    community_benefit_score: data.would_recommend === 'yes' ? 3 : data.would_recommend === 'maybe' ? 2 : 1,
+                    would_recommend: data.would_recommend === 'yes',
+                    referral_source: data.referral_source,
+                    standout_moment: data.standout_moment
                 };
 
-                const { error } = await supabaseClient
-                    .from('surveyresponses')
-                    .insert([dbData]);
-
+                const { error } = await supabaseClient.from('surveyresponses').insert([dbData]);
                 if (error) throw error;
 
-                console.log('✅ Survey submitted successfully');
+                console.log('✅ Submitted');
                 showScreen(totalScreens);
-            } catch (err) {
-                console.error('Submit error:', err);
+                launchConfetti();
+            } catch (e) {
+                console.error('Submit error:', e);
                 document.getElementById('errorMsg').classList.add('show');
-                // Still show thank you after brief delay
-                setTimeout(() => showScreen(totalScreens), 2000);
+                setTimeout(() => {
+                    showScreen(totalScreens);
+                    launchConfetti();
+                }, 1500);
             }
+        }
+
+        // ============================================
+        // CONFETTI 🎉
+        // ============================================
+        function launchConfetti() {
+            const colors = ['#22c55e', '#fbbf24', '#f472b6', '#60a5fa', '#a78bfa'];
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => createConfetti(colors[Math.floor(Math.random() * colors.length)]), i * 25);
+            }
+        }
+
+        function createConfetti(color) {
+            const el = document.createElement('div');
+            el.className = 'confetti';
+            el.style.cssText = `left:${Math.random() * 100}vw;top:-10px;width:${6 + Math.random() * 8}px;height:${6 + Math.random() * 8}px;background:${color};border-radius:${Math.random() > 0.5 ? '50%' : '2px'}`;
+            document.body.appendChild(el);
+
+            el.animate([
+                { transform: 'translateY(0) rotate(0)', opacity: 1 },
+                { transform: `translateY(${window.innerHeight + 50}px) translateX(${(Math.random() - 0.5) * 150}px) rotate(${360 + Math.random() * 360}deg)`, opacity: 0 }
+            ], { duration: 2000 + Math.random() * 1500, easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)' })
+                .onfinish = () => el.remove();
         }
 
         // Init
