@@ -32,9 +32,8 @@ A secure, mobile-optimized digital survey and analytics platform for Empowerment
 
 ### 1. Database Setup (Supabase)
 1. Create a new project at [database.new](https://database.new).
-2. Go to **SQL Editor** and run the scripts in this order:
-   - `01_schema_creation.sql` (Creates tables)
-   - `08_comprehensive_security.sql` (Enables Security Policies)
+3. Go to **SQL Editor** and run:
+   - `schema.sql` (Creates tables, views, and security policies)
 3. Go to **Project Settings > API** to get your `URL` and `ANON_KEY`.
 
 ### 2. Authentication Setup
@@ -65,9 +64,10 @@ A secure, mobile-optimized digital survey and analytics platform for Empowerment
 │       └── get_config.js   # Secure API Key Proxy
 │
 └── sql/                    # Database Scripts
-    ├── 01_schema_creation.sql
-    ├── 08_comprehensive_security.sql
-    └── ...
+    ├── schema.sql          # Main Schema + Security (Run this first!)
+    ├── seed_data.sql       # Optional: Sample data
+    ├── queries.sql         # Helpful analytics queries
+    └── DATA_DICTIONARY.md  # Documentation
 ```
 
 ## 🛡️ Security Details

@@ -7,19 +7,25 @@
 
 ## Schema Overview
 
+## Schema Overview
+
 | Table | Purpose | Access Level |
 |-------|---------|--------------|
-| `ProgramCatalog` | Actual programs from website (Cow Yoga, Tuesday Tuck-In, etc.) | Public |
-| `FarmZones` | Physical farm areas (Barnyard, Pollinator Garden, etc.) | Public |
-| `Animals` | Therapy animal registry | Public |
-| `Constituents` | Basic participant identity (no sensitive data) | Public |
-| `ConstituentProfiles` | 🔒 Sensitive PII for grant reporting | Restricted |
-| `Experiences` | Session attendance records | Staff |
-| `SurveyResponses` | JotForm-aligned feedback with demographics | Staff |
+| `programcatalog` | Actual programs from website (Cow Yoga, Tuesday Tuck-In, etc.) | Public |
+| `farmzones` | Physical farm areas (Barnyard, Pollinator Garden, etc.) | Public |
+| `animals` | Therapy animal registry | Public |
+| `constituents` | Basic participant identity (no sensitive data) | Public |
+| `constituentprofiles` | 🔒 Sensitive PII for grant reporting | Restricted |
+| `experiences` | Session attendance records | Staff |
+| `surveyresponses` | **Single Source of Truth** for all survey feedback | Staff |
+| `audit_log` | Database change tracking | Admin |
+
+> [!NOTE]
+> **Streamlined Architecture:** The `survey_v2` table has been deprecated. All data now flows into `surveyresponses`.
 
 ---
 
-## Table: `SurveyResponses` (JotForm-Aligned)
+## Table: `surveyresponses` (JotForm-Aligned)
 
 > [!IMPORTANT]
 > **Audit Compliance:** Every column maps directly to a JotForm question.  
@@ -53,12 +59,12 @@
 ## Why `age_range_bracket` Exists in TWO Tables
 
 > [!NOTE]
-> **Audit Design Decision:** Age range appears in both `SurveyResponses` AND `ConstituentProfiles` for different purposes.
+> **Audit Design Decision:** Age range appears in both `surveyresponses` AND `constituentprofiles` for different purposes.
 
 | Location | Purpose | Use Case |
 |----------|---------|----------|
-| `SurveyResponses.age_range_bracket` | **Anonymous Demographics** | Walk-in visitors who complete survey without creating account. Essential for grant reporting on one-time participants. |
-| `ConstituentProfiles.age_range` | **Known User Demographics** | Registered constituents with profiles. Used for longitudinal tracking of known participants. |
+| `surveyresponses.age_range_bracket` | **Anonymous Demographics** | Walk-in visitors who complete survey without creating account. Essential for grant reporting on one-time participants. |
+| `constituentprofiles.age_range` | **Known User Demographics** | Registered constituents with profiles. Used for longitudinal tracking of known participants. |
 
 This dual-storage approach ensures:
 1. **100% demographic coverage** even for anonymous walk-ins
@@ -67,7 +73,7 @@ This dual-storage approach ensures:
 
 ---
 
-## Table: `ProgramCatalog`
+## Table: `programcatalog`
 
 | Column | Type | Description |
 |--------|------|-------------|
@@ -89,11 +95,10 @@ This dual-storage approach ensures:
 - JusTeenys Greenies
 - Educational Field Trips
 - Group & Partner Programs
-- Farms Without Fences (Off-Site)
 
 ---
 
-## Table: `ConstituentProfiles` (🔒 Restricted)
+## Table: `constituentprofiles` (🔒 Restricted)
 
 > [!CAUTION]
 > This table requires elevated permissions. Supports "Labels Stop at the Gate" by separating sensitive data from daily operations.
@@ -115,12 +120,12 @@ This dual-storage approach ensures:
 
 ```sql
 -- Public can INSERT surveys (anonymous submissions allowed)
-CREATE POLICY "Allow public survey submissions" ON SurveyResponses
+CREATE POLICY "Allow public survey submissions" ON surveyresponses
     FOR INSERT TO anon, authenticated
     WITH CHECK (true);
 
 -- Only authenticated staff can VIEW responses
-CREATE POLICY "Only authenticated can view surveys" ON SurveyResponses
+CREATE POLICY "Only authenticated can view surveys" ON surveyresponses
     FOR SELECT TO authenticated
     USING (true);
 ```
@@ -129,4 +134,4 @@ CREATE POLICY "Only authenticated can view surveys" ON SurveyResponses
 
 ## ERD Reference
 
-See [06_erd_source.mermaid](file:///d:/DownloadsD/EMPOWEREMNET_FARM_DB/06_erd_source.mermaid) for visual diagram.
+See [ERD.mermaid](file:///d:/DownloadsD/EMPOWEREMNET_FARM_DB/ERD.mermaid) for visual diagram.

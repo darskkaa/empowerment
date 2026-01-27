@@ -1,21 +1,34 @@
 -- ============================================================================
--- EMPOWERMENT FARM DATABASE SCHEMA (AUDIT-COMPLIANT)
+-- EMPOWERMENT FARM DATABASE SCHEMA
 -- ============================================================================
 -- Client: Empowerment Farm (Naples, FL)
 -- Mission: "Labels Stop at the Gate" - Track outcomes without diagnostic labels
--- Audit: Schema matches JotForm survey questions exactly (Yes/Somewhat/No = 3/2/1)
 -- ============================================================================
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ============================================================================
--- TABLE: ProgramCatalog
+-- CLEANUP (Optional - ensures clean state if needed)
 -- ============================================================================
--- Purpose: Master list of actual programs offered at Empowerment Farm.
--- Source: Extracted directly from empowermentfarm.org website content.
+-- Uncomment these lines to DELETE ALL DATA and reset tables
+-- DROP TABLE IF EXISTS survey_v2 CASCADE;
+-- DROP TABLE IF EXISTS surveyresponses CASCADE;
+-- DROP TABLE IF EXISTS experiences CASCADE;
+-- DROP TABLE IF EXISTS constituentprofiles CASCADE;
+-- DROP TABLE IF EXISTS constituents CASCADE;
+-- DROP TABLE IF EXISTS animals CASCADE;
+-- DROP TABLE IF EXISTS farmzones CASCADE;
+-- DROP TABLE IF EXISTS programcatalog CASCADE;
+-- DROP TABLE IF EXISTS audit_log CASCADE;
+
+-- Drop unwanted table "survey_v2" if the user wants to consolidate
+DROP TABLE IF EXISTS survey_v2;
+
 -- ============================================================================
-CREATE TABLE ProgramCatalog (
+-- TABLE: programcatalog
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS programcatalog (
     program_id        UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     program_name      VARCHAR(150) NOT NULL UNIQUE,
     program_category  VARCHAR(100) NOT NULL,
@@ -26,27 +39,21 @@ CREATE TABLE ProgramCatalog (
     created_at        TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Insert ACTUAL programs from website
-INSERT INTO ProgramCatalog (program_name, program_category, description, schedule_notes, cost_notes) VALUES
-('Open Farm (Second Saturdays)', 'Open Farm', 'Self-guided tours, animal meet and greets, farm market shopping, food forest exploration', '2nd Saturday monthly, 9AM-1PM', '$10/Adult, $25/Family'),
+-- Insert programs (ON CONFLICT DO NOTHING prevents errors on re-run)
+INSERT INTO programcatalog (program_name, program_category, description, schedule_notes, cost_notes) VALUES
+('Open Farm (Second Saturdays)', 'Open Farm', 'Self-guided tours, animal meet and greets, farm market shopping', '2nd Saturday monthly, 9AM-1PM', '$10/Adult, $25/Family'),
 ('Cow Yoga', 'Yoga', 'Farmyard yoga featuring cows, relaxation and regeneration', '4th Thursday monthly, 4-6PM', '$30/Person'),
 ('Yoga with the Animals', 'Yoga', 'Monthly yoga on the farm with animals, includes social hour', '4th Thursday monthly, 4-5PM', '$30/Person'),
 ('Tuesday Night Tuck-In', 'Family Program', 'Afterschool wind-down: open play, tuck animals in for bed, story time', 'Every Tuesday 3:30-5:30PM', '$25/Family'),
-('Paint & Pollinators', 'Workshop', 'Guided painting experience in the pollinator garden', 'Saturday workshops', 'Varies'),
 ('Seedlings for Spring', 'Workshop', 'Learn the process of starting seedlings for springtime', 'Saturday workshops', 'Varies'),
-('Better Together - Hugging Can Planters', 'Workshop', 'Companion planting for healthier gardens', 'Saturday workshops', 'Varies'),
-('Sweethearts and Songbirds', 'Workshop', 'Hands-on project supporting local wildlife', 'Saturday workshops', 'Varies'),
 ('JusTeenys Greenies', 'Partner Workshop', 'Microgreens growing workshop with local organic farm', 'Monthly', '$10/Person, $5/Child'),
-('Educational Field Trips', 'Group Program', 'Hands-on learning for grades K-12, curriculum-aligned', 'By appointment', 'Contact for pricing'),
-('Group & Partner Programs', 'Group Program', 'Programs for nonprofits, schools, senior centers', 'By appointment', 'Contact for pricing'),
-('Farms Without Fences (Off-Site)', 'Outreach', 'Off-site programs brought to schools, businesses, senior centers', 'By appointment', 'Contact for pricing');
+('Educational Field Trips', 'Group Program', 'Hands-on learning for grades K-12, curriculum-aligned', 'By appointment', 'Contact for pricing')
+ON CONFLICT (program_name) DO NOTHING;
 
 -- ============================================================================
--- TABLE: FarmZones
+-- TABLE: farmzones
 -- ============================================================================
--- Purpose: Physical areas within the farm where experiences occur.
--- ============================================================================
-CREATE TABLE FarmZones (
+CREATE TABLE IF NOT EXISTS farmzones (
     zone_id       UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     zone_name     VARCHAR(100) NOT NULL UNIQUE,
     zone_type     VARCHAR(50) NOT NULL,
@@ -55,26 +62,23 @@ CREATE TABLE FarmZones (
     created_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
-INSERT INTO FarmZones (zone_name, zone_type, description, is_accessible) VALUES
+INSERT INTO farmzones (zone_name, zone_type, description, is_accessible) VALUES
 ('Main Barnyard', 'Animal Area', 'Primary animal interaction area with goats, cows, chickens', TRUE),
-('Pollinator Garden', 'Garden', 'Butterfly and bee garden, used for Paint & Pollinators', TRUE),
+('Pollinator Garden', 'Garden', 'Butterfly and bee garden', TRUE),
 ('Food Forest', 'Garden', 'Edible landscape with fruit trees and native plants', TRUE),
-('Yoga Pasture', 'Open Field', 'Open pasture area used for Cow Yoga and animal yoga', TRUE),
-('Pavilion', 'Structure', 'Covered area for story time and workshops', TRUE),
-('Farm Market', 'Retail', 'Shop area for farm products and local goods', TRUE),
-('Microgreens Station', 'Garden', 'JusTeenys Greenies workshop area', TRUE);
+('Yoga Pasture', 'Open Field', 'Open pasture area used for Cow Yoga', TRUE),
+('Pavilion', 'Structure', 'Covered area for story time and workshops', TRUE)
+ON CONFLICT (zone_name) DO NOTHING;
 
 -- ============================================================================
--- TABLE: Animals
+-- TABLE: animals
 -- ============================================================================
--- Purpose: Registry of therapy and farm animals.
--- ============================================================================
-CREATE TABLE Animals (
+CREATE TABLE IF NOT EXISTS animals (
     animal_id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     animal_name       VARCHAR(100) NOT NULL,
     species           VARCHAR(50) NOT NULL,
     breed             VARCHAR(100),
-    home_zone_id      UUID REFERENCES FarmZones(zone_id),
+    home_zone_id      UUID REFERENCES farmzones(zone_id),
     temperament       VARCHAR(50),
     is_therapy_animal BOOLEAN DEFAULT FALSE,
     is_active         BOOLEAN DEFAULT TRUE,
@@ -82,12 +86,9 @@ CREATE TABLE Animals (
 );
 
 -- ============================================================================
--- TABLE: Constituents
+-- TABLE: constituents
 -- ============================================================================
--- Purpose: Core identity for participants. Contains ONLY non-sensitive data.
--- Privacy: No diagnostic labels, referral sources, or medical info here.
--- ============================================================================
-CREATE TABLE Constituents (
+CREATE TABLE IF NOT EXISTS constituents (
     constituent_id    UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     first_name        VARCHAR(100),
     last_name         VARCHAR(100),
@@ -100,18 +101,13 @@ CREATE TABLE Constituents (
 );
 
 -- ============================================================================
--- TABLE: ConstituentProfiles (🔒 RESTRICTED ACCESS)
+-- TABLE: constituentprofiles
 -- ============================================================================
--- Purpose: Contains sensitive/private info requiring elevated permissions.
--- Privacy: This table supports "Labels Stop at the Gate" by separating
---          demographic data needed for GRANT REPORTING from operational use.
--- Audit Note: age_range exists here for known constituents with profiles.
--- ============================================================================
-CREATE TABLE ConstituentProfiles (
+CREATE TABLE IF NOT EXISTS constituentprofiles (
     profile_id        UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    constituent_id    UUID NOT NULL UNIQUE REFERENCES Constituents(constituent_id) ON DELETE CASCADE,
+    constituent_id    UUID NOT NULL UNIQUE REFERENCES constituents(constituent_id) ON DELETE CASCADE,
     date_of_birth     DATE,
-    age_range         VARCHAR(20),  -- For grant reporting on known users
+    age_range         VARCHAR(20),
     emergency_contact VARCHAR(255),
     emergency_phone   VARCHAR(20),
     referral_source   VARCHAR(255),
@@ -121,15 +117,13 @@ CREATE TABLE ConstituentProfiles (
 );
 
 -- ============================================================================
--- TABLE: Experiences
+-- TABLE: experiences
 -- ============================================================================
--- Purpose: Links participants to specific program sessions.
--- ============================================================================
-CREATE TABLE Experiences (
+CREATE TABLE IF NOT EXISTS experiences (
     experience_id     UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    constituent_id    UUID REFERENCES Constituents(constituent_id),
-    program_id        UUID REFERENCES ProgramCatalog(program_id),
-    zone_id           UUID REFERENCES FarmZones(zone_id),
+    constituent_id    UUID REFERENCES constituents(constituent_id),
+    program_id        UUID REFERENCES programcatalog(program_id),
+    zone_id           UUID REFERENCES farmzones(zone_id),
     experience_date   DATE NOT NULL,
     start_time        TIME,
     facilitator_name  VARCHAR(200),
@@ -139,98 +133,106 @@ CREATE TABLE Experiences (
 );
 
 -- ============================================================================
--- TABLE: SurveyResponses (JOTFORM-ALIGNED)
+-- TABLE: surveyresponses
 -- ============================================================================
--- Purpose: Captures participant feedback EXACTLY matching JotForm survey.
--- Audit: Each column maps 1:1 to a specific JotForm question.
--- Scale: 3=Yes, 2=Somewhat, 1=No (matches JotForm radio options)
--- 
--- CRITICAL: age_range_bracket exists HERE for anonymous walk-in surveys
---           where we don't have a constituent profile. This allows demographic
---           reporting even for one-time visitors who don't create accounts.
--- ============================================================================
-CREATE TABLE SurveyResponses (
+CREATE TABLE IF NOT EXISTS surveyresponses (
     response_id               UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    
-    -- Link to experience (optional - may be anonymous)
-    experience_id             UUID REFERENCES Experiences(experience_id),
-    constituent_id            UUID REFERENCES Constituents(constituent_id),
-    
-    -- Q1: What was your most recent experience?
+    experience_id             UUID REFERENCES experiences(experience_id),
+    constituent_id            UUID REFERENCES constituents(constituent_id),
     experience_type           VARCHAR(150) NOT NULL,
-    
-    -- Q2: Matrix questions (3=Yes, 2=Somewhat, 1=No)
     is_present_engaged        INT NOT NULL CHECK (is_present_engaged BETWEEN 1 AND 3),
     connection_others_score   INT NOT NULL CHECK (connection_others_score BETWEEN 1 AND 3),
     connection_nature_score   INT NOT NULL CHECK (connection_nature_score BETWEEN 1 AND 3),
     calmness_score            INT NOT NULL CHECK (calmness_score BETWEEN 1 AND 3),
     learning_intent_score     INT NOT NULL CHECK (learning_intent_score BETWEEN 1 AND 3),
     community_benefit_score   INT NOT NULL CHECK (community_benefit_score BETWEEN 1 AND 3),
-    
-    -- Q4: How did you hear about us? (multi-select stored as comma-separated)
     referral_source           TEXT,
-    
-    -- Q8: Standout moment (open text)
     standout_moment           TEXT,
-    
-    -- Q9: Would recommend?
     would_recommend           BOOLEAN DEFAULT TRUE,
-    
-    -- Q10: Additional feedback
     additional_feedback       TEXT,
-    
-    -- Demographics (REQUIRED for anonymous users)
-    age_range_bracket         VARCHAR(20) NOT NULL,  -- '0-17', '18-25', '26-40', '41-60', '61+'
-    
-    -- Optional identity (for follow-up)
+    age_range_bracket         VARCHAR(20) NOT NULL,
     participant_name          VARCHAR(200),
     participant_email         VARCHAR(255),
-    
-    -- Photo capture (optional)
     photo_url                 TEXT,
-    
-    -- Consent
     willing_to_review         BOOLEAN DEFAULT FALSE,
-    
-    -- Metadata
     submitted_at              TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     device_type               VARCHAR(50),
     created_at                TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- ============================================================================
--- INDEXES for performance
+-- TABLE: audit_log
 -- ============================================================================
-CREATE INDEX idx_survey_experience_type ON SurveyResponses(experience_type);
-CREATE INDEX idx_survey_age_range ON SurveyResponses(age_range_bracket);
-CREATE INDEX idx_survey_referral ON SurveyResponses(referral_source);
-CREATE INDEX idx_survey_submitted ON SurveyResponses(submitted_at);
-CREATE INDEX idx_survey_has_photo ON SurveyResponses(photo_url) WHERE photo_url IS NOT NULL;
-CREATE INDEX idx_experiences_program ON Experiences(program_id);
-CREATE INDEX idx_experiences_date ON Experiences(experience_date);
+CREATE TABLE IF NOT EXISTS audit_log (
+    log_id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    table_name        VARCHAR(100) NOT NULL,
+    record_id         UUID,
+    action            VARCHAR(20) NOT NULL CHECK (action IN ('INSERT', 'UPDATE', 'DELETE')),
+    changed_by        UUID,
+    changed_at        TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    old_values        JSONB,
+    new_values        JSONB
+);
 
 -- ============================================================================
--- ROW LEVEL SECURITY (Supabase)
+-- INDEXES (IF NOT EXISTS logic)
 -- ============================================================================
--- Enable RLS so public can INSERT surveys but only admins can SELECT
-ALTER TABLE SurveyResponses ENABLE ROW LEVEL SECURITY;
+CREATE INDEX IF NOT EXISTS idx_survey_experience_type ON surveyresponses(experience_type);
+CREATE INDEX IF NOT EXISTS idx_survey_age_range ON surveyresponses(age_range_bracket);
+CREATE INDEX IF NOT EXISTS idx_survey_referral ON surveyresponses(referral_source);
+CREATE INDEX IF NOT EXISTS idx_survey_submitted ON surveyresponses(submitted_at);
+CREATE INDEX IF NOT EXISTS idx_experiences_program ON experiences(program_id);
+CREATE INDEX IF NOT EXISTS idx_experiences_date ON experiences(experience_date);
 
--- Policy: Anyone can insert their own survey response
-CREATE POLICY "Allow public survey submissions" ON SurveyResponses
+-- ============================================================================
+-- ROW LEVEL SECURITY
+-- ============================================================================
+-- Ensure RLS is enabled
+ALTER TABLE surveyresponses ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies to avoid duplicates before recreating
+DROP POLICY IF EXISTS "Allow public survey submissions" ON surveyresponses;
+DROP POLICY IF EXISTS "Only authenticated can view surveys" ON surveyresponses;
+DROP POLICY IF EXISTS "Only authenticated can update" ON surveyresponses;
+DROP POLICY IF EXISTS "Only authenticated can delete" ON surveyresponses;
+
+CREATE POLICY "Allow public survey submissions" ON surveyresponses
     FOR INSERT TO anon, authenticated
     WITH CHECK (true);
 
--- Policy: Only authenticated users can view responses
-CREATE POLICY "Only authenticated can view surveys" ON SurveyResponses
+CREATE POLICY "Only authenticated can view surveys" ON surveyresponses
     FOR SELECT TO authenticated
     USING (true);
 
+CREATE POLICY "Only authenticated can update" ON surveyresponses
+    FOR UPDATE TO authenticated
+    USING (true);
+
+CREATE POLICY "Only authenticated can delete" ON surveyresponses
+    FOR DELETE TO authenticated
+    USING (true);
+
 -- ============================================================================
--- VIEWS: Analytics Pre-Built
+-- VIEWS
 -- ============================================================================
 
--- View: Survey responses with program details
-CREATE VIEW vw_survey_with_programs AS
+-- Impact Dashboard View
+DROP VIEW IF EXISTS vw_impact_dashboard;
+CREATE OR REPLACE VIEW vw_impact_dashboard AS
+SELECT 
+    experience_type,
+    COUNT(*) as total_responses,
+    ROUND(AVG(calmness_score)::NUMERIC, 2) as avg_calmness,
+    ROUND(AVG(connection_nature_score)::NUMERIC, 2) as avg_nature_connection,
+    ROUND(AVG(is_present_engaged)::NUMERIC, 2) as avg_engagement,
+    SUM(CASE WHEN would_recommend THEN 1 ELSE 0 END) as promoters,
+    COUNT(*) - SUM(CASE WHEN would_recommend THEN 1 ELSE 0 END) as detractors
+FROM surveyresponses
+GROUP BY experience_type;
+
+-- Survey with programs view
+DROP VIEW IF EXISTS vw_survey_with_programs;
+CREATE OR REPLACE VIEW vw_survey_with_programs AS
 SELECT 
     sr.response_id,
     sr.experience_type,
@@ -246,11 +248,6 @@ SELECT
     sr.would_recommend,
     sr.standout_moment,
     sr.submitted_at,
-    -- Computed impact score (average of core metrics)
     ROUND((sr.is_present_engaged + sr.connection_others_score + 
            sr.connection_nature_score + sr.calmness_score)::NUMERIC / 4, 2) AS impact_score
-FROM SurveyResponses sr;
-
--- ============================================================================
--- END OF SCHEMA
--- ============================================================================
+FROM surveyresponses sr;

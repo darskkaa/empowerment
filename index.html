@@ -849,17 +849,20 @@
         async function submitSurvey() {
             data.standout_moment = document.getElementById('standoutMoment').value.trim() || null;
 
+            console.log('📊 Survey data collected:', data);
+
             if (!supabaseClient) {
-                console.warn('No Supabase, showing thank you anyway');
+                console.warn('⚠️ No Supabase client - showing thank you anyway');
                 showScreen(totalScreens);
                 launchConfetti();
                 return;
             }
 
             try {
+                // Map to surveyresponses table columns
                 const dbData = {
-                    experience_type: data.program_name,
-                    age_range_bracket: data.age_range,
+                    experience_type: data.program_name || 'Not specified',
+                    age_range_bracket: data.age_range || '26-40',
                     is_present_engaged: data.mood_after || 3,
                     connection_others_score: data.nature_connection || 3,
                     connection_nature_score: data.nature_connection || 3,
@@ -867,18 +870,27 @@
                     learning_intent_score: 3,
                     community_benefit_score: data.would_recommend === 'yes' ? 3 : data.would_recommend === 'maybe' ? 2 : 1,
                     would_recommend: data.would_recommend === 'yes',
-                    referral_source: data.referral_source,
+                    referral_source: data.referral_source || null,
                     standout_moment: data.standout_moment
                 };
 
-                const { error } = await supabaseClient.from('surveyresponses').insert([dbData]);
-                if (error) throw error;
+                console.log('📤 Inserting into surveyresponses:', dbData);
 
-                console.log('✅ Submitted');
+                const { data: result, error } = await supabaseClient
+                    .from('surveyresponses')
+                    .insert([dbData])
+                    .select();
+
+                if (error) {
+                    console.error('❌ Supabase error:', error);
+                    throw error;
+                }
+
+                console.log('✅ Successfully inserted:', result);
                 showScreen(totalScreens);
                 launchConfetti();
             } catch (e) {
-                console.error('Submit error:', e);
+                console.error('❌ Submit error:', e.message || e);
                 // Still show thank you - don't block user experience
                 showScreen(totalScreens);
                 launchConfetti();

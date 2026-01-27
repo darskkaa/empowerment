@@ -24,7 +24,7 @@ SELECT
         THEN 'Nature Strong, People Needs Work'
         ELSE 'Focus Area'
     END AS correlation_insight
-FROM SurveyResponses
+FROM surveyresponses
 GROUP BY experience_type
 HAVING COUNT(*) >= 2
 ORDER BY avg_nature_connection DESC;
@@ -38,13 +38,13 @@ ORDER BY avg_nature_connection DESC;
 SELECT 
     referral_source,
     COUNT(*) AS total_responses,
-    ROUND(COUNT(*)::NUMERIC / (SELECT COUNT(*) FROM SurveyResponses) * 100, 1) AS percentage,
+    ROUND(COUNT(*)::NUMERIC / (SELECT COUNT(*) FROM surveyresponses) * 100, 1) AS percentage,
     ROUND(AVG(calmness_score), 2) AS avg_calmness,
     ROUND(AVG(
         (is_present_engaged + connection_others_score + connection_nature_score + calmness_score)::NUMERIC / 4
     ), 2) AS avg_impact_score,
     COUNT(CASE WHEN would_recommend = TRUE THEN 1 END) AS would_recommend_count
-FROM SurveyResponses
+FROM surveyresponses
 WHERE referral_source IS NOT NULL AND referral_source != ''
 GROUP BY referral_source
 ORDER BY total_responses DESC;
@@ -58,12 +58,12 @@ ORDER BY total_responses DESC;
 SELECT 
     age_range_bracket,
     COUNT(*) AS participant_count,
-    ROUND(COUNT(*)::NUMERIC / (SELECT COUNT(*) FROM SurveyResponses) * 100, 1) AS percentage,
+    ROUND(COUNT(*)::NUMERIC / (SELECT COUNT(*) FROM surveyresponses) * 100, 1) AS percentage,
     ROUND(AVG(calmness_score), 2) AS avg_calmness,
     ROUND(AVG(connection_nature_score), 2) AS avg_nature_connection,
     COUNT(CASE WHEN learning_intent_score = 3 THEN 1 END) AS will_apply_learnings,
     COUNT(photo_url) AS photos_submitted
-FROM SurveyResponses
+FROM surveyresponses
 GROUP BY age_range_bracket
 ORDER BY 
     CASE age_range_bracket 
@@ -88,7 +88,7 @@ SELECT
     connection_nature_score,
     photo_url,
     submitted_at::DATE AS visit_date
-FROM SurveyResponses
+FROM surveyresponses
 WHERE photo_url IS NOT NULL
 ORDER BY submitted_at DESC;
 
@@ -109,7 +109,7 @@ SELECT
     ROUND(
         COUNT(CASE WHEN learning_intent_score >= 2 THEN 1 END)::NUMERIC / COUNT(*) * 100, 1
     ) AS positive_percentage
-FROM SurveyResponses
+FROM surveyresponses
 GROUP BY experience_type
 ORDER BY yes_percentage DESC;
 
@@ -130,7 +130,7 @@ SELECT
         (is_present_engaged + connection_others_score + connection_nature_score + calmness_score)::NUMERIC / 4
     ), 2) AS impact_score,
     RANK() OVER (ORDER BY AVG(calmness_score) DESC) AS calmness_rank
-FROM SurveyResponses
+FROM surveyresponses
 GROUP BY experience_type
 HAVING COUNT(*) >= 2
 ORDER BY avg_calmness DESC;
@@ -152,7 +152,7 @@ SELECT
         OVER (ORDER BY TO_CHAR(submitted_at, 'YYYY-MM')) AS calmness_change,
     COUNT(photo_url) AS photos_captured,
     COUNT(CASE WHEN would_recommend = TRUE THEN 1 END) AS would_recommend
-FROM SurveyResponses
+FROM surveyresponses
 GROUP BY TO_CHAR(submitted_at, 'YYYY-MM')
 ORDER BY month;
 
@@ -177,7 +177,7 @@ SELECT
         WHEN MAX(connection_nature_score) = MIN(connection_nature_score) THEN '➡️ Stable'
         ELSE '📉 Needs Attention'
     END AS trend
-FROM SurveyResponses
+FROM surveyresponses
 WHERE participant_name IS NOT NULL
 GROUP BY participant_name
 HAVING COUNT(*) >= 2
@@ -199,7 +199,7 @@ SELECT
     ROUND(
         COUNT(CASE WHEN community_benefit_score = 3 THEN 1 END)::NUMERIC / COUNT(*) * 100, 1
     ) AS strong_advocate_pct
-FROM SurveyResponses
+FROM surveyresponses
 GROUP BY experience_type
 ORDER BY avg_community_benefit DESC;
 
@@ -218,11 +218,11 @@ SELECT
     COUNT(standout_moment) AS has_standout_moment,
     -- Sample standout moments for each program
     (SELECT standout_moment 
-     FROM SurveyResponses sr2 
+     FROM surveyresponses sr2 
      WHERE sr2.experience_type = SurveyResponses.experience_type 
        AND sr2.standout_moment IS NOT NULL 
      LIMIT 1) AS sample_moment
-FROM SurveyResponses
+FROM surveyresponses
 GROUP BY experience_type
 ORDER BY recommend_rate DESC, responses DESC;
 
@@ -249,7 +249,7 @@ SELECT
     ROUND(
         COUNT(CASE WHEN would_recommend = TRUE THEN 1 END)::NUMERIC / COUNT(*) * 100, 1
     ) AS recommend_pct
-FROM SurveyResponses
+FROM surveyresponses
 GROUP BY experience_type;
 
 -- ============================================================================

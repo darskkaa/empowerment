@@ -9,7 +9,7 @@
 -- ============================================================================
 -- ANIMALS (Farm animals mentioned on website)
 -- ============================================================================
-INSERT INTO Animals (animal_name, species, breed, temperament, is_therapy_animal) VALUES
+INSERT INTO animals (animal_name, species, breed, temperament, is_therapy_animal) VALUES
 ('Daisy', 'Cow', 'Jersey', 'Calm', TRUE),
 ('Buttercup', 'Cow', 'Holstein', 'Gentle', TRUE),
 ('Clover', 'Goat', 'Nigerian Dwarf', 'Playful', TRUE),
