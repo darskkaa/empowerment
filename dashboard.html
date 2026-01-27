@@ -330,6 +330,170 @@
             el.textContent = message;
         }
 
+        async function signOut() {
+            await supabaseClient.auth.signOut();
+            window.location.reload();
+        }
+
+        // ============================================
+        // DASHBOARD
+        // ============================================
+        async function showDashboard() {
+            document.getElementById('loginScreen').classList.remove('active');
+            document.getElementById('dashboard').classList.add('active');
+            document.getElementById('userEmail').textContent = currentUser.email;
+            await loadData();
+        }
+
+        async function loadData() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('surveyresponses')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                allResponses = data || [];
+                renderMetrics();
+                renderCharts();
+                renderTable();
+
+                document.getElementById('loadingState').classList.add('hidden');
+                document.getElementById('dashboardContent').classList.remove('hidden');
+            } catch (err) {
+                console.error('Data load error:', err);
+                document.getElementById('loadingState').innerHTML = '<p class="text-red-500">Error loading data: ' + err.message + '</p>';
+            }
+        }
+
+        function renderMetrics() {
+            const total = allResponses.length;
+            document.getElementById('totalResponses').textContent = total;
+
+            if (total > 0) {
+                const avgScore = allResponses.reduce((sum, r) => {
+                    return sum + (r.is_present_engaged || 0) + (r.connection_others_score || 0) +
+                        (r.connection_nature_score || 0) + (r.calmness_score || 0) +
+                        (r.learning_intent_score || 0) + (r.community_benefit_score || 0);
+                }, 0) / (total * 18) * 100;
+                document.getElementById('avgSatisfaction').textContent = avgScore.toFixed(0) + '%';
+
+                const recommends = allResponses.filter(r => r.would_recommend === true).length;
+                document.getElementById('recommendRate').textContent = ((recommends / total) * 100).toFixed(0) + '%';
+
+                const programCounts = {};
+                allResponses.forEach(r => {
+                    if (r.experience_type) {
+                        programCounts[r.experience_type] = (programCounts[r.experience_type] || 0) + 1;
+                    }
+                });
+                const topProgram = Object.entries(programCounts).sort((a, b) => b[1] - a[1])[0];
+                document.getElementById('topProgram').textContent = topProgram ? topProgram[0] : '-';
+            }
+        }
+
+        function renderCharts() {
+            let yes = 0, somewhat = 0, no = 0;
+            allResponses.forEach(r => {
+                [r.is_present_engaged, r.connection_others_score, r.connection_nature_score,
+                r.calmness_score, r.learning_intent_score, r.community_benefit_score].forEach(score => {
+                    if (score === 3) yes++;
+                    else if (score === 2) somewhat++;
+                    else if (score === 1) no++;
+                });
+            });
+
+            new Chart(document.getElementById('satisfactionChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Yes', 'Somewhat', 'No'],
+                    datasets: [{ data: [yes, somewhat, no], backgroundColor: ['#22c55e', '#f59e0b', '#ef4444'], borderWidth: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            });
+
+            const referralCounts = {};
+            allResponses.forEach(r => {
+                if (r.referral_source) {
+                    r.referral_source.split(',').forEach(ref => {
+                        const trimmed = ref.trim();
+                        if (trimmed) referralCounts[trimmed] = (referralCounts[trimmed] || 0) + 1;
+                    });
+                }
+            });
+
+            new Chart(document.getElementById('referralChart'), {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(referralCounts),
+                    datasets: [{ data: Object.values(referralCounts), backgroundColor: ['#22c55e', '#16a34a', '#15803d', '#166534', '#14532d', '#86efac', '#4ade80', '#bbf7d0'], borderWidth: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            });
+
+            const programCounts = {};
+            allResponses.forEach(r => {
+                if (r.experience_type) {
+                    programCounts[r.experience_type] = (programCounts[r.experience_type] || 0) + 1;
+                }
+            });
+
+            new Chart(document.getElementById('programsChart'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(programCounts),
+                    datasets: [{ label: 'Responses', data: Object.values(programCounts), backgroundColor: '#22c55e', borderRadius: 8 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+            });
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('responsesTable');
+            tbody.innerHTML = allResponses.slice(0, 20).map(r => {
+                const date = new Date(r.created_at).toLocaleDateString();
+                const avgScore = ((r.is_present_engaged || 0) + (r.connection_others_score || 0) +
+                    (r.connection_nature_score || 0) + (r.calmness_score || 0) +
+                    (r.learning_intent_score || 0) + (r.community_benefit_score || 0)) / 18 * 100;
+                const scoreColor = avgScore >= 80 ? 'bg-green-100 text-green-800' :
+                    avgScore >= 50 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800';
+
+                return `<tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 text-gray-600">${date}</td>
+                    <td class="px-6 py-4 text-gray-800 font-medium">${r.experience_type || '-'}</td>
+                    <td class="px-6 py-4 text-gray-600">${r.age_range_bracket || '-'}</td>
+                    <td class="px-6 py-4"><span class="px-2 py-1 rounded-full text-xs font-medium ${scoreColor}">${avgScore.toFixed(0)}%</span></td>
+                    <td class="px-6 py-4">${r.would_recommend ? '👍' : '👎'}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function exportCSV() {
+            const headers = ['Date', 'Program', 'Age', 'Present', 'People', 'Nature', 'Calm', 'Intent', 'Community', 'Recommend', 'Referral'];
+            const rows = allResponses.map(r => [
+                new Date(r.created_at).toLocaleDateString(),
+                r.experience_type,
+                r.age_range_bracket,
+                r.is_present_engaged,
+                r.connection_others_score,
+                r.connection_nature_score,
+                r.calmness_score,
+                r.learning_intent_score,
+                r.community_benefit_score,
+                r.would_recommend ? 'Yes' : 'No',
+                r.referral_source
+            ]);
+
+            const csv = [headers, ...rows].map(row => row.map(cell => `"${cell || ''}"`).join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `empowerment_farm_responses_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        }
+
         // Init
         initSupabase();
     </script>
