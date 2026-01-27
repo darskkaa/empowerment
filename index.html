@@ -892,12 +892,20 @@
                 const dbData = {
                     experience_type: data.program_name || 'Not specified',
                     age_range_bracket: data.age_range || '26-40',
+
+                    // Audit Scores (Mapped 1-3)
                     is_present_engaged: mapScore(data.mood_after),
                     connection_others_score: mapScore(data.nature_connection),
                     connection_nature_score: mapScore(data.nature_connection),
                     calmness_score: mapScore(data.mood_after),
                     learning_intent_score: 3,
                     community_benefit_score: data.would_recommend === 'yes' ? 3 : data.would_recommend === 'maybe' ? 2 : 1,
+
+                    // High Fidelity Scores (Raw 1-5)
+                    mood_before_raw: parseInt(data.mood_before) || null,
+                    mood_after_raw: parseInt(data.mood_after) || null,
+                    nature_connection_raw: parseInt(data.nature_connection) || null,
+
                     would_recommend: data.would_recommend === 'yes',
                     referral_source: data.referral_source || null,
                     standout_moment: data.standout_moment

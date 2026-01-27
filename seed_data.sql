@@ -9,21 +9,26 @@
 -- ============================================================================
 -- ANIMALS (Farm animals mentioned on website)
 -- ============================================================================
-INSERT INTO animals (animal_name, species, breed, temperament, is_therapy_animal) VALUES
-('Daisy', 'Cow', 'Jersey', 'Calm', TRUE),
-('Buttercup', 'Cow', 'Holstein', 'Gentle', TRUE),
-('Clover', 'Goat', 'Nigerian Dwarf', 'Playful', TRUE),
-('Maple', 'Goat', 'Pygmy', 'Calm', TRUE),
-('Patches', 'Goat', 'LaMancha', 'Friendly', TRUE),
-('Henrietta', 'Chicken', 'Silkie', 'Calm', TRUE),
-('Nugget', 'Chicken', 'Buff Orpington', 'Friendly', TRUE),
-('Thumper', 'Rabbit', 'Holland Lop', 'Gentle', TRUE),
-('Cinnamon', 'Rabbit', 'Mini Rex', 'Calm', TRUE);
+INSERT INTO animals (animal_name, species, breed, temperament, is_therapy_animal)
+SELECT * FROM (VALUES
+    ('Daisy', 'Cow', 'Jersey', 'Calm', TRUE),
+    ('Buttercup', 'Cow', 'Holstein', 'Gentle', TRUE),
+    ('Clover', 'Goat', 'Nigerian Dwarf', 'Playful', TRUE),
+    ('Maple', 'Goat', 'Pygmy', 'Calm', TRUE),
+    ('Patches', 'Goat', 'LaMancha', 'Friendly', TRUE),
+    ('Henrietta', 'Chicken', 'Silkie', 'Calm', TRUE),
+    ('Nugget', 'Chicken', 'Buff Orpington', 'Friendly', TRUE),
+    ('Thumper', 'Rabbit', 'Holland Lop', 'Gentle', TRUE),
+    ('Cinnamon', 'Rabbit', 'Mini Rex', 'Calm', TRUE)
+) AS v(animal_name, species, breed, temperament, is_therapy_animal)
+WHERE NOT EXISTS (
+    SELECT 1 FROM animals WHERE animal_name = v.animal_name
+);
 
 -- ============================================================================
 -- CONSTITUENTS (28 participants)
 -- ============================================================================
-INSERT INTO Constituents (constituent_id, first_name, last_name, email, role_type, enrollment_date) VALUES
+INSERT INTO constituents (constituent_id, first_name, last_name, email, role_type, enrollment_date) VALUES
 -- Volunteers (10)
 ('d0000001-0000-0000-0000-000000000001', 'Maria', 'Santos', 'maria.santos@email.com', 'Volunteer', '2025-06-15'),
 ('d0000001-0000-0000-0000-000000000002', 'James', 'Wilson', 'james.w@email.com', 'Volunteer', '2025-07-01'),
@@ -54,7 +59,8 @@ INSERT INTO Constituents (constituent_id, first_name, last_name, email, role_typ
 ('d0000001-0000-0000-0000-000000000025', 'Sarah', 'Taylor', 'staylor@email.com', 'Visitor', '2025-10-20'),
 ('d0000001-0000-0000-0000-000000000026', 'Daniel', 'Anderson', 'danderson@email.com', 'Visitor', '2025-11-01'),
 ('d0000001-0000-0000-0000-000000000027', 'Michelle', 'Thomas', 'mthomas@email.com', 'Visitor', '2025-11-10'),
-('d0000001-0000-0000-0000-000000000028', 'Matthew', 'Jackson', 'mjackson@email.com', 'Visitor', '2025-11-15');
+('d0000001-0000-0000-0000-000000000028', 'Matthew', 'Jackson', 'mjackson@email.com', 'Visitor', '2025-11-15')
+ON CONFLICT (constituent_id) DO NOTHING;
 
 -- ============================================================================
 -- SURVEY RESPONSES (55+ records with realistic trends)

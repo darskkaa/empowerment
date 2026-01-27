@@ -427,6 +427,9 @@
                 });
                 const topProgram = Object.entries(programCounts).sort((a, b) => b[1] - a[1])[0];
                 document.getElementById('topProgram').textContent = topProgram ? topProgram[0] : '-';
+
+                // Show Vibe Check if data exists
+                showVibeCheck();
             }
         }
 
@@ -589,6 +592,60 @@
             showDeepDive('👥 Age Demographics Breakdown', html);
         }
 
+        function showVibeCheck() {
+            // Calculate average before vs after
+            let totalBefore = 0, totalAfter = 0, count = 0;
+            allResponses.forEach(r => {
+                if (r.mood_before_raw && r.mood_after_raw) {
+                    totalBefore += r.mood_before_raw;
+                    totalAfter += r.mood_after_raw;
+                    count++;
+                }
+            });
+
+            if (count === 0) return;
+
+            const avgBefore = (totalBefore / count).toFixed(1);
+            const avgAfter = (totalAfter / count).toFixed(1);
+            const delta = (avgAfter - avgBefore).toFixed(1);
+            const isPositive = delta > 0;
+
+            const html = `
+                <div class="vibe-check-container p-6 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl mb-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">✨ Vibe Shift (Before vs After)</h3>
+                    <div class="flex items-center justify-between">
+                        <div class="text-center">
+                            <div class="text-3xl mb-1">😫</div>
+                            <div class="text-sm text-gray-500">Before</div>
+                            <div class="font-bold text-2xl">${avgBefore}</div>
+                        </div>
+                        <div class="flex-1 px-4 text-center">
+                            <div class="text-sm font-bold ${isPositive ? 'text-green-600' : 'text-gray-600'}">
+                                ${isPositive ? 'upgrade!' : 'change'}
+                            </div>
+                            <div class="h-2 bg-gray-200 rounded-full mt-2 relative overflow-hidden">
+                                <div class="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-purple-400 to-pink-500 transition-all duration-1000" 
+                                     style="width: 100%; transform: scaleX(${isPositive ? 1 : 0}); transform-origin: left"></div>
+                                <div class="absolute -top-1 left-1/2 transform -translate-x-1/2 bg-white px-2 text-xs font-bold shadow-sm rounded-full border">
+                                    +${delta}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl mb-1">🤩</div>
+                            <div class="text-sm text-gray-500">After</div>
+                            <div class="font-bold text-2xl">${avgAfter}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Insert after metrics
+            const metricsDiv = document.getElementById('metrics');
+            const vibeDiv = document.createElement('div');
+            vibeDiv.innerHTML = html;
+            metricsDiv.parentNode.insertBefore(vibeDiv, metricsDiv.nextSibling);
+        }
         function showReferralSources() {
             const refCounts = {};
             allResponses.forEach(r => {

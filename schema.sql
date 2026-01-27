@@ -140,12 +140,19 @@ CREATE TABLE IF NOT EXISTS surveyresponses (
     experience_id             UUID REFERENCES experiences(experience_id),
     constituent_id            UUID REFERENCES constituents(constituent_id),
     experience_type           VARCHAR(150) NOT NULL,
+    -- Standard Audit Scores (1-3)
     is_present_engaged        INT NOT NULL CHECK (is_present_engaged BETWEEN 1 AND 3),
     connection_others_score   INT NOT NULL CHECK (connection_others_score BETWEEN 1 AND 3),
     connection_nature_score   INT NOT NULL CHECK (connection_nature_score BETWEEN 1 AND 3),
     calmness_score            INT NOT NULL CHECK (calmness_score BETWEEN 1 AND 3),
     learning_intent_score     INT NOT NULL CHECK (learning_intent_score BETWEEN 1 AND 3),
     community_benefit_score   INT NOT NULL CHECK (community_benefit_score BETWEEN 1 AND 3),
+    
+    -- High Fidelity Raw Scores (1-5) - Added for Vibe Check
+    mood_before_raw           INT, -- 1-5 Scale
+    mood_after_raw            INT, -- 1-5 Scale
+    nature_connection_raw     INT, -- 1-5 Scale
+    
     referral_source           TEXT,
     standout_moment           TEXT,
     would_recommend           BOOLEAN DEFAULT TRUE,
