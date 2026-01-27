@@ -390,14 +390,8 @@
             document.getElementById('totalVisitors').textContent = allResponses.length.toLocaleString();
 
             // 3. Returning Neighbors
-            const people = {};
-            allResponses.forEach(r => {
-                const id = r.participant_email || r.participant_name || 'anon';
-                if (id !== 'anon') people[id] = (people[id] || 0) + 1;
-            });
-            const returning = Object.values(people).filter(c => c > 1).length;
-            const totalPeople = Object.keys(people).length;
-            const returnRate = totalPeople ? Math.round((returning / totalPeople) * 100) : 0;
+            const returningCount = allResponses.filter(r => r.is_returning_visitor === true).length;
+            const returnRate = allResponses.length ? Math.round((returningCount / allResponses.length) * 100) : 0;
             document.getElementById('returningRate').textContent = returnRate + '%';
 
             // 4. Human Impact (Before/After)

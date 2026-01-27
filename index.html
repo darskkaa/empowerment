@@ -561,9 +561,15 @@
             <p class="subtitle">Thanks for visiting Empowerment Farm today. Your feedback helps us grow.</p>
             <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 24px;"><strong>⏱ Takes about 2
                     minutes</strong></p>
-            <div class="btn-row">
-                <button class="btn btn-primary" onclick="nextScreen()" aria-label="Start the survey">Let's Go!
-                    →</button>
+            <div class="card-grid" style="margin-top: 20px;">
+                <button class="card-btn" onclick="startSurvey(false)">
+                    <span class="card-emoji">🆕</span>
+                    First Time Visiting
+                </button>
+                <button class="card-btn" onclick="startSurvey(true)">
+                    <span class="card-emoji">🏡</span>
+                    I've Been Here Before
+                </button>
             </div>
         </div>
 
@@ -739,7 +745,8 @@
         let currentScreen = 1;
         const totalScreens = 10;
         const totalQuestions = 8;
-        const data = {
+        let data = {
+            is_returning_visitor: false,
             program_name: null,
             mood_before: null,
             mood_after: null,
@@ -813,6 +820,11 @@
         // ============================================
         // SELECTION HANDLERS
         // ============================================
+        function startSurvey(isReturning) {
+            data.is_returning_visitor = isReturning;
+            nextScreen();
+        }
+
         function selectProgram(btn) {
             document.querySelectorAll('#screen2 .card-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
@@ -890,8 +902,9 @@
 
                 // Map to surveyresponses table columns
                 const dbData = {
-                    experience_type: data.program_name || 'Not specified',
-                    age_range_bracket: data.age_range || '26-40',
+                    experience_type: data.program_name,
+                    is_returning_visitor: data.is_returning_visitor,
+                    age_range_bracket: data.age_range,
 
                     // Audit Scores (Mapped 1-3)
                     is_present_engaged: mapScore(data.mood_after),
