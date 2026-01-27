@@ -664,7 +664,7 @@
         // ============================================
         // SUPABASE CONFIG (Via Netlify Secrets)
         // ============================================
-        let supabase = null;
+        let supabaseClient = null;
 
         async function initSupabase() {
             try {
@@ -672,7 +672,7 @@
                 if (response.ok) {
                     const config = await response.json();
                     if (config.SUPABASE_URL && config.ANON_KEY && typeof window.supabase !== 'undefined') {
-                        supabase = window.supabase.createClient(config.SUPABASE_URL, config.ANON_KEY);
+                        supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.ANON_KEY);
                         console.log('✅ Supabase connected via Netlify');
                     }
                 } else {
@@ -895,14 +895,14 @@
                 state.email = document.getElementById('participantEmail').value;
 
                 // Upload photo if present
-                if (state.photoFile && supabase) {
+                if (state.photoFile && supabaseClient) {
                     const fileName = `${Date.now()}_${state.photoFile.name}`;
-                    const { data, error } = await supabase.storage
+                    const { data, error } = await supabaseClient.storage
                         .from('survey-photos')
                         .upload(fileName, state.photoFile);
 
                     if (!error) {
-                        const { data: urlData } = supabase.storage
+                        const { data: urlData } = supabaseClient.storage
                             .from('survey-photos')
                             .getPublicUrl(fileName);
                         state.photoUrl = urlData.publicUrl;
@@ -910,8 +910,8 @@
                 }
 
                 // Insert survey response
-                if (supabase) {
-                    await supabase.from('SurveyResponses').insert({
+                if (supabaseClient) {
+                    await supabaseClient.from('SurveyResponses').insert({
                         experience_type: state.experienceType,
                         is_present_engaged: state.presence,
                         connection_others_score: state.people,
@@ -975,7 +975,7 @@
         document.getElementById('ageRange').addEventListener('change', validateStep1);
 
         // Log mode
-        console.log(supabase ? '✅ Supabase connected' : '📋 Demo mode (configure Supabase)');
+        console.log(supabaseClient ? '✅ Supabase connected' : '📋 Demo mode (configure Supabase)');
     </script>
 </body>
 
