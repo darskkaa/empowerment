@@ -304,23 +304,36 @@
             btn.textContent = 'Sending...';
 
             try {
-                const { error } = await supabaseClient.auth.signInWithOtp({
+                // Add 10-second timeout
+                const timeoutPromise = new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Request timed out. Check if Email Auth is enabled in Supabase.')), 10000)
+                );
+
+                const authPromise = supabaseClient.auth.signInWithOtp({
                     email,
                     options: { emailRedirectTo: window.location.href }
                 });
+
+                const { error } = await Promise.race([authPromise, timeoutPromise]);
 
                 if (error) throw error;
 
                 document.getElementById('loginForm').classList.add('hidden');
                 const msg = document.getElementById('loginMessage');
                 msg.classList.remove('hidden');
-                msg.innerHTML = `✅ Magic link sent to <strong>${email}</strong>.<br>Check your inbox and click the link to sign in.`;
+                msg.innerHTML = `✅ Magic link sent to <strong>${email}</strong>.<br>Check your inbox (and spam folder) and click the link to sign in.`;
             } catch (err) {
                 console.error('Magic Link Error:', err);
-                showError(err.message || 'Failed to send link');
+                showError(err.message || 'Failed to send link. Enable Email Auth in Supabase Dashboard.');
                 btn.disabled = false;
                 btn.innerHTML = originalText;
             }
+        }
+
+        function showError(message) {
+            const el = document.getElementById('loginError');
+            el.classList.remove('hidden');
+            el.textContent = message;
         }
 
         // Init
