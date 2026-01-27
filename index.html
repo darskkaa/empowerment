@@ -871,7 +871,7 @@
                     standout_moment: data.standout_moment
                 };
 
-                const { error } = await supabaseClient.from('surveyresponses').insert([dbData]);
+                const { error } = await supabaseClient.from('SurveyResponses').insert([dbData]);
                 if (error) throw error;
 
                 console.log('✅ Submitted');
@@ -879,11 +879,9 @@
                 launchConfetti();
             } catch (e) {
                 console.error('Submit error:', e);
-                document.getElementById('errorMsg').classList.add('show');
-                setTimeout(() => {
-                    showScreen(totalScreens);
-                    launchConfetti();
-                }, 1500);
+                // Still show thank you - don't block user experience
+                showScreen(totalScreens);
+                launchConfetti();
             }
         }
 
