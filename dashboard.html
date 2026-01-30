@@ -20,7 +20,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;700;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap"
         rel="stylesheet">
 
     <script>
@@ -30,20 +30,6 @@
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
                         heading: ['Outfit', 'sans-serif']
-                    },
-                    colors: {
-                        farm: {
-                            50: '#f7fee7',
-                            100: '#ecfccb',
-                            200: '#d9f99d',
-                            300: '#bef264',
-                            400: '#a3e635',
-                            500: '#84cc16',
-                            600: '#65a30d',
-                            700: '#4d7c0f',
-                            800: '#3f6212',
-                            900: '#365314',
-                        }
                     }
                 }
             }
@@ -51,11 +37,15 @@
     </script>
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #fefce8 0%, #f0fdf4 50%, #fff7ed 100%);
-            background-attachment: fixed;
-            color: #292524;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+            color: #e2e8f0;
         }
 
         h1,
@@ -65,47 +55,86 @@
             font-family: 'Outfit', sans-serif;
         }
 
-        /* Premium Glass Cards */
-        .card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 1.5rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        /* Power BI Style Cards */
+        .pbi-card {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 16px;
+            box-shadow:
+                0 4px 6px -1px rgba(0, 0, 0, 0.3),
+                0 10px 20px -5px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
         }
 
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        .pbi-card:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 8px 12px -2px rgba(0, 0, 0, 0.4),
+                0 16px 32px -8px rgba(0, 0, 0, 0.5);
+            border-color: rgba(148, 163, 184, 0.2);
         }
 
-        /* Insight Button Pills */
-        .insight-btn {
-            transition: all 0.2s ease;
+        /* Metric Cards */
+        .metric-card {
+            position: relative;
+            overflow: hidden;
         }
 
-        .insight-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 4px 12px rgba(132, 204, 22, 0.3);
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            border-radius: 16px 16px 0 0;
         }
 
-        .insight-btn.active {
-            background: linear-gradient(135deg, #84cc16 0%, #65a30d 100%);
-            color: white;
+        .metric-card.green::before {
+            background: linear-gradient(90deg, #22c55e, #84cc16);
         }
 
-        /* Score Pills - 1-5 Scale */
-        .score-pill {
+        .metric-card.blue::before {
+            background: linear-gradient(90deg, #3b82f6, #06b6d4);
+        }
+
+        .metric-card.purple::before {
+            background: linear-gradient(90deg, #8b5cf6, #d946ef);
+        }
+
+        .metric-card.orange::before {
+            background: linear-gradient(90deg, #f97316, #fbbf24);
+        }
+
+        /* Glow effects */
+        .glow-green {
+            text-shadow: 0 0 30px rgba(34, 197, 94, 0.5);
+        }
+
+        .glow-blue {
+            text-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+        }
+
+        .glow-purple {
+            text-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+        }
+
+        .glow-orange {
+            text-shadow: 0 0 30px rgba(249, 115, 22, 0.5);
+        }
+
+        /* Score badges */
+        .score-badge {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-width: 2.5rem;
-            padding: 0.375rem 0.75rem;
-            border-radius: 9999px;
+            min-width: 48px;
+            height: 32px;
+            padding: 0 12px;
+            border-radius: 8px;
             font-weight: 700;
-            font-size: 0.8rem;
+            font-size: 14px;
         }
 
         .score-5 {
@@ -113,34 +142,48 @@
             color: white;
         }
 
-        /* GREAT */
         .score-4 {
             background: linear-gradient(135deg, #84cc16, #65a30d);
             color: white;
         }
 
-        /* GOOD */
         .score-3 {
             background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: white;
+            color: #1e293b;
         }
 
-        /* OKAY */
         .score-2 {
             background: linear-gradient(135deg, #f97316, #ea580c);
             color: white;
         }
 
-        /* MEH */
         .score-1 {
             background: linear-gradient(135deg, #ef4444, #dc2626);
             color: white;
         }
 
-        /* AWFUL */
-        .score-na {
-            background: #e5e7eb;
-            color: #9ca3af;
+        /* Mood scale visual */
+        .mood-scale {
+            display: flex;
+            gap: 4px;
+            padding: 8px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+        }
+
+        .mood-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+
+        .mood-dot:hover {
+            transform: scale(1.2);
         }
 
         #loginScreen,
@@ -154,8 +197,8 @@
         }
 
         .spinner {
-            border: 4px solid #ecfccb;
-            border-top: 4px solid #84cc16;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #22c55e;
             border-radius: 50%;
             width: 48px;
             height: 48px;
@@ -172,26 +215,6 @@
             }
         }
 
-        .fade-in {
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-
         @keyframes pulse {
 
             0%,
@@ -200,70 +223,97 @@
             }
 
             50% {
-                opacity: 0.7;
+                opacity: 0.5;
             }
         }
 
-        /* Emoji Scale Legend */
-        .emoji-legend {
-            display: flex;
-            gap: 0.5rem;
-            font-size: 0.75rem;
+        .pulse {
+            animation: pulse 2s infinite;
         }
 
-        .emoji-legend span {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
+        /* Testimonial cards */
+        .testimonial-card {
+            background: linear-gradient(145deg, rgba(51, 65, 85, 0.5), rgba(30, 41, 59, 0.5));
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .testimonial-card:hover {
+            background: linear-gradient(145deg, rgba(51, 65, 85, 0.7), rgba(30, 41, 59, 0.7));
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(148, 163, 184, 0.5);
         }
     </style>
 </head>
 
-<body class="min-h-screen">
+<body>
 
     <!-- LOGIN SCREEN -->
     <div id="loginScreen" class="active min-h-screen flex items-center justify-center p-4">
-        <div class="card p-10 w-full max-w-md text-center relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-farm-400 via-orange-400 to-farm-500">
+        <div class="pbi-card p-10 w-full max-w-md text-center">
+            <div
+                class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-green-500/30">
+                <span class="text-3xl">🌿</span>
             </div>
-            <img src="logo.png" alt="Empowerment Farm" class="h-24 mx-auto mb-6">
-            <h1 class="text-3xl font-bold text-farm-800 mb-1">Impact Center</h1>
-            <p class="text-gray-500 mb-8 text-sm">Analytics Dashboard • v8.5</p>
+            <h1 class="text-3xl font-bold text-white mb-2">Impact Center</h1>
+            <p class="text-slate-400 mb-8 text-sm">Analytics Dashboard</p>
 
-            <div id="loginForm">
+            <div>
                 <input type="email" id="emailInput" placeholder="Email Address"
-                    class="w-full p-4 rounded-xl bg-gray-50 border border-farm-200 text-lg mb-3 focus:outline-none focus:ring-2 focus:ring-farm-400">
+                    class="w-full p-4 rounded-xl bg-slate-800/50 border border-slate-600/50 text-white text-lg mb-3 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500/50 placeholder-slate-500">
                 <input type="password" id="passwordInput" placeholder="Password"
-                    class="w-full p-4 rounded-xl bg-gray-50 border border-farm-200 text-lg mb-6 focus:outline-none focus:ring-2 focus:ring-farm-400">
+                    class="w-full p-4 rounded-xl bg-slate-800/50 border border-slate-600/50 text-white text-lg mb-6 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500/50 placeholder-slate-500">
                 <button onclick="signInWithPassword()" id="loginBtn"
-                    class="w-full py-4 rounded-xl bg-gradient-to-r from-farm-500 to-farm-600 hover:from-farm-600 hover:to-farm-700 text-white font-bold text-lg shadow-lg transition-all active:scale-95">
+                    class="w-full py-4 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold text-lg shadow-lg shadow-green-500/30 transition-all active:scale-95">
                     Sign In
                 </button>
             </div>
-            <div id="loginError" class="hidden mt-4 text-red-500 font-medium"></div>
+            <div id="loginError" class="hidden mt-4 text-red-400 font-medium"></div>
         </div>
     </div>
 
     <!-- DASHBOARD -->
     <div id="dashboard" class="min-h-screen">
         <!-- Header -->
-        <header class="bg-white/90 backdrop-blur-xl sticky top-0 z-50 border-b border-gray-100">
+        <header class="bg-slate-900/80 backdrop-blur-xl sticky top-0 z-50 border-b border-slate-700/50">
             <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
                 <div class="flex items-center gap-4">
-                    <img src="logo.png" alt="Logo" class="h-12 w-auto">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-green-500/20">
+                        <span class="text-xl">🌿</span>
+                    </div>
                     <div>
-                        <h1 class="font-extrabold text-gray-900 text-xl leading-none">Impact Center</h1>
-                        <p class="text-xs text-farm-600 font-semibold tracking-wide uppercase mt-0.5">Empowerment Farm
-                            Analytics</p>
+                        <h1 class="font-extrabold text-white text-xl leading-none">Impact Center</h1>
+                        <p class="text-xs text-green-400 font-semibold tracking-wide uppercase mt-0.5">Empowerment Farm
+                        </p>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <span id="userEmail" class="hidden md:block text-sm font-medium text-gray-500"></span>
+                    <span id="userEmail" class="hidden md:block text-sm font-medium text-slate-400"></span>
                     <button onclick="exportCSV()"
-                        class="bg-farm-100 text-farm-700 hover:bg-farm-200 font-semibold text-sm px-4 py-2 rounded-full transition-colors flex items-center gap-2">
+                        class="bg-slate-800 text-green-400 hover:bg-slate-700 font-semibold text-sm px-4 py-2 rounded-lg border border-slate-600/50 transition-colors flex items-center gap-2">
                         <span>📥</span> Export
                     </button>
-                    <button onclick="signOut()" class="text-gray-400 hover:text-gray-600 font-medium text-sm">
+                    <button onclick="signOut()" class="text-slate-500 hover:text-slate-300 font-medium text-sm">
                         Sign Out
                     </button>
                 </div>
@@ -274,146 +324,100 @@
             <!-- Loading -->
             <div id="loadingState" class="flex flex-col items-center justify-center py-20">
                 <div class="spinner mb-4"></div>
-                <p class="text-farm-600 font-medium">Gathering insights...</p>
+                <p class="text-green-400 font-medium">Loading insights...</p>
             </div>
 
             <!-- Content -->
-            <div id="dashboardContent" class="hidden space-y-8">
+            <div id="dashboardContent" class="hidden space-y-6">
 
-                <!-- Scale Legend -->
-                <div class="flex items-center justify-between bg-white/50 rounded-xl px-4 py-2 text-xs text-gray-500">
-                    <span class="font-semibold">📊 Mood Scale (1-5):</span>
-                    <div class="emoji-legend">
-                        <span><span class="score-pill score-1 text-xs px-2 py-0.5">1</span> 😫 Awful</span>
-                        <span><span class="score-pill score-2 text-xs px-2 py-0.5">2</span> 😒 Meh</span>
-                        <span><span class="score-pill score-3 text-xs px-2 py-0.5">3</span> 😐 Okay</span>
-                        <span><span class="score-pill score-4 text-xs px-2 py-0.5">4</span> 🙂 Good</span>
-                        <span><span class="score-pill score-5 text-xs px-2 py-0.5">5</span> 🤩 Great!</span>
+                <!-- Mood Scale Legend -->
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg font-bold text-white">📊 Dashboard Overview</h2>
+                    <div class="mood-scale">
+                        <div class="mood-dot bg-red-500/20" title="1 - Awful">😫</div>
+                        <div class="mood-dot bg-orange-500/20" title="2 - Meh">😒</div>
+                        <div class="mood-dot bg-yellow-500/20" title="3 - Okay">😐</div>
+                        <div class="mood-dot bg-lime-500/20" title="4 - Good">🙂</div>
+                        <div class="mood-dot bg-green-500/20" title="5 - Great">🤩</div>
                     </div>
                 </div>
 
                 <!-- ====================================== -->
                 <!-- HERO METRICS -->
                 <!-- ====================================== -->
-                <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
 
                     <!-- Total Visitors -->
-                    <div class="card p-6 text-center bg-gradient-to-br from-white to-farm-50">
-                        <p class="text-xs font-semibold text-farm-600 uppercase tracking-wider mb-2">Total Visitors</p>
-                        <h2 id="totalVisitors" class="text-5xl font-extrabold text-farm-900 metric-val">--</h2>
-                        <p class="text-xs text-gray-400 mt-2">All time</p>
+                    <div class="pbi-card metric-card green p-6">
+                        <p class="text-xs font-semibold text-green-400 uppercase tracking-wider mb-3">Total Visitors</p>
+                        <h2 id="totalVisitors" class="text-5xl font-extrabold text-white metric-val glow-green">--</h2>
+                        <p class="text-xs text-slate-500 mt-2">All time responses</p>
                     </div>
 
                     <!-- NPS Score -->
-                    <div class="card p-6 text-center bg-gradient-to-br from-white to-orange-50">
-                        <p class="text-xs font-semibold text-orange-600 uppercase tracking-wider mb-2">Would Recommend
+                    <div class="pbi-card metric-card orange p-6">
+                        <p class="text-xs font-semibold text-orange-400 uppercase tracking-wider mb-3">Would Recommend
                         </p>
-                        <h2 id="npsScore" class="text-5xl font-extrabold text-gray-900 metric-val">--%</h2>
-                        <p class="text-xs text-gray-400 mt-2">NPS Score</p>
+                        <h2 id="npsScore" class="text-5xl font-extrabold text-white metric-val glow-orange">--%</h2>
+                        <p class="text-xs text-slate-500 mt-2">Net Promoter Score</p>
                     </div>
 
-                    <!-- Avg Mood Improvement -->
-                    <div class="card p-6 text-center bg-gradient-to-br from-white to-blue-50">
-                        <p class="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-2">Mood Boost</p>
-                        <h2 id="moodBoost" class="text-5xl font-extrabold text-blue-700 metric-val">+--</h2>
-                        <p class="text-xs text-gray-400 mt-2">Before → After (1-5)</p>
+                    <!-- Mood Boost -->
+                    <div class="pbi-card metric-card blue p-6">
+                        <p class="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-3">Mood Boost</p>
+                        <h2 id="moodBoost" class="text-5xl font-extrabold text-white metric-val glow-blue">+--</h2>
+                        <p class="text-xs text-slate-500 mt-2">Before → After (1-5)</p>
                     </div>
 
-                    <!-- Returning Visitors -->
-                    <div class="card p-6 text-center bg-gradient-to-br from-white to-purple-50">
-                        <p class="text-xs font-semibold text-purple-600 uppercase tracking-wider mb-2">Returning</p>
-                        <h2 id="returningRate" class="text-5xl font-extrabold text-gray-900 metric-val">--%</h2>
-                        <p class="text-xs text-gray-400 mt-2">Visited before</p>
+                    <!-- Returning -->
+                    <div class="pbi-card metric-card purple p-6">
+                        <p class="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-3">Returning</p>
+                        <h2 id="returningRate" class="text-5xl font-extrabold text-white metric-val glow-purple">--%
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-2">Visited before</p>
                     </div>
 
                 </section>
 
                 <!-- ====================================== -->
-                <!-- THE HUMAN IMPACT (Before/After Visual) -->
+                <!-- HUMAN IMPACT BANNER -->
                 <!-- ====================================== -->
-                <section class="card p-8 bg-gradient-to-r from-gray-50 to-green-50 border-l-8 border-farm-500">
-                    <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                        ✨ The Human Impact
-                        <span class="text-sm font-normal text-gray-500 ml-2 bg-white px-3 py-1 rounded-full shadow-sm">
-                            Before vs After (1-5 Scale)
-                        </span>
-                    </h3>
+                <section class="pbi-card p-8">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div
+                            class="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center">
+                            <span class="text-xl">✨</span>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-white">The Human Impact</h3>
+                            <p class="text-xs text-slate-400">Mood transformation on 1-5 scale</p>
+                        </div>
+                    </div>
 
-                    <div class="flex items-center justify-around text-center">
-                        <div class="relative group">
-                            <div class="text-6xl mb-3 grayscale opacity-70 group-hover:grayscale-0 transition-all">😫
-                            </div>
-                            <p class="font-bold text-gray-400 uppercase text-xs tracking-wider">Before Arriving</p>
-                            <p id="avgBefore" class="text-3xl font-bold text-gray-500 mt-1">--</p>
+                    <div class="grid grid-cols-3 gap-8 items-center">
+                        <div class="text-center">
+                            <div class="text-6xl mb-3 opacity-60 grayscale">😫</div>
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Before</p>
+                            <p id="avgBefore" class="text-4xl font-extrabold text-slate-400 mt-1">--</p>
                         </div>
 
-                        <div class="flex-1 px-8 max-w-md">
-                            <div
-                                class="h-6 bg-gradient-to-r from-gray-200 via-yellow-200 to-green-400 rounded-full overflow-hidden relative shadow-inner">
-                                <div class="absolute inset-0 flex items-center justify-center">
-                                    <span class="text-xs font-bold text-gray-700 drop-shadow-sm">✨ Transformation
-                                        ✨</span>
+                        <div class="text-center relative">
+                            <div class="absolute inset-0 flex items-center">
+                                <div
+                                    class="w-full h-3 rounded-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 opacity-50">
                                 </div>
                             </div>
-                            <div class="text-center mt-3">
-                                <span id="impactDelta"
-                                    class="inline-block bg-farm-100 text-farm-800 px-4 py-2 rounded-full font-extrabold text-lg shadow-sm">
-                                    +-- points
-                                </span>
+                            <div
+                                class="relative bg-slate-800 px-6 py-4 rounded-2xl border border-green-500/30 shadow-lg shadow-green-500/10">
+                                <span id="impactDelta" class="text-3xl font-extrabold text-green-400">+-- pts</span>
+                                <p class="text-xs text-slate-400 mt-1">Average Improvement</p>
                             </div>
                         </div>
 
-                        <div class="relative group">
-                            <div class="text-6xl mb-3 transform group-hover:scale-110 transition-transform">🥰</div>
-                            <p class="font-bold text-farm-600 uppercase text-xs tracking-wider">After Leaving</p>
-                            <p id="avgAfter" class="text-3xl font-bold text-farm-700 mt-1">--</p>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- ====================================== -->
-                <!-- QUICK INSIGHTS -->
-                <!-- ====================================== -->
-                <section class="card p-6">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <h3 class="font-bold text-gray-800 text-lg">🔮 Quick Insights</h3>
-                            <p class="text-xs text-gray-500">Click any button to see detailed analysis</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 bg-green-500 rounded-full pulse"></span>
-                            <span class="text-xs text-gray-400">Live Data</span>
-                        </div>
-                    </div>
-
-                    <div class="flex flex-wrap gap-2" id="insightButtons">
-                        <button onclick="showInsight('zen')"
-                            class="insight-btn bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold hover:bg-blue-200">🧘
-                            Zen Factor</button>
-                        <button onclick="showInsight('mission')"
-                            class="insight-btn bg-teal-100 text-teal-700 px-4 py-2 rounded-full text-sm font-semibold hover:bg-teal-200">🎯
-                            Mission Match</button>
-                        <button onclick="showInsight('demographics')"
-                            class="insight-btn bg-orange-100 text-orange-700 px-4 py-2 rounded-full text-sm font-semibold hover:bg-orange-200">📊
-                            Demographics</button>
-                        <button onclick="showInsight('learning')"
-                            class="insight-btn bg-pink-100 text-pink-700 px-4 py-2 rounded-full text-sm font-semibold hover:bg-pink-200">💡
-                            Learning Intent</button>
-                        <button onclick="showInsight('referrals')"
-                            class="insight-btn bg-amber-100 text-amber-700 px-4 py-2 rounded-full text-sm font-semibold hover:bg-amber-200">📣
-                            Referral Sources</button>
-                        <button onclick="showInsight('community')"
-                            class="insight-btn bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-semibold hover:bg-green-200">👥
-                            Community Benefit</button>
-                        <button onclick="showInsight('regulars')"
-                            class="insight-btn bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm font-semibold hover:bg-purple-200">🔄
-                            Returning Visitors</button>
-                    </div>
-
-                    <div id="insightDisplay" class="mt-6 hidden fade-in">
-                        <div class="bg-gray-50 rounded-xl p-6 border border-gray-100">
-                            <h4 id="insightTitle" class="font-bold text-gray-800 text-lg mb-4"></h4>
-                            <div id="insightContent" class="space-y-4"></div>
+                        <div class="text-center">
+                            <div class="text-6xl mb-3">🥰</div>
+                            <p class="text-xs font-bold text-green-400 uppercase tracking-wider">After</p>
+                            <p id="avgAfter" class="text-4xl font-extrabold text-green-400 mt-1 glow-green">--</p>
                         </div>
                     </div>
                 </section>
@@ -423,26 +427,32 @@
                 <!-- ====================================== -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                    <!-- LEFT: Program & Charts -->
+                    <!-- LEFT: Charts -->
                     <div class="lg:col-span-2 space-y-6">
 
-                        <!-- Program Mood Scores Table -->
-                        <div class="card p-6">
-                            <div class="flex items-center justify-between mb-4">
+                        <!-- Program Performance Table -->
+                        <div class="pbi-card p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500/20 to-cyan-500/20 flex items-center justify-center">
+                                    <span>🏆</span>
+                                </div>
                                 <div>
-                                    <h3 class="font-bold text-gray-800 text-lg">🏆 Program Mood Scores</h3>
-                                    <p class="text-xs text-gray-500">Average Before/After mood on 1-5 scale</p>
+                                    <h3 class="font-bold text-white">Program Performance</h3>
+                                    <p class="text-xs text-slate-400">Mood scores by experience (1-5 scale)</p>
                                 </div>
                             </div>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-sm">
                                     <thead>
-                                        <tr class="border-b-2 border-gray-200">
-                                            <th class="text-left py-3 px-2 font-bold text-gray-700">Program</th>
-                                            <th class="text-center py-3 px-2 font-bold text-gray-700">😫 Before</th>
-                                            <th class="text-center py-3 px-2 font-bold text-gray-700">🥰 After</th>
-                                            <th class="text-center py-3 px-2 font-bold text-gray-700">🌿 Nature</th>
-                                            <th class="text-center py-3 px-2 font-bold text-gray-700">📈 Boost</th>
+                                        <tr class="border-b border-slate-700/50">
+                                            <th class="text-left py-3 px-2 font-semibold text-slate-400">Program</th>
+                                            <th class="text-center py-3 px-2 font-semibold text-slate-400">😫 Before
+                                            </th>
+                                            <th class="text-center py-3 px-2 font-semibold text-slate-400">🥰 After</th>
+                                            <th class="text-center py-3 px-2 font-semibold text-slate-400">🌿 Nature
+                                            </th>
+                                            <th class="text-center py-3 px-2 font-semibold text-slate-400">📈 Boost</th>
                                         </tr>
                                     </thead>
                                     <tbody id="programTable"></tbody>
@@ -453,40 +463,59 @@
                         <!-- Charts Row -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                            <!-- Mission Radar -->
-                            <div class="card p-6">
-                                <h3 class="font-bold text-gray-800 mb-1">🕸️ Mission Matrix</h3>
-                                <p class="text-xs text-gray-500 mb-4">Impact Profile (1-5 Scale)</p>
-                                <div class="h-56">
-                                    <canvas id="missionChart"></canvas>
+                            <!-- Cumulative Growth -->
+                            <div class="pbi-card p-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div
+                                            class="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500/20 to-emerald-500/20 flex items-center justify-center">
+                                            <span>🚀</span>
+                                        </div>
+                                        <div>
+                                            <h3 class="font-bold text-white">Cumulative Impact</h3>
+                                            <p class="text-xs text-slate-400">Lives touched</p>
+                                        </div>
+                                    </div>
+                                    <span class="text-2xl font-extrabold text-green-400" id="totalImpact">--</span>
+                                </div>
+                                <div class="h-48">
+                                    <canvas id="growthChart"></canvas>
                                 </div>
                             </div>
 
                             <!-- Demographics Pie -->
-                            <div class="card p-6">
-                                <h3 class="font-bold text-gray-800 mb-1">📊 Age Demographics</h3>
-                                <p class="text-xs text-gray-500 mb-4">Who are we reaching?</p>
-                                <div class="h-56">
+                            <div class="pbi-card p-6">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div
+                                        class="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500/20 to-amber-500/20 flex items-center justify-center">
+                                        <span>📊</span>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-white">Demographics</h3>
+                                        <p class="text-xs text-slate-400">Age distribution</p>
+                                    </div>
+                                </div>
+                                <div class="h-48">
                                     <canvas id="demoChart"></canvas>
                                 </div>
                             </div>
 
                         </div>
 
-                        <!-- Growth Chart -->
-                        <div class="card p-6">
-                            <div class="flex items-center justify-between mb-4">
-                                <div>
-                                    <h3 class="font-bold text-gray-800">🚀 Cumulative Impact</h3>
-                                    <p class="text-xs text-gray-500">Lives touched over time</p>
+                        <!-- Referral Sources -->
+                        <div class="pbi-card p-6">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500/20 to-yellow-500/20 flex items-center justify-center">
+                                    <span>📣</span>
                                 </div>
-                                <div class="text-right">
-                                    <span class="text-2xl font-bold text-farm-600" id="totalImpact">--</span>
-                                    <p class="text-xs text-gray-400">total</p>
+                                <div>
+                                    <h3 class="font-bold text-white">Referral Sources</h3>
+                                    <p class="text-xs text-slate-400">How visitors found us</p>
                                 </div>
                             </div>
                             <div class="h-40">
-                                <canvas id="growthChart"></canvas>
+                                <canvas id="referralChart"></canvas>
                             </div>
                         </div>
 
@@ -494,20 +523,22 @@
 
                     <!-- RIGHT: Wall of Love -->
                     <div class="lg:col-span-1">
-                        <div class="card h-full flex flex-col bg-gradient-to-b from-orange-50 to-white">
-                            <div class="p-6 border-b border-orange-100">
-                                <h3 class="font-bold text-gray-800 flex items-center gap-2 text-lg">
-                                    💌 Wall of Love
-                                </h3>
-                                <p class="text-sm text-gray-500">Standout moments</p>
+                        <div class="pbi-card h-full flex flex-col">
+                            <div class="p-6 border-b border-slate-700/50">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500/20 to-rose-500/20 flex items-center justify-center">
+                                        <span>💌</span>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-bold text-white">Wall of Love</h3>
+                                        <p class="text-xs text-slate-400">Standout moments</p>
+                                    </div>
+                                </div>
                             </div>
 
                             <div id="vibesFeed" class="flex-1 overflow-y-auto p-4 space-y-3 max-h-[600px]">
-                                <div class="text-center text-gray-400 py-10">Loading...</div>
-                            </div>
-
-                            <div class="p-4 bg-white border-t border-orange-100 text-center">
-                                <span class="text-xs text-gray-400">Live updates</span>
+                                <div class="text-center text-slate-500 py-10">Loading...</div>
                             </div>
                         </div>
                     </div>
@@ -518,19 +549,17 @@
         </main>
 
         <!-- Footer -->
-        <footer class="border-t border-gray-100 mt-8 bg-white/70 backdrop-blur-sm">
+        <footer class="border-t border-slate-800 mt-8 bg-slate-900/50">
             <div class="max-w-7xl mx-auto px-4 py-6">
-                <div class="flex flex-col md:flex-row items-center justify-between text-xs text-gray-400 font-medium">
+                <div class="flex flex-col md:flex-row items-center justify-between text-xs text-slate-500">
                     <div class="flex items-center gap-4">
-                        <span class="font-semibold text-farm-600">Empowerment Farm</span>
-                        <span>|</span>
-                        <span>2600 Garland Road, Naples, FL 34117</span>
-                        <span>|</span>
-                        <span>(239) 330-2777</span>
+                        <span class="font-semibold text-green-400">Empowerment Farm</span>
+                        <span class="text-slate-700">|</span>
+                        <span>Naples, FL</span>
                     </div>
-                    <div class="mt-4 md:mt-0">
-                        <span class="italic">"Labels stop at the gate"</span>
-                        <span class="ml-3 text-gray-300">• v8.5</span>
+                    <div class="mt-4 md:mt-0 flex items-center gap-2">
+                        <span class="w-2 h-2 bg-green-500 rounded-full pulse"></span>
+                        <span>Live Dashboard v9.0</span>
                     </div>
                 </div>
             </div>
@@ -543,7 +572,7 @@
         // CONFIG
         // ============================================
         Chart.defaults.font.family = 'Inter';
-        Chart.defaults.color = '#78716c';
+        Chart.defaults.color = '#94a3b8';
 
         let supabaseClient = null;
         let currentUser = null;
@@ -568,7 +597,7 @@
                         checkSession();
                     }
                 }
-            } catch (err) { console.error(err); showError('Connection Error'); }
+            } catch (err) { console.error(err); }
         }
 
         async function checkSession() {
@@ -583,12 +612,12 @@
             if (!email || !password) return showError('Please enter email & password');
 
             const btn = document.getElementById('loginBtn');
-            btn.textContent = 'Opening gateway...';
+            btn.textContent = 'Signing in...';
             btn.disabled = true;
 
             const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
             if (error) {
-                showError('Incorrect email or password');
+                showError('Invalid credentials');
                 btn.textContent = 'Sign In';
                 btn.disabled = false;
             }
@@ -601,7 +630,7 @@
         }
 
         // ============================================
-        // DATA FETCH
+        // DATA
         // ============================================
         async function showDashboard() {
             document.getElementById('loginScreen').classList.remove('active');
@@ -627,16 +656,14 @@
         function renderDashboard() {
             if (!allResponses.length) return;
 
-            // Hero Metrics
-            document.getElementById('totalVisitors').textContent = allResponses.length.toLocaleString();
-            document.getElementById('totalImpact').textContent = allResponses.length.toLocaleString();
+            // Metrics
+            document.getElementById('totalVisitors').textContent = allResponses.length;
+            document.getElementById('totalImpact').textContent = allResponses.length;
 
-            // NPS
             const recs = allResponses.filter(r => r.would_recommend === true).length;
-            const nps = Math.round((recs / allResponses.length) * 100);
-            document.getElementById('npsScore').textContent = nps + '%';
+            document.getElementById('npsScore').textContent = Math.round((recs / allResponses.length) * 100) + '%';
 
-            // Before/After Mood (1-5 scale from mood_before_raw and mood_after_raw)
+            // Mood Before/After
             let sumBefore = 0, sumAfter = 0, moodCount = 0;
             allResponses.forEach(r => {
                 if (r.mood_before_raw && r.mood_after_raw) {
@@ -652,45 +679,37 @@
                 const diff = (avgA - avgB).toFixed(1);
                 document.getElementById('avgBefore').textContent = avgB;
                 document.getElementById('avgAfter').textContent = avgA;
-                document.getElementById('impactDelta').textContent = `+${diff} points`;
+                document.getElementById('impactDelta').textContent = `+${diff} pts`;
                 document.getElementById('moodBoost').textContent = `+${diff}`;
             }
 
-            // Returning Rate
+            // Returning
             const returning = allResponses.filter(r => r.is_returning_visitor === true).length;
-            const returnRate = Math.round((returning / allResponses.length) * 100);
-            document.getElementById('returningRate').textContent = returnRate + '%';
+            document.getElementById('returningRate').textContent = Math.round((returning / allResponses.length) * 100) + '%';
 
-            // Render components
             renderProgramTable();
-            renderMissionRadar();
-            renderDemographics();
             renderGrowthChart();
+            renderDemographics();
+            renderReferralChart();
             renderVibesFeed();
         }
 
-        // ============================================
-        // PROGRAM TABLE (1-5 Scale)
-        // ============================================
+        // Program Table
         function renderProgramTable() {
             const programs = {};
-
             allResponses.forEach(r => {
-                const prog = r.experience_type || 'General Visit';
-                if (!programs[prog]) {
-                    programs[prog] = { count: 0, before: [], after: [], nature: [] };
-                }
+                const prog = r.experience_type || 'General';
+                if (!programs[prog]) programs[prog] = { count: 0, before: [], after: [], nature: [] };
                 programs[prog].count++;
                 if (r.mood_before_raw) programs[prog].before.push(r.mood_before_raw);
                 if (r.mood_after_raw) programs[prog].after.push(r.mood_after_raw);
                 if (r.nature_connection_raw) programs[prog].nature.push(r.nature_connection_raw);
             });
 
-            const sorted = Object.entries(programs).sort((a, b) => b[1].count - a[1].count).slice(0, 10);
-
+            const sorted = Object.entries(programs).sort((a, b) => b[1].count - a[1].count).slice(0, 8);
             const avg = arr => arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : null;
             const scoreClass = val => {
-                if (val === null) return 'score-na';
+                if (!val) return 'bg-slate-700 text-slate-400';
                 const n = parseFloat(val);
                 if (n >= 4.5) return 'score-5';
                 if (n >= 3.5) return 'score-4';
@@ -704,70 +723,71 @@
                 const after = avg(stats.after);
                 const nature = avg(stats.nature);
                 const boost = before && after ? (parseFloat(after) - parseFloat(before)).toFixed(1) : null;
-                const boostClass = boost ? (parseFloat(boost) > 0 ? 'text-green-600' : 'text-red-500') : 'text-gray-400';
 
                 return `
-                    <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                    <tr class="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
                         <td class="py-3 px-2">
-                            <span class="font-semibold text-gray-800">${name}</span>
-                            <span class="text-xs text-gray-400 ml-1">(${stats.count})</span>
+                            <span class="font-semibold text-white">${name}</span>
+                            <span class="text-xs text-slate-500 ml-1">(${stats.count})</span>
                         </td>
-                        <td class="text-center py-3 px-2"><span class="score-pill ${scoreClass(before)}">${before || '--'}</span></td>
-                        <td class="text-center py-3 px-2"><span class="score-pill ${scoreClass(after)}">${after || '--'}</span></td>
-                        <td class="text-center py-3 px-2"><span class="score-pill ${scoreClass(nature)}">${nature || '--'}</span></td>
-                        <td class="text-center py-3 px-2 font-bold ${boostClass}">${boost ? (parseFloat(boost) > 0 ? '+' : '') + boost : '--'}</td>
+                        <td class="text-center py-3 px-2"><span class="score-badge ${scoreClass(before)}">${before || '--'}</span></td>
+                        <td class="text-center py-3 px-2"><span class="score-badge ${scoreClass(after)}">${after || '--'}</span></td>
+                        <td class="text-center py-3 px-2"><span class="score-badge ${scoreClass(nature)}">${nature || '--'}</span></td>
+                        <td class="text-center py-3 px-2 font-bold ${boost && parseFloat(boost) > 0 ? 'text-green-400' : 'text-slate-500'}">${boost ? (parseFloat(boost) > 0 ? '+' : '') + boost : '--'}</td>
                     </tr>
                 `;
             }).join('');
         }
 
-        // ============================================
-        // CHARTS (1-5 Scale)
-        // ============================================
-        function renderMissionRadar() {
-            const totals = { before: 0, after: 0, nature: 0 };
-            let count = 0;
-
-            allResponses.forEach(r => {
-                if (r.mood_before_raw || r.mood_after_raw) {
-                    totals.before += r.mood_before_raw || 0;
-                    totals.after += r.mood_after_raw || 0;
-                    totals.nature += r.nature_connection_raw || 0;
-                    count++;
-                }
+        // Growth Chart
+        function renderGrowthChart() {
+            const sorted = [...allResponses].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            const daily = {};
+            sorted.forEach(r => {
+                const d = new Date(r.created_at).toLocaleDateString();
+                daily[d] = (daily[d] || 0) + 1;
             });
 
-            const avg = v => count ? (v / count).toFixed(2) : 0;
+            const labels = [], data = [];
+            let running = 0;
+            Object.keys(daily).forEach(d => {
+                running += daily[d];
+                labels.push(d);
+                data.push(running);
+            });
 
-            new Chart(document.getElementById('missionChart'), {
-                type: 'radar',
+            const ctx = document.getElementById('growthChart').getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+            gradient.addColorStop(0, 'rgba(34, 197, 94, 0.3)');
+            gradient.addColorStop(1, 'rgba(34, 197, 94, 0)');
+
+            new Chart(ctx, {
+                type: 'line',
                 data: {
-                    labels: ['Before Mood', 'After Mood', 'Nature Connection', 'Would Recommend', 'Experience'],
+                    labels: labels,
                     datasets: [{
-                        label: 'Avg Score',
-                        data: [
-                            avg(totals.before),
-                            avg(totals.after),
-                            avg(totals.nature),
-                            allResponses.filter(r => r.would_recommend).length / allResponses.length * 5,
-                            avg(totals.after) // Duplicate for visual balance
-                        ],
-                        backgroundColor: 'rgba(132, 204, 22, 0.25)',
-                        borderColor: '#84cc16',
-                        borderWidth: 3,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: '#84cc16',
-                        pointBorderWidth: 2,
-                        pointRadius: 5
+                        data: data,
+                        borderColor: '#22c55e',
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        borderWidth: 3
                     }]
                 },
                 options: {
-                    scales: { r: { min: 0, max: 5, ticks: { stepSize: 1, font: { size: 10 } } } },
-                    plugins: { legend: { display: false } }
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { display: false }
+                    }
                 }
             });
         }
 
+        // Demographics
         function renderDemographics() {
             const ages = {};
             allResponses.forEach(r => {
@@ -781,316 +801,77 @@
                     labels: Object.keys(ages),
                     datasets: [{
                         data: Object.values(ages),
-                        backgroundColor: ['#fbbf24', '#fb923c', '#f97316', '#84cc16', '#22c55e', '#14b8a6'],
-                        borderWidth: 0
+                        backgroundColor: ['#f97316', '#fbbf24', '#84cc16', '#22c55e', '#06b6d4', '#8b5cf6'],
+                        borderWidth: 0,
+                        borderRadius: 4
                     }]
                 },
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     cutout: '60%',
-                    plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } } }
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { boxWidth: 12, padding: 12, font: { size: 11 } }
+                        }
+                    }
                 }
             });
         }
 
-        function renderGrowthChart() {
-            const sorted = [...allResponses].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-            const daily = {};
-            sorted.forEach(r => {
-                const d = new Date(r.created_at).toLocaleDateString();
-                daily[d] = (daily[d] || 0) + 1;
-            });
-
-            const dates = [], counts = [];
-            let running = 0;
-            Object.keys(daily).forEach(d => {
-                running += daily[d];
-                dates.push(d);
-                counts.push(running);
-            });
-
-            new Chart(document.getElementById('growthChart'), {
-                type: 'line',
-                data: {
-                    labels: dates,
-                    datasets: [{
-                        data: counts,
-                        borderColor: '#84cc16',
-                        backgroundColor: 'rgba(132, 204, 22, 0.15)',
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 0,
-                        borderWidth: 3
-                    }]
-                },
-                options: {
-                    plugins: { legend: { display: false } },
-                    scales: { x: { display: false }, y: { display: false } }
-                }
-            });
-        }
-
-        // ============================================
-        // VIBES FEED
-        // ============================================
-        function renderVibesFeed() {
-            const quotes = allResponses
-                .filter(r => r.standout_moment && r.standout_moment.trim().length > 5)
-                .slice(0, 25);
-
-            document.getElementById('vibesFeed').innerHTML = quotes.map(q => `
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
-                    <p class="text-gray-700 italic text-sm leading-relaxed">"${q.standout_moment}"</p>
-                    <div class="mt-2 flex items-center justify-between text-xs">
-                        <span class="bg-farm-100 text-farm-700 px-2 py-1 rounded-full font-semibold">${q.experience_type || 'Farm Visit'}</span>
-                        <span class="text-gray-400">${new Date(q.created_at).toLocaleDateString()}</span>
-                    </div>
-                </div>
-            `).join('') || '<p class="text-gray-400 text-center py-10">No testimonials yet</p>';
-        }
-
-        // ============================================
-        // QUICK INSIGHTS
-        // ============================================
-        function showInsight(type) {
-            const display = document.getElementById('insightDisplay');
-            const title = document.getElementById('insightTitle');
-            const content = document.getElementById('insightContent');
-
-            display.classList.remove('hidden');
-
-            document.querySelectorAll('.insight-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
-
-            let html = '';
-
-            switch (type) {
-                case 'zen':
-                    title.textContent = '🧘 The Zen Factor - Which programs boost mood the most?';
-                    const zenData = getProgramMoodBoost();
-                    html = renderZenTable(zenData);
-                    break;
-
-                case 'mission':
-                    title.textContent = '🎯 Mission Match - Before/After Mood by Program';
-                    html = renderMissionSummary();
-                    break;
-
-                case 'demographics':
-                    title.textContent = '📊 Demographics - Age Range Breakdown';
-                    const demoData = getDemographics();
-                    html = renderDemoTable(demoData);
-                    break;
-
-                case 'learning':
-                    title.textContent = '💡 Learning Intent - Will they use what they learned?';
-                    html = '<p class="text-gray-500">Learning intent is tracked via community_benefit_score (1-3 scale mapped from survey).</p>';
-                    break;
-
-                case 'referrals':
-                    title.textContent = '📣 Referral Sources - How did they find us?';
-                    const refData = getReferralSources();
-                    html = renderRefTable(refData);
-                    break;
-
-                case 'community':
-                    title.textContent = '👥 Community Benefit - Do they believe community would benefit?';
-                    const commData = getCommunityBenefit();
-                    html = renderCommunityTable(commData);
-                    break;
-
-                case 'regulars':
-                    title.textContent = '🔄 Returning Visitors - Our loyal community';
-                    const returning = allResponses.filter(r => r.is_returning_visitor).length;
-                    const firstTimers = allResponses.length - returning;
-                    html = `
-                        <div class="flex gap-4">
-                            <div class="bg-purple-100 rounded-xl p-6 flex-1 text-center">
-                                <p class="text-4xl font-bold text-purple-700">${returning}</p>
-                                <p class="text-sm text-purple-600 mt-1">Returning Visitors</p>
-                            </div>
-                            <div class="bg-gray-100 rounded-xl p-6 flex-1 text-center">
-                                <p class="text-4xl font-bold text-gray-700">${firstTimers}</p>
-                                <p class="text-sm text-gray-600 mt-1">First-Time Visitors</p>
-                            </div>
-                        </div>
-                    `;
-                    break;
-            }
-
-            content.innerHTML = html;
-        }
-
-        function getProgramMoodBoost() {
-            const progs = {};
-            allResponses.forEach(r => {
-                const p = r.experience_type || 'General';
-                if (!progs[p]) progs[p] = { before: [], after: [] };
-                if (r.mood_before_raw) progs[p].before.push(r.mood_before_raw);
-                if (r.mood_after_raw) progs[p].after.push(r.mood_after_raw);
-            });
-            return Object.entries(progs)
-                .filter(([_, v]) => v.before.length >= 2 && v.after.length >= 2)
-                .map(([name, v]) => {
-                    const avgB = v.before.reduce((a, b) => a + b, 0) / v.before.length;
-                    const avgA = v.after.reduce((a, b) => a + b, 0) / v.after.length;
-                    return { name, before: avgB.toFixed(1), after: avgA.toFixed(1), boost: (avgA - avgB).toFixed(1), count: v.after.length };
-                })
-                .sort((a, b) => parseFloat(b.boost) - parseFloat(a.boost));
-        }
-
-        function getDemographics() {
-            const ages = {};
-            allResponses.forEach(r => {
-                const a = r.age_range_bracket || 'Unknown';
-                ages[a] = (ages[a] || 0) + 1;
-            });
-            const total = allResponses.length;
-            return Object.entries(ages)
-                .map(([age, count]) => ({ age, count, pct: ((count / total) * 100).toFixed(1) }))
-                .sort((a, b) => b.count - a.count);
-        }
-
-        function getReferralSources() {
+        // Referral Chart
+        function renderReferralChart() {
             const sources = {};
             allResponses.forEach(r => {
                 const s = r.referral_source || 'Not specified';
                 sources[s] = (sources[s] || 0) + 1;
             });
-            const total = allResponses.length;
-            return Object.entries(sources)
-                .map(([source, count]) => ({ source, count, pct: ((count / total) * 100).toFixed(1) }))
-                .sort((a, b) => b.count - a.count)
-                .slice(0, 8);
-        }
 
-        function getCommunityBenefit() {
-            const progs = {};
-            allResponses.forEach(r => {
-                const p = r.experience_type || 'General';
-                if (!progs[p]) progs[p] = { scores: [], count: 0 };
-                progs[p].count++;
-                if (r.community_benefit_score) progs[p].scores.push(r.community_benefit_score);
-            });
-            return Object.entries(progs)
-                .filter(([_, v]) => v.scores.length >= 2)
-                .map(([name, v]) => ({
-                    name,
-                    avg: (v.scores.reduce((a, b) => a + b, 0) / v.scores.length).toFixed(2),
-                    count: v.count
-                }))
-                .sort((a, b) => parseFloat(b.avg) - parseFloat(a.avg));
-        }
+            const sorted = Object.entries(sources).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
-        function renderZenTable(data) {
-            return `
-                <table class="w-full text-sm">
-                    <thead><tr class="border-b border-gray-200">
-                        <th class="text-left py-2">Program</th>
-                        <th class="text-center py-2">Before</th>
-                        <th class="text-center py-2">After</th>
-                        <th class="text-center py-2">Boost</th>
-                    </tr></thead>
-                    <tbody>
-                        ${data.map(d => `
-                            <tr class="border-b border-gray-100">
-                                <td class="py-2 font-medium">${d.name} <span class="text-gray-400 text-xs">(${d.count})</span></td>
-                                <td class="py-2 text-center"><span class="score-pill score-${Math.round(d.before)}">${d.before}</span></td>
-                                <td class="py-2 text-center"><span class="score-pill score-${Math.round(d.after)}">${d.after}</span></td>
-                                <td class="py-2 text-center font-bold ${parseFloat(d.boost) > 0 ? 'text-green-600' : 'text-red-500'}">${parseFloat(d.boost) > 0 ? '+' : ''}${d.boost}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-        }
-
-        function renderMissionSummary() {
-            let sumBefore = 0, sumAfter = 0, count = 0;
-            allResponses.forEach(r => {
-                if (r.mood_before_raw && r.mood_after_raw) {
-                    sumBefore += r.mood_before_raw;
-                    sumAfter += r.mood_after_raw;
-                    count++;
+            new Chart(document.getElementById('referralChart'), {
+                type: 'bar',
+                data: {
+                    labels: sorted.map(s => s[0]),
+                    datasets: [{
+                        data: sorted.map(s => s[1]),
+                        backgroundColor: ['#fbbf24', '#f97316', '#84cc16', '#22c55e', '#06b6d4'],
+                        borderRadius: 6,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false, grid: { display: false } },
+                        y: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 11 } } }
+                    }
                 }
             });
-            const before = count ? (sumBefore / count).toFixed(2) : '--';
-            const after = count ? (sumAfter / count).toFixed(2) : '--';
-            const boost = count ? (sumAfter / count - sumBefore / count).toFixed(2) : '--';
+        }
 
-            return `
-                <div class="grid grid-cols-3 gap-4 text-center">
-                    <div class="bg-gray-100 rounded-xl p-4">
-                        <p class="text-3xl font-bold text-gray-600">${before}</p>
-                        <p class="text-sm text-gray-500">Avg Before</p>
-                    </div>
-                    <div class="bg-green-100 rounded-xl p-4">
-                        <p class="text-3xl font-bold text-green-600">${after}</p>
-                        <p class="text-sm text-green-600">Avg After</p>
-                    </div>
-                    <div class="bg-farm-100 rounded-xl p-4">
-                        <p class="text-3xl font-bold text-farm-700">+${boost}</p>
-                        <p class="text-sm text-farm-600">Boost</p>
+        // Vibes Feed
+        function renderVibesFeed() {
+            const quotes = allResponses.filter(r => r.standout_moment && r.standout_moment.trim().length > 5).slice(0, 20);
+
+            document.getElementById('vibesFeed').innerHTML = quotes.map(q => `
+                <div class="testimonial-card p-4">
+                    <p class="text-slate-300 italic text-sm leading-relaxed">"${q.standout_moment}"</p>
+                    <div class="mt-3 flex items-center justify-between text-xs">
+                        <span class="bg-green-500/20 text-green-400 px-2 py-1 rounded-lg font-semibold">${q.experience_type || 'Farm Visit'}</span>
+                        <span class="text-slate-500">${new Date(q.created_at).toLocaleDateString()}</span>
                     </div>
                 </div>
-            `;
+            `).join('') || '<p class="text-slate-500 text-center py-10">No testimonials yet</p>';
         }
 
-        function renderDemoTable(data) {
-            return `
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    ${data.map(d => `
-                        <div class="bg-orange-50 rounded-xl p-4 text-center">
-                            <p class="text-2xl font-bold text-orange-700">${d.pct}%</p>
-                            <p class="text-sm text-gray-600">${d.age}</p>
-                            <p class="text-xs text-gray-400">${d.count} visitors</p>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        function renderRefTable(data) {
-            return `
-                <div class="space-y-2">
-                    ${data.map(d => `
-                        <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
-                            <span class="font-medium text-gray-800">${d.source}</span>
-                            <div class="flex items-center gap-3">
-                                <span class="text-sm text-gray-500">${d.count}</span>
-                                <span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full font-bold text-sm">${d.pct}%</span>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        function renderCommunityTable(data) {
-            return `
-                <table class="w-full text-sm">
-                    <thead><tr class="border-b border-gray-200">
-                        <th class="text-left py-2">Program</th>
-                        <th class="text-center py-2">Community Score (1-3)</th>
-                        <th class="text-center py-2">Responses</th>
-                    </tr></thead>
-                    <tbody>
-                        ${data.map(d => `
-                            <tr class="border-b border-gray-100">
-                                <td class="py-2 font-medium">${d.name}</td>
-                                <td class="py-2 text-center"><span class="bg-green-100 text-green-700 px-3 py-1 rounded-full font-bold">${d.avg}</span></td>
-                                <td class="py-2 text-center text-gray-500">${d.count}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-        }
-
-        // ============================================
-        // EXPORT CSV
-        // ============================================
+        // Export
         function exportCSV() {
-            const headers = ['Date', 'Program', 'Age', 'Mood Before (1-5)', 'Mood After (1-5)', 'Nature (1-5)', 'Recommend', 'Returning', 'Referral', 'Standout'];
+            const headers = ['Date', 'Program', 'Age', 'Before', 'After', 'Nature', 'Recommend', 'Moment'];
             const rows = allResponses.map(r => [
                 new Date(r.created_at).toLocaleDateString(),
                 r.experience_type || '',
@@ -1099,19 +880,15 @@
                 r.mood_after_raw || '',
                 r.nature_connection_raw || '',
                 r.would_recommend ? 'Yes' : 'No',
-                r.is_returning_visitor ? 'Yes' : 'No',
-                r.referral_source || '',
-                (r.standout_moment || '').replace(/,/g, ' ').replace(/\n/g, ' ')
+                (r.standout_moment || '').replace(/,/g, ' ')
             ]);
             const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
-            const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
             const a = document.createElement('a');
-            a.href = url;
+            a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
             a.download = `empowerment_farm_${new Date().toISOString().split('T')[0]}.csv`;
             a.click();
         }
 
-        // Start
         initSupabase();
     </script>
 </body>
