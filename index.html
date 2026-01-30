@@ -731,8 +731,18 @@
         <div class="screen" id="screen10">
             <h2>What was your favorite part?</h2>
             <p class="subtitle">A moment, animal, or feeling... (optional)</p>
+
             <textarea class="text-box" id="standoutMoment" placeholder="The baby goats made my day! 🐐"
                 aria-label="Your favorite moment"></textarea>
+
+            <div style="margin-top: 20px; text-align: left;">
+                <label for="participantName"
+                    style="display: block; font-size: 0.85rem; font-weight: 600; color: #64748b; margin-bottom: 5px;">
+                    Your Name (Optional)
+                </label>
+                <input type="text" id="participantName" class="text-box" style="height: 45px; margin-bottom: 15px;"
+                    placeholder="First Name or Initials">
+            </div>
             <div class="btn-row">
                 <button class="btn btn-primary" onclick="submitSurvey()">Submit 🌻</button>
             </div>
@@ -775,7 +785,9 @@
             would_recommend: null,
             referral_source: null,
             age_range: null,
-            standout_moment: null
+            age_range: null,
+            standout_moment: null,
+            participant_name: null
         };
         let supabaseClient = null;
 
@@ -908,6 +920,7 @@
         // ============================================
         async function submitSurvey() {
             data.standout_moment = document.getElementById('standoutMoment').value.trim() || null;
+            data.participant_name = document.getElementById('participantName').value.trim() || null;
 
             console.log('📊 Survey data collected:', data);
 
@@ -949,10 +962,12 @@
                     nature_connection_raw: parseInt(data.nature_connection) || null,
                     skills_learned_score: data.skills_learned_score, // Send to DB
 
+                    // Metadata
+                    referral_source: data.referral_source,
                     would_recommend: data.would_recommend === 'yes',
-                    referral_source: data.referral_source || null,
-                    standout_moment: data.standout_moment
-                    // submitted_at handled by Postgres DEFAULT NOW() for "background" timing
+                    standout_moment: data.standout_moment,
+                    participant_name: data.participant_name, // Secure name
+                    created_at: new Date().toISOString()
                 };
 
                 console.log('📤 Inserting into surveyresponses:', dbData);

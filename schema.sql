@@ -8,6 +8,9 @@
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
+-- Enable PGCrypto for secure encryption (Future-proofing for column-level security)
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
 -- ============================================================================
 -- CLEANUP - DROP EVERYTHING FOR CLEAN SLATE
 -- ============================================================================
