@@ -930,8 +930,7 @@
 
                 const { data: result, error } = await supabaseClient
                     .from('surveyresponses')
-                    .insert([dbData])
-                    .select();
+                    .insert([dbData]);
 
                 if (error) {
                     console.error('❌ Supabase error:', error);
