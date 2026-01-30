@@ -923,15 +923,16 @@
 
                     would_recommend: data.would_recommend === 'yes',
                     referral_source: data.referral_source || null,
-                    standout_moment: data.standout_moment,
-                    submitted_at: new Date().toISOString() // Explicitly log client time for analytics
+                    standout_moment: data.standout_moment
+                    // submitted_at handled by Postgres DEFAULT NOW() for "background" timing
                 };
 
                 console.log('📤 Inserting into surveyresponses:', dbData);
 
                 const { data: result, error } = await supabaseClient
                     .from('surveyresponses')
-                    .insert([dbData]);
+                    .insert([dbData])
+                    .select(); // Add select() to return the inserted record for logging
 
                 if (error) {
                     console.error('❌ Supabase error:', error);
