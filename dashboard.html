@@ -402,11 +402,12 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-8 items-center">
+                    <div class="grid grid-cols-3 gap-1 md:gap-8 items-center">
                         <div class="text-center">
-                            <div class="text-6xl mb-3 opacity-60 grayscale">😫</div>
-                            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Before</p>
-                            <p id="avgBefore" class="text-4xl font-extrabold text-slate-400 mt-1">--</p>
+                            <div class="text-4xl md:text-6xl mb-3 opacity-60 grayscale">😫</div>
+                            <p class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wider">Before
+                            </p>
+                            <p id="avgBefore" class="text-2xl md:text-4xl font-extrabold text-slate-400 mt-1">--</p>
                         </div>
 
                         <div class="text-center relative">
@@ -416,16 +417,20 @@
                                 </div>
                             </div>
                             <div
-                                class="relative bg-slate-800 px-6 py-4 rounded-2xl border border-green-500/30 shadow-lg shadow-green-500/10">
-                                <span id="impactDelta" class="text-3xl font-extrabold text-green-400">+-- pts</span>
-                                <p class="text-xs text-slate-400 mt-1">Average Improvement</p>
+                                class="relative bg-slate-800 px-2 py-3 md:px-6 md:py-4 rounded-xl md:rounded-2xl border border-green-500/30 shadow-lg shadow-green-500/10">
+                                <span id="impactDelta"
+                                    class="text-lg md:text-3xl font-extrabold text-green-400 whitespace-nowrap">+--
+                                    pts</span>
+                                <p class="text-[10px] md:text-xs text-slate-400 mt-1 leading-tight">Avg Boost</p>
                             </div>
                         </div>
 
                         <div class="text-center">
-                            <div class="text-6xl mb-3">🥰</div>
-                            <p class="text-xs font-bold text-green-400 uppercase tracking-wider">After</p>
-                            <p id="avgAfter" class="text-4xl font-extrabold text-green-400 mt-1 glow-green">--</p>
+                            <div class="text-4xl md:text-6xl mb-3">🥰</div>
+                            <p class="text-[10px] md:text-xs font-bold text-green-400 uppercase tracking-wider">After
+                            </p>
+                            <p id="avgAfter" class="text-2xl md:text-4xl font-extrabold text-green-400 mt-1 glow-green">
+                                --</p>
                         </div>
                     </div>
                 </section>
@@ -570,6 +575,57 @@
                         </div>
                     </div>
 
+                </div>
+
+                <!-- ====================================== -->
+                <!-- DETAILED RESPONSE EXPLORER -->
+                <!-- ====================================== -->
+                <section class="mt-8 pbi-card overflow-hidden">
+                    <div
+                        class="p-6 border-b border-slate-700/50 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500/20 to-violet-500/20 flex items-center justify-center">
+                                <span class="text-xl">🔎</span>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">Response Explorer</h3>
+                                <p class="text-xs text-slate-400">Deep dive into individual experiences</p>
+                            </div>
+                        </div>
+                        <input type="text" id="responseSearch" placeholder="Search by program, date..."
+                            class="bg-slate-800/50 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 w-full md:w-64">
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-800/30 text-xs text-slate-400 uppercase tracking-wider">
+                                    <th class="p-4 font-semibold">Date</th>
+                                    <th class="p-4 font-semibold">Program</th>
+                                    <th class="p-4 font-semibold text-center">Mood Δ</th>
+                                    <th class="p-4 font-semibold text-center">Skills</th>
+                                    <th class="p-4 font-semibold text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="responseTableBody" class="text-sm divide-y divide-slate-700/30">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- DETAIL MODAL -->
+                <div id="detailModal"
+                    class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                    <div
+                        class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl relative">
+                        <button onclick="closeModal()"
+                            class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 rounded-full p-2 transition">
+                            ✕
+                        </button>
+                        <div id="modalContent"></div>
+                    </div>
                 </div>
 
             </div>
@@ -732,7 +788,149 @@
             renderReferralChart();
             renderVibesFeed();
             renderPeakTimes();
+            renderResponseTable(allResponses);
         }
+
+        // Response Explorer & Modal
+        function renderResponseTable(data) {
+            const tbody = document.getElementById('responseTableBody');
+
+            // Sort by date (newest first)
+            const sorted = [...data].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            tbody.innerHTML = sorted.map((r, i) => {
+                const date = new Date(r.created_at).toLocaleDateString();
+                const diff = (r.mood_after_raw && r.mood_before_raw) ? (r.mood_after_raw - r.mood_before_raw).toFixed(1) : '--';
+                const boostClass = diff > 0 ? 'text-green-400' : 'text-slate-500';
+                const skillsDisplay = (r.skills_learned_score !== null && r.skills_learned_score !== undefined)
+                    ? `<span class="px-2 py-1 rounded bg-pink-500/10 text-pink-400 font-bold text-xs">${r.skills_learned_score}</span>`
+                    : '<span class="text-slate-600">--</span>';
+
+                return `
+                    <tr class="hover:bg-slate-800/30 transition-colors group">
+                        <td class="p-4 text-slate-300 font-medium">${date}</td>
+                        <td class="p-4">
+                            <span class="text-white block">${r.experience_type || 'General Visit'}</span>
+                            ${r.participant_name ? `<span class="text-xs text-slate-500">${r.participant_name}</span>` : ''}
+                        </td>
+                        <td class="p-4 text-center font-bold ${boostClass}">${diff > 0 ? '+' : ''}${diff}</td>
+                        <td class="p-4 text-center">${skillsDisplay}</td>
+                        <td class="p-4 text-right">
+                            <button onclick="openModal(${allResponses.indexOf(r)})" class="text-xs bg-indigo-500/10 hover:bg-indigo-500 text-indigo-400 hover:text-white px-3 py-1.5 rounded-lg transition-all border border-indigo-500/30">
+                                View Details
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Search Filter
+            // document.getElementById('responseSearch').addEventListener('input', (e) => {
+            //     const term = e.target.value.toLowerCase();
+            //     const filtered = allResponses.filter(r =>
+            //         (r.experience_type && r.experience_type.toLowerCase().includes(term)) ||
+            //         (r.participant_name && r.participant_name.toLowerCase().includes(term)) ||
+            //         (r.standout_moment && r.standout_moment.toLowerCase().includes(term))
+            //     );
+            //     renderResponseTable(filtered); // WARNING: This recursion needs handling, better to separate render from sort logic if needed, but for now simple re-render is fine.
+            //     // Correction: renderResponseTable takes data arg, so valid.
+            // });
+        }
+
+        // Initialize Search Listener (Called once)
+        document.getElementById('responseSearch').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = allResponses.filter(r =>
+                (r.experience_type && r.experience_type.toLowerCase().includes(term)) ||
+                (r.participant_name && r.participant_name.toLowerCase().includes(term)) ||
+                (r.standout_moment && r.standout_moment.toLowerCase().includes(term))
+            );
+            renderResponseTable(filtered);
+        });
+
+        function openModal(index) {
+            const r = allResponses[index];
+            const date = new Date(r.created_at).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            const time = new Date(r.created_at).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+
+            const scoreBubble = (val, color) => `
+                <div class="flex flex-col items-center gap-2 p-3 bg-slate-800/50 rounded-xl border border-slate-700">
+                    <div class="text-3xl font-bold text-${color}-400">${val || '--'}</div>
+                    <div class="text-[10px] uppercase tracking-wider text-slate-500 font-bold">1-5 Scale</div>
+                </div>
+            `;
+
+            const modalHtml = `
+                <div class="p-8">
+                    <div class="border-b border-slate-700 pb-6 mb-6">
+                        <div class="flex items-center gap-2 mb-2">
+                             <span class="bg-indigo-500 text-white text-xs font-bold px-2 py-1 rounded-md uppercase tracking-wider">Response Details</span>
+                             <span class="text-slate-500 text-xs">${date} at ${time}</span>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white mb-1">${r.experience_type || 'Farm Visitor'}</h2>
+                        <p class="text-slate-400 text-sm">Participant: <span class="text-white font-medium">${r.participant_name || 'Anonymous'}</span></p>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        <div class="text-center">
+                            <p class="text-xs text-slate-500 mb-2 font-bold uppercase">Before</p>
+                            ${scoreBubble(r.mood_before_raw, 'slate')}
+                        </div>
+                        <div class="text-center">
+                            <p class="text-xs text-slate-500 mb-2 font-bold uppercase">After</p>
+                            ${scoreBubble(r.mood_after_raw, 'green')}
+                        </div>
+                        <div class="text-center">
+                            <p class="text-xs text-slate-500 mb-2 font-bold uppercase">Nature</p>
+                            ${scoreBubble(r.nature_connection_raw, 'emerald')}
+                        </div>
+                        <div class="text-center">
+                            <p class="text-xs text-slate-500 mb-2 font-bold uppercase">Skills</p>
+                            <div class="flex flex-col items-center gap-2 p-3 bg-slate-800/50 rounded-xl border border-pink-500/30">
+                                <div class="text-3xl font-bold text-pink-400">${r.skills_learned_score ?? '--'}</div>
+                                <div class="text-[10px] uppercase tracking-wider text-slate-500 font-bold">0-100</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="bg-slate-800/30 p-4 rounded-xl border border-slate-700">
+                            <p class="text-xs text-slate-500 font-bold uppercase mb-2">Standout Moment</p>
+                            <p class="text-slate-200 italic leading-relaxed">"${r.standout_moment || 'No comment provided.'}"</p>
+                        </div>
+                        
+                        ${r.additional_feedback ? `
+                        <div class="bg-slate-800/30 p-4 rounded-xl border border-slate-700">
+                            <p class="text-xs text-slate-500 font-bold uppercase mb-2">Feedback</p>
+                            <p class="text-slate-300 text-sm leading-relaxed">${r.additional_feedback}</p>
+                        </div>` : ''}
+
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                             <div class="p-3 bg-slate-800/30 rounded-lg text-center">
+                                <p class="text-xs text-slate-500">Returning Visitor</p>
+                                <p class="text-white font-semibold">${r.is_returning_visitor ? 'Yes' : 'No'}</p>
+                             </div>
+                             <div class="p-3 bg-slate-800/30 rounded-lg text-center">
+                                <p class="text-xs text-slate-500">Would Recommend</p>
+                                <p class="text-white font-semibold">${r.would_recommend ? 'Yes 100%' : 'No'}</p>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('modalContent').innerHTML = modalHtml;
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+        }
+
+        // Close modal on outside click
+        document.getElementById('detailModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('detailModal')) closeModal();
+        });
+
 
         // Program Table
         function renderProgramTable() {
