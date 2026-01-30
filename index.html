@@ -923,7 +923,8 @@
 
                     would_recommend: data.would_recommend === 'yes',
                     referral_source: data.referral_source || null,
-                    standout_moment: data.standout_moment
+                    standout_moment: data.standout_moment,
+                    submitted_at: new Date().toISOString() // Explicitly log client time for analytics
                 };
 
                 console.log('📤 Inserting into surveyresponses:', dbData);
