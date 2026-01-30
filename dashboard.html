@@ -722,7 +722,7 @@
             document.getElementById('returningRate').textContent = Math.round((returning / allResponses.length) * 100) + '%';
 
             // Global Skills Score
-            const skillsScores = allResponses.filter(r => r.skills_learned_score).map(r => r.skills_learned_score);
+            const skillsScores = allResponses.filter(r => r.skills_learned_score !== null && r.skills_learned_score !== undefined).map(r => r.skills_learned_score);
             const globalSkillsAvg = skillsScores.length ? Math.round(skillsScores.reduce((a, b) => a + b, 0) / skillsScores.length) : '--';
             document.getElementById('avgSkillsGlobal').textContent = globalSkillsAvg;
 
@@ -744,7 +744,7 @@
                 if (r.mood_before_raw) programs[prog].before.push(r.mood_before_raw);
                 if (r.mood_after_raw) programs[prog].after.push(r.mood_after_raw);
                 if (r.nature_connection_raw) programs[prog].nature.push(r.nature_connection_raw);
-                if (r.skills_learned_score) programs[prog].skills.push(r.skills_learned_score);
+                if (r.skills_learned_score !== null && r.skills_learned_score !== undefined) programs[prog].skills.push(r.skills_learned_score);
             });
 
             const sorted = Object.entries(programs).sort((a, b) => b[1].count - a[1].count).slice(0, 8);
