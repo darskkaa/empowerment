@@ -342,7 +342,7 @@
                 <!-- ====================================== -->
                 <!-- HERO METRICS -->
                 <!-- ====================================== -->
-                <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <section class="grid grid-cols-2 lg:grid-cols-5 gap-4">
 
                     <!-- Total Visitors -->
                     <div class="pbi-card metric-card green p-6">
@@ -372,6 +372,17 @@
                         <h2 id="returningRate" class="text-5xl font-extrabold text-white metric-val glow-purple">--%
                         </h2>
                         <p class="text-xs text-slate-500 mt-2">Visited before</p>
+                    </div>
+
+                    <!-- Skills Score (NEW) -->
+                    <div class="pbi-card metric-card p-6" style="position: relative; overflow: hidden;">
+                        <div
+                            style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #ec4899, #be185d);">
+                        </div>
+                        <p class="text-xs font-semibold text-pink-400 uppercase tracking-wider mb-3">Skills Score</p>
+                        <h2 id="avgSkillsGlobal" class="text-5xl font-extrabold text-white metric-val"
+                            style="text-shadow: 0 0 30px rgba(236, 72, 153, 0.5);">--</h2>
+                        <p class="text-xs text-slate-500 mt-2">Avg Learning (0-100)</p>
                     </div>
 
                 </section>
@@ -448,6 +459,8 @@
                                             </th>
                                             <th class="text-center py-3 px-2 font-semibold text-slate-400">🥰 After</th>
                                             <th class="text-center py-3 px-2 font-semibold text-slate-400">🌿 Nature
+                                            </th>
+                                            <th class="text-center py-3 px-2 font-semibold text-slate-400">🎓 Skills
                                             </th>
                                             <th class="text-center py-3 px-2 font-semibold text-slate-400">📈 Boost</th>
                                         </tr>
@@ -704,8 +717,14 @@
             }
 
             // Returning (Robust Check)
+            // Returning (Robust Check)
             const returning = allResponses.filter(r => r.is_returning_visitor === true || r.is_returning_visitor === 'true').length;
             document.getElementById('returningRate').textContent = Math.round((returning / allResponses.length) * 100) + '%';
+
+            // Global Skills Score
+            const skillsScores = allResponses.filter(r => r.skills_learned_score).map(r => r.skills_learned_score);
+            const globalSkillsAvg = skillsScores.length ? Math.round(skillsScores.reduce((a, b) => a + b, 0) / skillsScores.length) : '--';
+            document.getElementById('avgSkillsGlobal').textContent = globalSkillsAvg;
 
             renderProgramTable();
             renderGrowthChart();
@@ -720,11 +739,12 @@
             const programs = {};
             allResponses.forEach(r => {
                 const prog = r.experience_type || 'General';
-                if (!programs[prog]) programs[prog] = { count: 0, before: [], after: [], nature: [] };
+                if (!programs[prog]) programs[prog] = { count: 0, before: [], after: [], nature: [], skills: [] };
                 programs[prog].count++;
                 if (r.mood_before_raw) programs[prog].before.push(r.mood_before_raw);
                 if (r.mood_after_raw) programs[prog].after.push(r.mood_after_raw);
                 if (r.nature_connection_raw) programs[prog].nature.push(r.nature_connection_raw);
+                if (r.skills_learned_score) programs[prog].skills.push(r.skills_learned_score);
             });
 
             const sorted = Object.entries(programs).sort((a, b) => b[1].count - a[1].count).slice(0, 8);
@@ -743,6 +763,7 @@
                 const before = avg(stats.before);
                 const after = avg(stats.after);
                 const nature = avg(stats.nature);
+                const skills = stats.skills.length ? Math.round(stats.skills.reduce((a, b) => a + b, 0) / stats.skills.length) : '--';
                 const boost = before && after ? (parseFloat(after) - parseFloat(before)).toFixed(1) : null;
 
                 return `
@@ -754,6 +775,7 @@
                         <td class="text-center py-3 px-2"><span class="score-badge ${scoreClass(before)}">${before || '--'}</span></td>
                         <td class="text-center py-3 px-2"><span class="score-badge ${scoreClass(after)}">${after || '--'}</span></td>
                         <td class="text-center py-3 px-2"><span class="score-badge ${scoreClass(nature)}">${nature || '--'}</span></td>
+                        <td class="text-center py-3 px-2 font-bold text-pink-400">${skills}</td>
                         <td class="text-center py-3 px-2 font-bold ${boost && parseFloat(boost) > 0 ? 'text-green-400' : 'text-slate-500'}">${boost ? (parseFloat(boost) > 0 ? '+' : '') + boost : '--'}</td>
                     </tr>
                 `;
@@ -943,7 +965,7 @@
         }
 
         function exportCSV() {
-            const headers = ['Date', 'Time', 'Program', 'Age', 'Before', 'After', 'Nature', 'Recommend', 'Moment'];
+            const headers = ['Date', 'Time', 'Program', 'Age', 'Before', 'After', 'Nature', 'Skills', 'Recommend', 'Moment'];
             const rows = allResponses.map(r => [
                 new Date(r.created_at).toLocaleDateString(),
                 new Date(r.created_at).toLocaleTimeString(), // Added time to CSV
@@ -952,6 +974,7 @@
                 r.mood_before_raw || '',
                 r.mood_after_raw || '',
                 r.nature_connection_raw || '',
+                r.skills_learned_score || '',
                 r.would_recommend ? 'Yes' : 'No',
                 (r.standout_moment || '').replace(/,/g, ' ')
             ]);

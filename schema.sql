@@ -186,6 +186,7 @@ CREATE TABLE surveyresponses (
     mood_before_raw           INT,
     mood_after_raw            INT,
     nature_connection_raw     INT,
+    skills_learned_score      INT CHECK (skills_learned_score BETWEEN 0 AND 100), -- New 0-100 scale metric
     
     -- Other fields
     referral_source           TEXT,

@@ -653,8 +653,25 @@
             <button class="skip" onclick="nextScreen()">Skip this question</button>
         </div>
 
-        <!-- SCREEN 6: Recommend -->
+        <!-- SCREEN 6: Skills Learned (New) -->
         <div class="screen" id="screen6">
+            <h2>Did you learn a new skill?</h2>
+            <p class="subtitle">Stress relief, gardening, animal care... (0-100)</p>
+            <div style="margin: 40px 0; padding: 0 20px;">
+                <input type="range" id="skillsInput" min="0" max="100" value="50"
+                    style="width: 100%; accent-color: var(--primary); height: 8px; border-radius: 4px;"
+                    oninput="document.getElementById('skillsVal').textContent = this.value">
+                <div style="text-align: center; margin-top: 20px;">
+                    <span id="skillsVal" style="font-size: 2.5rem; font-weight: 800; color: var(--primary);">50</span>
+                    <span style="font-size: 1rem; color: #888; font-weight: 600;">/ 100</span>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="saveSkillsAndNext()">Continue</button>
+            <button class="skip" onclick="nextScreen()">Skip this question</button>
+        </div>
+
+        <!-- SCREEN 7: Recommend (Renumbered) -->
+        <div class="screen" id="screen7">
             <h2>Would you tell a friend?</h2>
             <p class="subtitle">"Hey, you should check out this place!"</p>
             <div class="nps-row" role="radiogroup" aria-label="Recommendation">
@@ -668,8 +685,8 @@
             <button class="skip" onclick="nextScreen()">Skip this question</button>
         </div>
 
-        <!-- SCREEN 7: Referral -->
-        <div class="screen" id="screen7">
+        <!-- SCREEN 8: Referral (Renumbered) -->
+        <div class="screen" id="screen8">
             <h2>How did you find us?</h2>
             <p class="subtitle">Select one</p>
             <div class="ref-grid" role="radiogroup" aria-label="Referral source">
@@ -689,8 +706,8 @@
             <button class="skip" onclick="nextScreen()">Skip this question</button>
         </div>
 
-        <!-- SCREEN 8: Age -->
-        <div class="screen" id="screen8">
+        <!-- SCREEN 9: Age (Renumbered) -->
+        <div class="screen" id="screen9">
             <h2>What's your age range?</h2>
             <p class="subtitle">Helps us understand our visitors</p>
             <div class="card-grid" role="radiogroup" aria-label="Age range">
@@ -708,8 +725,8 @@
             <button class="skip" onclick="nextScreen()">Skip this question</button>
         </div>
 
-        <!-- SCREEN 9: Standout Moment -->
-        <div class="screen" id="screen9">
+        <!-- SCREEN 10: Standout Moment (Renumbered) -->
+        <div class="screen" id="screen10">
             <h2>What was your favorite part?</h2>
             <p class="subtitle">A moment, animal, or feeling... (optional)</p>
             <textarea class="text-box" id="standoutMoment" placeholder="The baby goats made my day! 🐐"
@@ -721,8 +738,8 @@
             <p id="errorMsg" class="error">Oops! Something went wrong. Trying again...</p>
         </div>
 
-        <!-- SCREEN 10: Thank You -->
-        <div class="screen" id="screen10">
+        <!-- SCREEN 11: Thank You (Renumbered) -->
+        <div class="screen" id="screen11">
             <div class="thank-card">
                 <div class="thank-emoji">🎉</div>
                 <h1>Thank You!</h1>
@@ -745,8 +762,8 @@
         // STATE
         // ============================================
         let currentScreen = 1;
-        const totalScreens = 10;
-        const totalQuestions = 8;
+        const totalScreens = 11; // Increased for new skills screen
+        const totalQuestions = 9;
         let data = {
             is_returning_visitor: false,
             program_name: null,
@@ -822,6 +839,12 @@
         // ============================================
         // SELECTION HANDLERS
         // ============================================
+        function saveSkillsAndNext() {
+            const val = document.getElementById('skillsInput').value;
+            data.skills_learned_score = parseInt(val);
+            nextScreen();
+        }
+
         function startSurvey(isReturning) {
             data.is_returning_visitor = isReturning;
             nextScreen();
@@ -920,6 +943,7 @@
                     mood_before_raw: parseInt(data.mood_before) || null,
                     mood_after_raw: parseInt(data.mood_after) || null,
                     nature_connection_raw: parseInt(data.nature_connection) || null,
+                    skills_learned_score: data.skills_learned_score, // Send to DB
 
                     would_recommend: data.would_recommend === 'yes',
                     referral_source: data.referral_source || null,
