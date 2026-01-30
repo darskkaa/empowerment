@@ -653,20 +653,22 @@
             <button class="skip" onclick="nextScreen()">Skip this question</button>
         </div>
 
-        <!-- SCREEN 6: Skills Learned (New) -->
+        <!-- SCREEN 6: Skills Learned (Updated for Accessibility) -->
         <div class="screen" id="screen6">
-            <h2>Did you learn a new skill?</h2>
-            <p class="subtitle">Stress relief, gardening, animal care... (0-100)</p>
-            <div style="margin: 40px 0; padding: 0 20px;">
-                <input type="range" id="skillsInput" min="0" max="100" value="50"
-                    style="width: 100%; accent-color: var(--primary); height: 8px; border-radius: 4px;"
-                    oninput="document.getElementById('skillsVal').textContent = this.value">
-                <div style="text-align: center; margin-top: 20px;">
-                    <span id="skillsVal" style="font-size: 2.5rem; font-weight: 800; color: var(--primary);">50</span>
-                    <span style="font-size: 1rem; color: #888; font-weight: 600;">/ 100</span>
-                </div>
+            <h2>Did you learn something new?</h2>
+            <p class="subtitle">About animals, plants, or yourself...</p>
+            <div class="rating-group" role="radiogroup" aria-label="Skills learned">
+                <div class="rating-item"><button class="rating-btn" data-value="0" onclick="selectSkill(this)"
+                        aria-label="Nothing new">🤷‍♀️</button><span class="rating-label">Nope</span></div>
+                <div class="rating-item"><button class="rating-btn" data-value="25" onclick="selectSkill(this)"
+                        aria-label="A little bit">🤏</button><span class="rating-label">A bit</span></div>
+                <div class="rating-item"><button class="rating-btn" data-value="50" onclick="selectSkill(this)"
+                        aria-label="Some things">🌱</button><span class="rating-label">Some</span></div>
+                <div class="rating-item"><button class="rating-btn" data-value="75" onclick="selectSkill(this)"
+                        aria-label="A lot">🧠</button><span class="rating-label">A lot</span></div>
+                <div class="rating-item"><button class="rating-btn" data-value="100" onclick="selectSkill(this)"
+                        aria-label="Yes absolutely">🤯</button><span class="rating-label">Yes!</span></div>
             </div>
-            <button class="btn btn-primary" onclick="saveSkillsAndNext()">Continue</button>
             <button class="skip" onclick="nextScreen()">Skip this question</button>
         </div>
 
@@ -839,10 +841,12 @@
         // ============================================
         // SELECTION HANDLERS
         // ============================================
-        function saveSkillsAndNext() {
-            const val = document.getElementById('skillsInput').value;
-            data.skills_learned_score = parseInt(val);
-            nextScreen();
+        function selectSkill(btn) {
+            const group = btn.closest('.rating-group');
+            group.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            data.skills_learned_score = parseInt(btn.dataset.value);
+            setTimeout(nextScreen, 250);
         }
 
         function startSurvey(isReturning) {
