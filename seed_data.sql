@@ -1,28 +1,10 @@
 -- ============================================================================
 -- Empowerment Farm - Seed Data
--- Populates dropdowns and adds mock survey responses for testing
 -- ============================================================================
+-- NOTE: 'ExperienceTypes' table does not exist. Programs are defined in 'programcatalog' in schema.sql.
+-- This script ONLY populates the 'surveyresponses' table for analytics testing.
 
--- 1. Programs / Experience Types
-INSERT INTO ExperienceTypes (experience_name, category, description) VALUES
-('Cow Yoga', 'Wellness', 'Yoga session in the pasture with cows'),
-('Grief Retreats', 'Wellness', 'Supportive retreat for those grieving'),
-('Sound Bath', 'Wellness', 'Meditative sound healing session'),
-('Reiki', 'Wellness', 'Energy healing session'),
-('Forest Bathing', 'Wellness', 'Immersive nature walk for relaxation'),
-('Educational Field Trips', 'Education', 'School groups learning about farming'),
-('Seedlings for Spring', 'Education', 'Planting workshop for kids'),
-('JusTeenys Greenies', 'Education', 'Microgreens workshop for teens'),
-('Sweethearts and Songbirds', 'Education', 'Bird-focused observation and learning'),
-('Paint & Pollinators', 'Creative', 'Art session in the pollinator garden'),
-('Better Together - Hugging Can Planters', 'Creative', 'Community planting project'),
-('Tuesday Night Tuck-In', 'Community', 'Evening farm chores and animal care'),
-('Open Farm (Second Saturdays)', 'Community', 'Public open house and market'),
-('Group & Partner Programs', 'Community', 'Custom programs for partner organizations'),
-('Yoga with the Animals', 'Wellness', 'General yoga with farm animals'),
-('Farms Without Fences (Off-Site)', 'Outreach', 'Traveling farm education program');
-
--- 2. Mock Survey Responses (Rich Data for Analytics)
+-- Mock Survey Responses (Rich Data for Analytics)
 -- Includes variations in:
 -- - Dates (Jan 2025 - Jan 2026) for "Monthly Trends"
 -- - Times (Morning, Afternoon, Evening) for "Peak Times"
