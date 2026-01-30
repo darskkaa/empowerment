@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Empowerment Farm Dashboard</title>
+    <title>Empowerment Farm | Impact Center</title>
     <meta name="robots" content="noindex, nofollow">
 
-    <!-- Tailwind CSS (Warm Theme) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Chart.js -->
@@ -16,10 +16,11 @@
     <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- Google Fonts: Inter & Outfit for friendly vibe -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;700&display=swap"
         rel="stylesheet">
 
     <script>
@@ -32,21 +33,16 @@
                     },
                     colors: {
                         farm: {
-                            50: '#f7fee7',  // Very light lime/green (Warm background)
+                            50: '#f7fee7',
                             100: '#ecfccb',
                             200: '#d9f99d',
                             300: '#bef264',
                             400: '#a3e635',
-                            500: '#84cc16', // Main Brand Green
+                            500: '#84cc16',
                             600: '#65a30d',
-                            700: '#4d7c0f', // Dark Text
+                            700: '#4d7c0f',
                             800: '#3f6212',
                             900: '#365314',
-                        },
-                        soil: {
-                            50: '#fafaf9',
-                            100: '#f5f5f4',
-                            800: '#57534e', // Warm Gray/Brown Text
                         }
                     }
                 }
@@ -57,12 +53,9 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: #fdfdfc;
-            color: #44403c;
-            background-image:
-                radial-gradient(at 0% 0%, rgba(132, 204, 22, 0.1) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(251, 146, 60, 0.05) 0px, transparent 50%);
+            background: linear-gradient(135deg, #fefce8 0%, #f0fdf4 50%, #fff7ed 100%);
             background-attachment: fixed;
+            color: #44403c;
         }
 
         h1,
@@ -72,26 +65,36 @@
             font-family: 'Outfit', sans-serif;
         }
 
-        /* SOTA Glass Cards */
+        /* Glassmorphism Cards */
         .card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border-radius: 1.5rem;
-            box-shadow:
-                0 4px 6px -1px rgba(0, 0, 0, 0.02),
-                0 10px 15px -3px rgba(0, 0, 0, 0.04),
-                inset 0 0 0 1px rgba(255, 255, 255, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04), inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.7);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .card:hover {
-            transform: translateY(-2px);
-            box-shadow:
-                0 10px 20px -5px rgba(0, 0, 0, 0.05),
-                0 4px 6px -2px rgba(0, 0, 0, 0.02);
-            background: rgba(255, 255, 255, 0.85);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Heatmap Cell Colors */
+        .heat-low {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .heat-mid {
+            background: #86efac;
+            color: #14532d;
+        }
+
+        .heat-high {
+            background: #22c55e;
+            color: white;
         }
 
         #loginScreen,
@@ -108,8 +111,8 @@
             border: 4px solid #ecfccb;
             border-top: 4px solid #84cc16;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 48px;
+            height: 48px;
             animation: spin 1s linear infinite;
         }
 
@@ -122,19 +125,36 @@
                 transform: rotate(360deg);
             }
         }
+
+        /* Testimonial ticker */
+        .ticker-item {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 
-<body class="min-h-screen pb-12">
+<body class="min-h-screen">
 
     <!-- LOGIN SCREEN -->
-    <div id="loginScreen" class="active min-h-screen flex items-center justify-center bg-farm-50 p-4">
+    <div id="loginScreen" class="active min-h-screen flex items-center justify-center p-4">
         <div class="card p-10 w-full max-w-md text-center relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-farm-400 to-farm-600"></div>
-            <img src="logo.png" alt="Empowerment Farm"
-                class="h-20 mx-auto mb-6 transform hover:scale-105 transition-transform duration-500">
-            <h1 class="text-3xl font-bold text-farm-800 mb-2">Welcome Back!</h1>
-            <p class="text-gray-500 mb-8">Sign in to see how the farm is doing.</p>
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-farm-400 via-orange-400 to-farm-600">
+            </div>
+            <img src="logo.png" alt="Empowerment Farm" class="h-20 mx-auto mb-6">
+            <h1 class="text-3xl font-bold text-farm-800 mb-2">Impact Center</h1>
+            <p class="text-gray-500 mb-8">Dashboard v2.0 • Grant-Ready Analytics</p>
 
             <div id="loginForm">
                 <input type="email" id="emailInput" placeholder="Email Address"
@@ -142,7 +162,7 @@
                 <input type="password" id="passwordInput" placeholder="Password"
                     class="w-full p-4 rounded-xl bg-gray-50 border border-farm-200 text-lg mb-6 focus:outline-none focus:ring-2 focus:ring-farm-400">
                 <button onclick="signInWithPassword()" id="loginBtn"
-                    class="w-full py-4 rounded-xl bg-farm-600 hover:bg-farm-700 text-white font-bold text-lg shadow-lg shadow-farm-200 transition-transform active:scale-95">
+                    class="w-full py-4 rounded-xl bg-gradient-to-r from-farm-500 to-farm-600 hover:from-farm-600 hover:to-farm-700 text-white font-bold text-lg shadow-lg transition-all active:scale-95">
                     Sign In
                 </button>
             </div>
@@ -152,28 +172,30 @@
 
     <!-- DASHBOARD -->
     <div id="dashboard" class="min-h-screen">
-        <!-- Friendly Header -->
-        <!-- Friendly Header -->
+        <!-- Header -->
         <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100/50">
             <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
                 <div class="flex items-center gap-4">
                     <img src="logo.png" alt="Logo" class="h-10 w-auto">
                     <div class="hidden md:block">
-                        <h1 class="font-bold text-gray-900 text-lg leading-none">Empowerment Farm</h1>
-                        <p class="text-xs text-gray-500 font-medium tracking-wide uppercase mt-0.5">Analytic Suite</p>
+                        <h1 class="font-bold text-gray-900 text-lg leading-none">Impact Center</h1>
+                        <p class="text-xs text-gray-500 font-medium tracking-wide uppercase mt-0.5">Dashboard v2.0</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-4">
                     <span id="userEmail" class="hidden md:block text-sm font-medium text-gray-500"></span>
-                    <button onclick="signOut()"
-                        class="text-farm-700 hover:text-farm-900 font-medium text-sm bg-farm-50 px-4 py-2 rounded-full hover:bg-farm-100 transition-colors">
+                    <button onclick="exportCSV()"
+                        class="text-farm-600 hover:text-farm-800 font-medium text-sm bg-farm-50 px-4 py-2 rounded-full hover:bg-farm-100 transition-colors">
+                        📥 Export CSV
+                    </button>
+                    <button onclick="signOut()" class="text-gray-500 hover:text-gray-700 font-medium text-sm">
                         Sign Out
                     </button>
                 </div>
             </div>
         </header>
 
-        <main class="max-w-6xl mx-auto px-4 py-8">
+        <main class="max-w-7xl mx-auto px-4 py-8">
             <!-- Loading -->
             <div id="loadingState" class="flex flex-col items-center justify-center py-20">
                 <div class="spinner mb-4"></div>
@@ -181,235 +203,171 @@
             </div>
 
             <!-- Content -->
-            <div id="dashboardContent" class="hidden animate-fade-in">
+            <div id="dashboardContent" class="hidden space-y-8">
 
-                <!-- TOP METRICS: SIMPLE & BIG -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <!-- Happiness Score -->
-                    <div class="card p-6 flex items-center justify-between bg-gradient-to-br from-white to-farm-50">
-                        <div>
-                            <p class="text-farm-600 font-medium mb-1">Happiness Score</p>
-                            <h2 id="happinessScore" class="text-4xl font-bold text-farm-900 metric-val">--%</h2>
-                            <p class="text-xs text-gray-400 mt-2">Based on recommendations</p>
-                        </div>
-                        <div class="text-5xl">😊</div>
-                    </div>
+                <!-- ====================================== -->
+                <!-- VIEW A: OPERATIONAL PULSE (Top Row) -->
+                <!-- ====================================== -->
+                <section>
+                    <h2 class="text-lg font-bold text-gray-600 mb-4 flex items-center gap-2">
+                        <span class="text-2xl">📊</span> Operational Pulse
+                        <span class="text-xs font-normal text-gray-400 ml-2">Last 30 Days</span>
+                    </h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-                    <!-- Visitor Count -->
-                    <div class="card p-6 flex items-center justify-between bg-gradient-to-br from-white to-orange-50">
-                        <div>
-                            <p class="text-orange-800 font-medium mb-1">Total Visitors</p>
-                            <h2 id="totalVisitors" class="text-4xl font-bold text-gray-800 metric-val">--</h2>
-                            <p class="text-xs text-gray-400 mt-2">Survey responses</p>
-                        </div>
-                        <div class="text-5xl">👋</div>
-                    </div>
-
-                    <!-- Returning Neighbors -->
-                    <div class="card p-6 flex items-center justify-between bg-gradient-to-br from-white to-blue-50">
-                        <div>
-                            <p class="text-blue-800 font-medium mb-1">Returning Neighbors</p>
-                            <h2 id="returningRate" class="text-4xl font-bold text-gray-800 metric-val">--%</h2>
-                            <p class="text-xs text-gray-400 mt-2">Have visited before</p>
-                        </div>
-                        <div class="text-5xl">🏡</div>
-                    </div>
-                </div>
-
-                <!-- MAIN SECTION: IMPACT & FEED -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-                    <!-- LEFT COL (2/3): Impact & Charts -->
-                    <div class="lg:col-span-2 space-y-8">
-
-                        <!-- HUMAN IMPACT CARD (Simple Before/After) -->
-                        <div class="card p-8 bg-gradient-to-r from-gray-50 to-green-50 border-l-8 border-farm-500">
-                            <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                                ✨ The Human Impact
-                                <span
-                                    class="text-sm font-normal text-gray-500 ml-2 bg-white px-3 py-1 rounded-full shadow-sm">How
-                                    people feel Before vs After</span>
-                            </h3>
-
-                            <div class="flex items-center justify-around text-center">
-                                <div class="relative group">
-                                    <div
-                                        class="text-5xl mb-3 grayscale opacity-70 group-hover:grayscale-0 transition-all">
-                                        😫</div>
-                                    <p class="font-bold text-gray-400 uppercase text-xs tracking-wider">Before Arriving
+                        <!-- Headcount Card -->
+                        <div class="card p-6 bg-gradient-to-br from-white to-farm-50">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-farm-600 font-medium text-sm uppercase tracking-wide">Total Headcount
                                     </p>
-                                    <p id="avgBefore" class="text-2xl font-bold text-gray-500 mt-1">--</p>
+                                    <h2 id="headcount30" class="text-5xl font-bold text-farm-900 metric-val mt-2">--
+                                    </h2>
+                                    <p class="text-xs text-gray-400 mt-2">Rolling 30 days</p>
                                 </div>
-
-                                <div class="flex-1 px-8">
-                                    <div class="h-4 bg-gray-200 rounded-full overflow-hidden relative">
-                                        <div
-                                            class="absolute inset-0 bg-gradient-to-r from-gray-300 to-farm-500 opacity-50">
-                                        </div>
-                                        <div class="absolute inset-0 flex items-center justify-center">
-                                            <span class="text-xs font-bold text-white drop-shadow-md">Improving
-                                                Lives</span>
-                                        </div>
-                                    </div>
-                                    <div class="text-center mt-3">
-                                        <span id="impactDelta"
-                                            class="inline-block bg-farm-100 text-farm-800 px-3 py-1 rounded-full font-bold text-sm">
-                                            +-- Improvement
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="relative group">
-                                    <div class="text-6xl mb-3 transform group-hover:scale-110 transition-transform">🥰
-                                    </div>
-                                    <p class="font-bold text-farm-600 uppercase text-xs tracking-wider">After Leaving
-                                    </p>
-                                    <p id="avgAfter" class="text-3xl font-bold text-farm-700 mt-1">--</p>
-                                </div>
+                                <div class="text-6xl opacity-80">👋</div>
                             </div>
                         </div>
 
-                        <!-- SIMPLE CHARTS -->
-                        <div class="card p-6">
-                            <h3 class="font-bold text-gray-800 mb-4">Recent Visits</h3>
-                            <div class="h-64">
-                                <canvas id="visitsChart"></canvas>
+                        <!-- The "Yoda" Index (Most Popular Zone/Program) -->
+                        <div class="card p-6 bg-gradient-to-br from-white to-blue-50">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-blue-600 font-medium text-sm uppercase tracking-wide">Top Program</p>
+                                    <h2 id="yodaProgram"
+                                        class="text-2xl font-bold text-gray-800 metric-val mt-2 leading-tight">--</h2>
+                                    <p id="yodaCount" class="text-xs text-gray-400 mt-2">-- visitors</p>
+                                </div>
+                                <div class="text-6xl opacity-80">🐄</div>
                             </div>
                         </div>
 
-                        <!-- Programs List -->
+                        <!-- NPS Card -->
+                        <div class="card p-6 bg-gradient-to-br from-white to-orange-50">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-orange-600 font-medium text-sm uppercase tracking-wide">Would
+                                        Recommend</p>
+                                    <h2 id="npsScore" class="text-5xl font-bold text-gray-800 metric-val mt-2">--%</h2>
+                                    <p class="text-xs text-gray-400 mt-2">Net Promoter Score</p>
+                                </div>
+                                <div class="text-6xl opacity-80">💚</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ====================================== -->
+                <!-- VIEW B: GRANT WINNER (Middle Section) -->
+                <!-- ====================================== -->
+                <section>
+                    <h2 class="text-lg font-bold text-gray-600 mb-4 flex items-center gap-2">
+                        <span class="text-2xl">🏆</span> Grant-Ready Outcomes
+                        <span
+                            class="text-xs font-normal text-white bg-farm-500 px-2 py-1 rounded-full uppercase tracking-wider ml-2">Board
+                            Report</span>
+                    </h2>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                        <!-- Therapeutic Heatmap (2/3 width) -->
+                        <div class="lg:col-span-2 card p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h3 class="font-bold text-gray-800">🧘 Therapeutic Outcomes Matrix</h3>
+                                    <p class="text-xs text-gray-500">Which programs drive which feelings? (1-3 Scale:
+                                        Darker = Higher Impact)</p>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-sm" id="heatmapTable">
+                                    <thead>
+                                        <tr class="border-b border-gray-200">
+                                            <th class="text-left py-3 px-2 font-semibold text-gray-600">Program</th>
+                                            <th class="text-center py-3 px-2 font-semibold text-gray-600">😌 Calmness
+                                            </th>
+                                            <th class="text-center py-3 px-2 font-semibold text-gray-600">🤝 Social</th>
+                                            <th class="text-center py-3 px-2 font-semibold text-gray-600">🌿 Nature</th>
+                                            <th class="text-center py-3 px-2 font-semibold text-gray-600">📚 Learning
+                                            </th>
+                                            <th class="text-center py-3 px-2 font-semibold text-gray-600">👥 Community
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="heatmapBody">
+                                        <!-- JS Injected -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Demographics Pie (1/3 width) -->
                         <div class="card p-6">
-                            <h3 class="font-bold text-gray-800 mb-4">Most Popular Programs</h3>
-                            <div class="space-y-4" id="programList">
-                                <!-- Injected JS -->
+                            <div class="mb-4">
+                                <h3 class="font-bold text-gray-800">📊 Demographics</h3>
+                                <p class="text-xs text-gray-500">Age distribution (for county grants)</p>
+                            </div>
+                            <div class="h-56 relative">
+                                <canvas id="demoChart"></canvas>
                             </div>
                         </div>
 
                     </div>
 
-                    <!-- RIGHT COL (1/3): Good Vibes Feed -->
-                    <div class="lg:col-span-1">
-                        <div class="card h-full flex flex-col bg-orange-50 border-orange-100">
-                            <div class="p-6 border-b border-orange-100 bg-white rounded-t-[1.5rem]">
-                                <h3 class="font-bold text-gray-800 flex items-center gap-2">
-                                    💌 Good Vibes
-                                </h3>
-                                <p class="text-sm text-gray-500">What people are saying</p>
-                            </div>
+                    <!-- Second Row: Mission Matrix + Growth -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
 
-                            <div id="vibesFeed" class="flex-1 overflow-y-auto p-4 space-y-4 max-h-[600px]">
-                                <!-- Feed Items -->
-                                <div class="text-center text-gray-400 py-10">Loading comments...</div>
+                        <!-- Mission Matrix Radar -->
+                        <div class="card p-6">
+                            <div class="mb-4">
+                                <h3 class="font-bold text-gray-800">🕸️ Mission Alignment</h3>
+                                <p class="text-xs text-gray-500">5-Point Holistic Impact Score</p>
                             </div>
-
-                            <div class="p-4 bg-white rounded-b-[1.5rem] border-t border-orange-100 text-center">
-                                <button onclick="exportCSV()" class="text-farm-600 font-medium hover:underline text-sm">
-                                    Download All Data (CSV)
-                                </button>
+                            <div class="h-56">
+                                <canvas id="missionChart"></canvas>
                             </div>
                         </div>
-                    </div>
 
-                </div>
+                        <!-- Growth Engine -->
+                        <div class="card p-6">
+                            <div class="mb-4">
+                                <h3 class="font-bold text-gray-800">🚀 Cumulative Impact</h3>
+                                <p class="text-xs text-gray-500">Total lives touched over time</p>
+                            </div>
+                            <div class="h-48">
+                                <canvas id="growthChart"></canvas>
+                            </div>
+                            <div class="mt-4 flex justify-between text-xs text-gray-400">
+                                <span>Started: <strong id="startDate">--</strong></span>
+                                <span>Total: <strong id="currentCount" class="text-farm-600">--</strong></span>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- ====================================== -->
+                <!-- VIEW C: WALL OF LOVE (Testimonials) -->
+                <!-- ====================================== -->
+                <section>
+                    <h2 class="text-lg font-bold text-gray-600 mb-4 flex items-center gap-2">
+                        <span class="text-2xl">💌</span> Wall of Love
+                        <span class="text-xs font-normal text-gray-400 ml-2">Standout Moments for Newsletters</span>
+                    </h2>
+
+                    <div class="card p-6 bg-gradient-to-br from-orange-50 to-white">
+                        <div id="wallOfLove"
+                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[500px] overflow-y-auto">
+                            <!-- JS Injected -->
+                        </div>
+                    </div>
+                </section>
+
             </div>
         </main>
 
-        <!-- DEEP DIVE INSIGHTS ("SQUEIRAL" SECTION) -->
-        <section class="max-w-7xl mx-auto px-4 pb-16">
-            <h2 class="text-2xl font-bold text-farm-900 mb-6 flex items-center gap-2">
-                🔮 Deep Dive Insights
-                <span
-                    class="text-xs font-normal text-white bg-farm-500 px-2 py-1 rounded-full uppercase tracking-wider">BETA</span>
-            </h2>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-
-                <!-- 1. THE ZEN FACTOR (Calmness by Program) -->
-                <div class="card p-6 border-l-4 border-blue-400">
-                    <div class="mb-4">
-                        <h3 class="font-bold text-gray-800">🧘 The Zen Factor</h3>
-                        <p class="text-xs text-gray-500">Which program creates the most calm?</p>
-                    </div>
-                    <div class="h-48">
-                        <canvas id="zenChart"></canvas>
-                    </div>
-                    <div class="mt-4 text-center">
-                        <p class="text-xs font-bold text-gray-400 uppercase">Top Performer</p>
-                        <p id="zenWinner" class="text-xl font-bold text-blue-500">--</p>
-                    </div>
-                </div>
-
-                <!-- 2. DEMOGRAPHICS (Age Distribution) -->
-                <div class="card p-6 border-l-4 border-orange-400">
-                    <div class="mb-4">
-                        <h3 class="font-bold text-gray-800">📊 Community Mix</h3>
-                        <p class="text-xs text-gray-500">Who are we reaching?</p>
-                    </div>
-                    <div class="h-48 relative">
-                        <canvas id="demoChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- 3. RETENTION HEALTH (Cohort/Trend) -->
-                <div class="card p-6 border-l-4 border-purple-400">
-                    <div class="mb-4">
-                        <h3 class="font-bold text-gray-800">🚀 Growth Engine</h3>
-                        <p class="text-xs text-gray-500">Cumulative Impact over time</p>
-                    </div>
-                    <div class="h-48">
-                        <canvas id="growthChart"></canvas>
-                    </div>
-                    <div class="mt-4 flex justify-between text-xs text-gray-400">
-                        <span>Started: <strong id="startDate">--</strong></span>
-                        <span>Current: <strong id="currentCount">--</strong></span>
-                    </div>
-                </div>
-
-                <!-- 4. HOLISTIC IMPACT (Radar) -->
-                <div class="card p-6 border-l-4 border-teal-400 md:col-span-2 lg:col-span-1">
-                    <div class="mb-4">
-                        <h3 class="font-bold text-gray-800">🕸️ Mission Matrix</h3>
-                        <p class="text-xs text-gray-500">5-Point Holistic Impact Score</p>
-                    </div>
-                    <div class="h-48">
-                        <canvas id="missionChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- 5. INTENTIONALITY (Pie) -->
-                <div class="card p-6 border-l-4 border-pink-400">
-                    <div class="mb-4">
-                        <h3 class="font-bold text-gray-800">💡 Learning Intent</h3>
-                        <p class="text-xs text-gray-500">Will apply what they learned?</p>
-                    </div>
-                    <div class="h-48 relative">
-                        <canvas id="intentChart"></canvas>
-                    </div>
-                    <div class="mt-4 text-center">
-                        <p class="text-xs font-bold text-gray-400 uppercase">Success Rate</p>
-                        <p id="intentRate" class="text-xl font-bold text-pink-500">--%</p>
-                    </div>
-                </div>
-
-                <!-- 6. REFERRALS (Horizontal Bar) -->
-                <div class="card p-6 border-l-4 border-amber-400">
-                    <div class="mb-4">
-                        <h3 class="font-bold text-gray-800">📣 Word of Mouth</h3>
-                        <p class="text-xs text-gray-500">How did they find us?</p>
-                    </div>
-                    <div class="h-48">
-                        <canvas id="referralChart"></canvas>
-                    </div>
-                    <div class="mt-4 text-center">
-                        <p class="text-xs font-bold text-gray-400 uppercase">Primary Channel</p>
-                        <p id="topSource" class="text-xl font-bold text-amber-500">--</p>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- SOTA Footer -->
+        <!-- Footer -->
         <footer class="border-t border-gray-100 mt-auto bg-white/50 backdrop-blur-sm">
             <div class="max-w-7xl mx-auto px-4 py-6">
                 <div
@@ -418,25 +376,23 @@
                         <span>Empowerment Farm</span>
                         <span class="hidden md:inline text-gray-300">|</span>
                         <span>2600 Garland Road, Naples, FL 34117</span>
-                        <span class="hidden md:inline text-gray-300">|</span>
-                        <span>(239) 330-2777</span>
                     </div>
                     <div class="mt-4 md:mt-0 opacity-50">
-                        &copy; 2026 Dashboard v7.0
+                        &copy; 2026 Impact Center v2.0 • "Labels Stop at the Gate"
                     </div>
                 </div>
             </div>
         </footer>
 
-
     </div>
 
     <script>
+        // ============================================
         // CONFIG
+        // ============================================
         Chart.defaults.font.family = 'Inter';
         Chart.defaults.color = '#78716c';
 
-        // GLOBAL VARS
         let supabaseClient = null;
         let currentUser = null;
         let allResponses = [];
@@ -493,14 +449,13 @@
         }
 
         // ============================================
-        // DATA LOGIC
+        // DATA FETCH
         // ============================================
         async function showDashboard() {
             document.getElementById('loginScreen').classList.remove('active');
             document.getElementById('dashboard').classList.add('active');
             document.getElementById('userEmail').textContent = currentUser.email;
 
-            // Fetch everything
             const { data, error } = await supabaseClient
                 .from('surveyresponses')
                 .select('*')
@@ -514,192 +469,160 @@
             document.getElementById('dashboardContent').classList.remove('hidden');
         }
 
+        // ============================================
+        // RENDER LOGIC
+        // ============================================
         function renderDashboard() {
-            if (!allResponses.length) return;
-
-            // 1. Happiness Score (Recommend %)
-            const recs = allResponses.filter(r => r.would_recommend === true).length;
-            const happiness = Math.round((recs / allResponses.length) * 100);
-            document.getElementById('happinessScore').textContent = happiness + '%';
-
-            // 2. Visitors
-            document.getElementById('totalVisitors').textContent = allResponses.length.toLocaleString();
-
-            // 3. Returning Neighbors (Hybrid: Explicit Flag OR Duplicate Email)
-            const emailCounts = {};
-            let explicitReturning = 0;
-
-            allResponses.forEach(r => {
-                // Count explicit
-                if (r.is_returning_visitor === true) explicitReturning++;
-
-                // Track emails for legacy detection
-                const id = r.participant_email || r.participant_name || 'anon';
-                if (id !== 'anon') emailCounts[id] = (emailCounts[id] || 0) + 1;
-            });
-
-            // Calculate Total Returning (Distinct people who are returning)
-            // If someone is explicit flag=true, they count.
-            // If someone has count > 1, they count.
-            // Simplified: Just take the max of either metric for the KPI to show "best" data? 
-            // Or better: Count rows that are EITHER flagged OR are 2nd+ visit by email.
-
-            const returningCount = allResponses.filter((r, index) => {
-                if (r.is_returning_visitor === true) return true;
-
-                // Legacy check: Is this not the first time we see this email in the sorted list?
-                // (List is sorted by date desc, so we check if it appears "later" in time (earlier in array? No, sorted Desc))
-                // Actually simple email count check:
-                const id = r.participant_email || r.participant_name;
-                if (id && emailCounts[id] > 1) {
-                    // This is a returning person. But are they the returning visit?
-                    // We want the RATE of visits that are returning visits.
-                    // If count > 1, then (count-1) visits are "returning".
-                    return true; // Simplified: If they connect multiple times, they are a "Returning Neighbor"
-                }
-                return false;
-            }).length;
-
-            // Actually, let's stick to the user's request: "Returning Neighbors".
-            // If I have 10 visitors, and 1 is returning. 10%.
-            // Logic: Count rows where (is_returning_visitor) OR (email_is_duplicate_and_not_first_visit).
-            // Hard to determine "not first visit" without sorting.
-            // Let's rely on the explicit flag for accuracy, but fallback to "Total Returning Unique People" for the big number if explicit is 0?
-            // "Returning Neighbors" usually means % of Total Visitors who are returning.
-
-            // Let's use a simpler heuristic for the update:
-            // Count of rows where is_returning_visitor is TRUE.
-            // PLUS Count of rows that are deemed 'returning' by email (legacy).
-
-            // Re-implementation for robust simple math:
-            const legacyReturningCount = Object.values(emailCounts).filter(c => c > 1).length; // Unique People returning
-            const finalReturningCount = Math.max(explicitReturning, legacyReturningCount); // Use whichever is higher
-
-            const returnRate = allResponses.length ? Math.round((finalReturningCount / allResponses.length) * 100) : 0;
-            document.getElementById('returningRate').textContent = returnRate + '%';
-
-            // 4. Human Impact (Before/After)
-            let sumBefore = 0, sumAfter = 0, count = 0;
-            allResponses.forEach(r => {
-                if (r.mood_before_raw && r.mood_after_raw) {
-                    sumBefore += r.mood_before_raw;
-                    sumAfter += r.mood_after_raw;
-                    count++;
-                }
-            });
-            if (count > 0) {
-                const avgB = (sumBefore / count).toFixed(1);
-                const avgA = (sumAfter / count).toFixed(1);
-                const diff = (avgA - avgB).toFixed(1);
-                document.getElementById('avgBefore').textContent = avgB;
-                document.getElementById('avgAfter').textContent = avgA;
-                document.getElementById('impactDelta').textContent = `+${diff} Improvement`;
+            if (!allResponses.length) {
+                document.getElementById('heatmapBody').innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-400">No data yet</td></tr>';
+                document.getElementById('wallOfLove').innerHTML = '<p class="text-gray-400 col-span-3 text-center py-8">No testimonials yet.</p>';
+                return;
             }
 
-            // 5. Visits Chart (Monthly)
-            const months = {};
-            allResponses.forEach(r => {
-                const m = new Date(r.created_at).toLocaleString('default', { month: 'short' });
-                months[m] = (months[m] || 0) + 1;
-            });
-            new Chart(document.getElementById('visitsChart'), {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(months),
-                    datasets: [{
-                        label: 'Visitors',
-                        data: Object.values(months),
-                        backgroundColor: '#a3e635',
-                        borderRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }
-                }
-            });
+            // Calculate 30-day filter
+            const now = new Date();
+            const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+            const last30 = allResponses.filter(r => new Date(r.created_at) >= thirtyDaysAgo);
 
-            // 6. Popular Programs
-            const progs = {};
-            allResponses.forEach(r => {
+            // =====================================
+            // VIEW A: OPERATIONAL PULSE
+            // =====================================
+
+            // 1. Headcount (30 days)
+            document.getElementById('headcount30').textContent = last30.length.toLocaleString();
+
+            // 2. Top Program ("Yoda" Index)
+            const progCounts = {};
+            last30.forEach(r => {
                 const p = r.experience_type || 'General Visit';
-                progs[p] = (progs[p] || 0) + 1;
+                progCounts[p] = (progCounts[p] || 0) + 1;
             });
-            const sortedProgs = Object.entries(progs).sort((a, b) => b[1] - a[1]).slice(0, 5);
-            document.getElementById('programList').innerHTML = sortedProgs.map(([name, count]) => `
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <span class="font-medium text-gray-700">${name}</span>
-                    <span class="bg-white px-3 py-1 rounded-full text-sm font-bold text-farm-600 shadow-sm">${count}</span>
-                </div>
-            `).join('');
+            const topProgram = Object.entries(progCounts).sort((a, b) => b[1] - a[1])[0];
+            if (topProgram) {
+                document.getElementById('yodaProgram').textContent = topProgram[0];
+                document.getElementById('yodaCount').textContent = `${topProgram[1]} visitors`;
+            }
 
-            // 7. Good Vibes Feed (Standout Moments)
-            const comments = allResponses
-                .filter(r => r.standout_moment && r.standout_moment.length > 3)
-                .slice(0, 20);
+            // 3. NPS (Would Recommend %)
+            const recs = allResponses.filter(r => r.would_recommend === true).length;
+            const nps = allResponses.length ? Math.round((recs / allResponses.length) * 100) : 0;
+            document.getElementById('npsScore').textContent = nps + '%';
 
-            document.getElementById('vibesFeed').innerHTML = comments.map(c => `
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                    <p class="text-gray-700 italic">"${c.standout_moment}"</p>
-                    <div class="mt-2 flex items-center gap-2 text-xs text-gray-400">
-                        <span>${new Date(c.created_at).toLocaleDateString()}</span>
-                        <span>•</span>
-                        <span>${c.experience_type || 'Farm Visit'}</span>
-                    </div>
-                </div>
-            `).join('') || '<p class="text-center text-gray-400">No comments yet.</p>';
+            // =====================================
+            // VIEW B: GRANT WINNER
+            // =====================================
 
-            // 8. DEEP INSIGHTS
-            renderDeepInsights(allResponses);
+            // Therapeutic Heatmap
+            renderHeatmap(allResponses);
+
+            // Demographics Pie
+            renderDemographics(allResponses);
+
+            // Mission Matrix Radar
+            renderMissionMatrix(allResponses);
+
+            // Growth Chart
+            renderGrowthChart(allResponses);
+
+            // =====================================
+            // VIEW C: WALL OF LOVE
+            // =====================================
+            renderWallOfLove(allResponses);
         }
 
-        function renderDeepInsights(data) {
-            // A. ZEN FACTOR (Avg Mood After by Program)
-            const progStats = {};
+        // ============================================
+        // HEATMAP LOGIC
+        // ============================================
+        function renderHeatmap(data) {
+            // Group by program and calculate averages for each outcome
+            const programs = {};
+
             data.forEach(r => {
-                const p = r.experience_type || 'General';
-                // Use mood_after_raw (1-5) or is_present_engaged (1-3 mapped)
-                // Prefer RAW if available, else map score * 1.66
-                let score = r.mood_after_raw;
-                if (!score && r.is_present_engaged) score = r.is_present_engaged * 1.66; // approx map 3->5
+                const prog = r.experience_type || 'General Visit';
+                if (!programs[prog]) {
+                    programs[prog] = {
+                        calmness: { sum: 0, count: 0 },
+                        social: { sum: 0, count: 0 },
+                        nature: { sum: 0, count: 0 },
+                        learning: { sum: 0, count: 0 },
+                        community: { sum: 0, count: 0 },
+                        total: 0
+                    };
+                }
 
-                if (score) {
-                    if (!progStats[p]) progStats[p] = { sum: 0, count: 0 };
-                    progStats[p].sum += score;
-                    progStats[p].count++;
+                programs[prog].total++;
+
+                if (r.calmness_score) {
+                    programs[prog].calmness.sum += r.calmness_score;
+                    programs[prog].calmness.count++;
+                }
+                if (r.connection_others_score) {
+                    programs[prog].social.sum += r.connection_others_score;
+                    programs[prog].social.count++;
+                }
+                if (r.connection_nature_score) {
+                    programs[prog].nature.sum += r.connection_nature_score;
+                    programs[prog].nature.count++;
+                }
+                if (r.learning_intent_score) {
+                    programs[prog].learning.sum += r.learning_intent_score;
+                    programs[prog].learning.count++;
+                }
+                if (r.community_benefit_score) {
+                    programs[prog].community.sum += r.community_benefit_score;
+                    programs[prog].community.count++;
                 }
             });
 
-            const labels = Object.keys(progStats);
-            const scores = labels.map(p => (progStats[p].sum / progStats[p].count).toFixed(1));
+            // Sort by total visitors
+            const sorted = Object.entries(programs).sort((a, b) => b[1].total - a[1].total).slice(0, 8);
 
-            // Find Winner
-            let maxScore = 0; let winner = 'N/A';
-            labels.forEach((l, i) => {
-                if (parseFloat(scores[i]) > maxScore) { maxScore = parseFloat(scores[i]); winner = l; }
-            });
-            document.getElementById('zenWinner').textContent = winner;
+            // Build table rows
+            const tbody = document.getElementById('heatmapBody');
+            tbody.innerHTML = sorted.map(([prog, stats]) => {
+                const avg = (metric) => {
+                    if (stats[metric].count === 0) return '--';
+                    return (stats[metric].sum / stats[metric].count).toFixed(1);
+                };
 
-            new Chart(document.getElementById('zenChart'), {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Avg Calm (1-5)',
-                        data: scores,
-                        backgroundColor: '#60a5fa',
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    plugins: { legend: { display: false } },
-                    scales: { x: { min: 0, max: 5 } }
-                }
-            });
+                const heatClass = (metric) => {
+                    if (stats[metric].count === 0) return 'bg-gray-100 text-gray-400';
+                    const val = stats[metric].sum / stats[metric].count;
+                    if (val >= 2.5) return 'heat-high';
+                    if (val >= 1.8) return 'heat-mid';
+                    return 'heat-low';
+                };
 
-            // B. DEMOGRAPHICS (Donut)
+                return `
+                    <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                        <td class="py-3 px-2">
+                            <span class="font-medium text-gray-800">${prog}</span>
+                            <span class="text-xs text-gray-400 ml-2">(${stats.total})</span>
+                        </td>
+                        <td class="text-center py-3 px-2">
+                            <span class="inline-block px-3 py-1 rounded-lg font-semibold text-sm ${heatClass('calmness')}">${avg('calmness')}</span>
+                        </td>
+                        <td class="text-center py-3 px-2">
+                            <span class="inline-block px-3 py-1 rounded-lg font-semibold text-sm ${heatClass('social')}">${avg('social')}</span>
+                        </td>
+                        <td class="text-center py-3 px-2">
+                            <span class="inline-block px-3 py-1 rounded-lg font-semibold text-sm ${heatClass('nature')}">${avg('nature')}</span>
+                        </td>
+                        <td class="text-center py-3 px-2">
+                            <span class="inline-block px-3 py-1 rounded-lg font-semibold text-sm ${heatClass('learning')}">${avg('learning')}</span>
+                        </td>
+                        <td class="text-center py-3 px-2">
+                            <span class="inline-block px-3 py-1 rounded-lg font-semibold text-sm ${heatClass('community')}">${avg('community')}</span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ============================================
+        // DEMOGRAPHICS PIE
+        // ============================================
+        function renderDemographics(data) {
             const ages = {};
             data.forEach(r => {
                 const a = r.age_range_bracket || 'Unknown';
@@ -712,26 +635,80 @@
                     labels: Object.keys(ages),
                     datasets: [{
                         data: Object.values(ages),
-                        backgroundColor: ['#fdba74', '#fb923c', '#f97316', '#ea580c', '#c2410c'],
+                        backgroundColor: ['#fbbf24', '#fb923c', '#f97316', '#ea580c', '#c2410c', '#9a3412'],
                         borderWidth: 0
                     }]
                 },
-                options: { cutout: '70%', plugins: { legend: { position: 'right', labels: { boxWidth: 10 } } } }
+                options: {
+                    cutout: '65%',
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { boxWidth: 12, font: { size: 11 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ============================================
+        // MISSION MATRIX RADAR
+        // ============================================
+        function renderMissionMatrix(data) {
+            const totals = { calmness: 0, nature: 0, social: 0, learning: 0, community: 0 };
+            let count = 0;
+
+            data.forEach(r => {
+                const hasData = r.calmness_score || r.connection_nature_score || r.connection_others_score;
+                if (hasData) {
+                    totals.calmness += r.calmness_score || 0;
+                    totals.nature += r.connection_nature_score || 0;
+                    totals.social += r.connection_others_score || 0;
+                    totals.learning += r.learning_intent_score || 0;
+                    totals.community += r.community_benefit_score || 0;
+                    count++;
+                }
             });
 
-            // C. GROWTH ENGINE (Cumulative)
-            // Sort by date
-            const sorted = [...data].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-            const dates = [];
-            const counts = [];
-            let running = 0;
+            const avg = (val) => count ? (val / count).toFixed(2) : 0;
 
-            // Group by day for cleaner chart
+            new Chart(document.getElementById('missionChart'), {
+                type: 'radar',
+                data: {
+                    labels: ['Calmness', 'Nature Connection', 'Community Benefit', 'Learning Intent', 'Social Connection'],
+                    datasets: [{
+                        label: 'Avg Score',
+                        data: [avg(totals.calmness), avg(totals.nature), avg(totals.community), avg(totals.learning), avg(totals.social)],
+                        backgroundColor: 'rgba(74, 222, 128, 0.3)',
+                        borderColor: '#22c55e',
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#22c55e',
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    scales: {
+                        r: { min: 0, max: 3, ticks: { stepSize: 1, font: { size: 10 } } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        // ============================================
+        // GROWTH CHART
+        // ============================================
+        function renderGrowthChart(data) {
+            const sorted = [...data].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
             const daily = {};
             sorted.forEach(r => {
                 const d = new Date(r.created_at).toLocaleDateString();
                 daily[d] = (daily[d] || 0) + 1;
             });
+
+            const dates = [];
+            const counts = [];
+            let running = 0;
 
             Object.keys(daily).forEach(d => {
                 running += daily[d];
@@ -741,7 +718,7 @@
 
             if (dates.length) {
                 document.getElementById('startDate').textContent = dates[0];
-                document.getElementById('currentCount').textContent = running;
+                document.getElementById('currentCount').textContent = running.toLocaleString();
             }
 
             new Chart(document.getElementById('growthChart'), {
@@ -749,12 +726,13 @@
                 data: {
                     labels: dates,
                     datasets: [{
-                        label: 'Total Impact',
+                        label: 'Cumulative',
                         data: counts,
-                        borderColor: '#c084fc',
-                        backgroundColor: 'rgba(192, 132, 252, 0.1)',
+                        borderColor: '#84cc16',
+                        backgroundColor: 'rgba(132, 204, 22, 0.1)',
                         fill: true,
-                        tension: 0.4
+                        tension: 0.4,
+                        pointRadius: 0
                     }]
                 },
                 options: {
@@ -762,145 +740,57 @@
                     scales: {
                         x: { display: false },
                         y: { display: false }
-                    },
-                    elements: { point: { radius: 0 } }
-                }
-            });
-
-            // --- PHASE 9: HYPER-DETAILED INSIGHTS ---
-            const palette = {
-                teal: 'rgba(45, 212, 191, 0.6)',
-                tealBorder: '#14b8a6',
-                pink: ['#f472b6', '#fb7185', '#fda4af'],
-                amber: '#fbbf24'
-            };
-
-            // D. MISSION MATRIX (Radar)
-            // Dimensions: Calmness, Nature, People, Learning, Community
-            // D. MISSION MATRIX (Radar)
-            // Dimensions: Calmness, Nature, People, Learning, Community
-            const avgScores = {
-                calm: 0, nature: 0, people: 0, learn: 0, comm: 0
-            };
-            let countValid = 0;
-            data.forEach(r => {
-                const s = r.mood_after_raw || (r.is_present_engaged * 1.6);
-                if (s) {
-                    avgScores.calm += s;
-                    // Map 1-3 scores to 5-point scale (* 1.66)
-                    avgScores.nature += (r.connection_nature_score || 0) * 1.66;
-                    avgScores.people += (r.connection_others_score || 0) * 1.66;
-                    avgScores.learn += (r.learning_intent_score || 0) * 1.66;
-                    avgScores.comm += (r.community_benefit_score || 0) * 1.66;
-                    countValid++;
-                }
-            });
-
-            // Normalize
-            if (countValid > 0) {
-                avgScores.calm = (avgScores.calm / countValid).toFixed(1);
-                avgScores.nature = (avgScores.nature / countValid).toFixed(1);
-                avgScores.people = (avgScores.people / countValid).toFixed(1);
-                avgScores.learn = (avgScores.learn / countValid).toFixed(1);
-                avgScores.comm = (avgScores.comm / countValid).toFixed(1);
-            }
-
-            new Chart(document.getElementById('missionChart'), {
-                type: 'radar',
-                data: {
-                    labels: ['Zen/Calm', 'Nature', 'Community', 'Learning', 'People'],
-                    datasets: [{
-                        label: 'Impact Score',
-                        data: [
-                            avgScores.calm,
-                            avgScores.nature,
-                            avgScores.comm,
-                            avgScores.learn,
-                            avgScores.people
-                        ],
-                        backgroundColor: palette.teal,
-                        borderColor: palette.tealBorder,
-                        pointBackgroundColor: '#fff',
-                        pointBorderColor: palette.tealBorder,
-                    }]
-                },
-                options: {
-                    scales: { r: { min: 0, max: 5, ticks: { display: false } } },
-                    plugins: { legend: { display: false } }
-                }
-            });
-
-            // E. INTENTIONALITY (Pie)
-            const intents = { 'Will Use It!': 0, 'Maybe': 0, 'Not Really': 0 };
-            data.forEach(r => {
-                // Use actual DB score if varied, otherwise rely on fallback mapping
-                // score 3 = Yes, 2 = Somewhat, 1 = No
-                if (r.learning_intent_score === 3) intents['Will Use It!']++;
-                else if (r.learning_intent_score === 2) intents['Maybe']++;
-                else intents['Not Really']++;
-            });
-
-            const totalIntent = Object.values(intents).reduce((a, b) => a + b, 0);
-            const intentRate = totalIntent ? Math.round((intents['Will Use It!'] / totalIntent) * 100) : 0;
-            document.getElementById('intentRate').textContent = intentRate + '%';
-
-            new Chart(document.getElementById('intentChart'), {
-                type: 'pie',
-                data: {
-                    labels: Object.keys(intents),
-                    datasets: [{
-                        data: Object.values(intents),
-                        backgroundColor: palette.pink,
-                        borderWidth: 0
-                    }]
-                },
-                options: { plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } } }
-            });
-
-            // F. REFERRALS (Horizontal Bar)
-            const sources = {};
-            data.forEach(r => {
-                const s = r.referral_source || 'Word of Mouth'; // Default
-                sources[s] = (sources[s] || 0) + 1;
-            });
-            const topSources = Object.entries(sources).sort((a, b) => b[1] - a[1]).slice(0, 5);
-            if (topSources.length > 0) {
-                document.getElementById('topSource').textContent = topSources[0][0];
-            }
-
-            new Chart(document.getElementById('referralChart'), {
-                type: 'bar',
-                data: {
-                    labels: topSources.map(s => s[0]),
-                    datasets: [{
-                        label: 'Visitors',
-                        data: topSources.map(s => s[1]),
-                        backgroundColor: palette.amber,
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    indexAxis: 'y',
-                    plugins: { legend: { display: false } },
-                    scales: { x: { display: false }, y: { grid: { display: false } } }
+                    }
                 }
             });
         }
 
+        // ============================================
+        // WALL OF LOVE (Testimonials)
+        // ============================================
+        function renderWallOfLove(data) {
+            const quotes = data
+                .filter(r => r.standout_moment && r.standout_moment.trim().length > 10)
+                .slice(0, 15);
+
+            const container = document.getElementById('wallOfLove');
+            container.innerHTML = quotes.map(q => `
+                <div class="ticker-item bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <p class="text-gray-700 italic leading-relaxed">"${q.standout_moment}"</p>
+                    <div class="mt-3 flex items-center gap-2">
+                        <span class="bg-farm-100 text-farm-700 px-2 py-1 rounded-full text-xs font-semibold">#${(q.experience_type || 'FarmVisit').replace(/\s+/g, '')}</span>
+                        <span class="text-xs text-gray-400">${new Date(q.created_at).toLocaleDateString()}</span>
+                    </div>
+                </div>
+            `).join('') || '<p class="text-gray-400 col-span-3 text-center py-8">No standout moments yet. They\'ll appear here as visitors share their experiences!</p>';
+        }
+
+        // ============================================
+        // EXPORT CSV
+        // ============================================
         function exportCSV() {
-            const headers = ['Date', 'Program', 'Happiness', 'Feedback'];
+            const headers = ['Date', 'Program', 'Age', 'Calmness', 'Social', 'Nature', 'Learning', 'Community', 'Recommend', 'Standout'];
             const rows = allResponses.map(r => [
                 new Date(r.created_at).toLocaleDateString(),
-                r.experience_type,
-                r.would_recommend ? 'Happy' : 'Unhappy',
-                (r.standout_moment || '').replace(/,/g, ' ')
+                r.experience_type || '',
+                r.age_range_bracket || '',
+                r.calmness_score || '',
+                r.connection_others_score || '',
+                r.connection_nature_score || '',
+                r.learning_intent_score || '',
+                r.community_benefit_score || '',
+                r.would_recommend ? 'Yes' : 'No',
+                (r.standout_moment || '').replace(/,/g, ' ').replace(/\n/g, ' ')
             ]);
             const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
             const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
             const a = document.createElement('a');
-            a.href = url; a.download = 'farm_data.csv'; a.click();
+            a.href = url;
+            a.download = `empowerment_farm_export_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
         }
 
+        // Start
         initSupabase();
     </script>
 </body>
