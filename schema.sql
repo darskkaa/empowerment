@@ -1,34 +1,31 @@
 -- ============================================================================
--- EMPOWERMENT FARM DATABASE SCHEMA
+-- EMPOWERMENT FARM DATABASE SCHEMA (PRODUCTION-READY)
 -- ============================================================================
--- Client: Empowerment Farm (Naples, FL)
--- Mission: "Labels Stop at the Gate" - Track outcomes without diagnostic labels
+-- Version: 2.0 - Full security compliance
+-- Last Updated: 2026-01-29
 -- ============================================================================
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ============================================================================
--- CLEANUP (Optional - ensures clean state if needed)
+-- CLEANUP - DROP EVERYTHING FOR CLEAN SLATE
 -- ============================================================================
--- Uncomment these lines to DELETE ALL DATA and reset tables
--- DROP TABLE IF EXISTS survey_v2 CASCADE;
--- DROP TABLE IF EXISTS surveyresponses CASCADE;
--- DROP TABLE IF EXISTS experiences CASCADE;
--- DROP TABLE IF EXISTS constituentprofiles CASCADE;
--- DROP TABLE IF EXISTS constituents CASCADE;
--- DROP TABLE IF EXISTS animals CASCADE;
--- DROP TABLE IF EXISTS farmzones CASCADE;
--- DROP TABLE IF EXISTS programcatalog CASCADE;
--- DROP TABLE IF EXISTS audit_log CASCADE;
-
--- Drop unwanted table "survey_v2" if the user wants to consolidate
-DROP TABLE IF EXISTS survey_v2;
+DROP VIEW IF EXISTS vw_impact_dashboard CASCADE;
+DROP VIEW IF EXISTS vw_survey_with_programs CASCADE;
+DROP TABLE IF EXISTS surveyresponses CASCADE;
+DROP TABLE IF EXISTS experiences CASCADE;
+DROP TABLE IF EXISTS constituentprofiles CASCADE;
+DROP TABLE IF EXISTS constituents CASCADE;
+DROP TABLE IF EXISTS animals CASCADE;
+DROP TABLE IF EXISTS farmzones CASCADE;
+DROP TABLE IF EXISTS programcatalog CASCADE;
+DROP TABLE IF EXISTS audit_log CASCADE;
 
 -- ============================================================================
 -- TABLE: programcatalog
 -- ============================================================================
-CREATE TABLE IF NOT EXISTS programcatalog (
+CREATE TABLE programcatalog (
     program_id        UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     program_name      VARCHAR(150) NOT NULL UNIQUE,
     program_category  VARCHAR(100) NOT NULL,
@@ -39,7 +36,14 @@ CREATE TABLE IF NOT EXISTS programcatalog (
     created_at        TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Insert programs (ON CONFLICT DO NOTHING prevents errors on re-run)
+-- RLS for programcatalog (read-only for all)
+ALTER TABLE programcatalog ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can view programs" ON programcatalog FOR SELECT TO anon, authenticated USING (true);
+CREATE POLICY "Only authenticated can modify programs" ON programcatalog FOR ALL TO authenticated USING (true);
+GRANT SELECT ON programcatalog TO anon, authenticated;
+GRANT ALL ON programcatalog TO authenticated;
+
+-- Insert programs
 INSERT INTO programcatalog (program_name, program_category, description, schedule_notes, cost_notes) VALUES
 ('Open Farm (Second Saturdays)', 'Open Farm', 'Self-guided tours, animal meet and greets, farm market shopping', '2nd Saturday monthly, 9AM-1PM', '$10/Adult, $25/Family'),
 ('Cow Yoga', 'Yoga', 'Farmyard yoga featuring cows, relaxation and regeneration', '4th Thursday monthly, 4-6PM', '$30/Person'),
@@ -53,7 +57,7 @@ ON CONFLICT (program_name) DO NOTHING;
 -- ============================================================================
 -- TABLE: farmzones
 -- ============================================================================
-CREATE TABLE IF NOT EXISTS farmzones (
+CREATE TABLE farmzones (
     zone_id       UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     zone_name     VARCHAR(100) NOT NULL UNIQUE,
     zone_type     VARCHAR(50) NOT NULL,
@@ -61,6 +65,13 @@ CREATE TABLE IF NOT EXISTS farmzones (
     is_accessible BOOLEAN DEFAULT TRUE,
     created_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- RLS for farmzones
+ALTER TABLE farmzones ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can view zones" ON farmzones FOR SELECT TO anon, authenticated USING (true);
+CREATE POLICY "Only authenticated can modify zones" ON farmzones FOR ALL TO authenticated USING (true);
+GRANT SELECT ON farmzones TO anon, authenticated;
+GRANT ALL ON farmzones TO authenticated;
 
 INSERT INTO farmzones (zone_name, zone_type, description, is_accessible) VALUES
 ('Main Barnyard', 'Animal Area', 'Primary animal interaction area with goats, cows, chickens', TRUE),
@@ -73,7 +84,7 @@ ON CONFLICT (zone_name) DO NOTHING;
 -- ============================================================================
 -- TABLE: animals
 -- ============================================================================
-CREATE TABLE IF NOT EXISTS animals (
+CREATE TABLE animals (
     animal_id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     animal_name       VARCHAR(100) NOT NULL,
     species           VARCHAR(50) NOT NULL,
@@ -85,10 +96,17 @@ CREATE TABLE IF NOT EXISTS animals (
     created_at        TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- RLS for animals
+ALTER TABLE animals ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can view animals" ON animals FOR SELECT TO anon, authenticated USING (true);
+CREATE POLICY "Only authenticated can modify animals" ON animals FOR ALL TO authenticated USING (true);
+GRANT SELECT ON animals TO anon, authenticated;
+GRANT ALL ON animals TO authenticated;
+
 -- ============================================================================
 -- TABLE: constituents
 -- ============================================================================
-CREATE TABLE IF NOT EXISTS constituents (
+CREATE TABLE constituents (
     constituent_id    UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     first_name        VARCHAR(100),
     last_name         VARCHAR(100),
@@ -100,10 +118,15 @@ CREATE TABLE IF NOT EXISTS constituents (
     updated_at        TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- RLS for constituents
+ALTER TABLE constituents ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Only authenticated can access constituents" ON constituents FOR ALL TO authenticated USING (true);
+GRANT ALL ON constituents TO authenticated;
+
 -- ============================================================================
 -- TABLE: constituentprofiles
 -- ============================================================================
-CREATE TABLE IF NOT EXISTS constituentprofiles (
+CREATE TABLE constituentprofiles (
     profile_id        UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     constituent_id    UUID NOT NULL UNIQUE REFERENCES constituents(constituent_id) ON DELETE CASCADE,
     date_of_birth     DATE,
@@ -116,10 +139,15 @@ CREATE TABLE IF NOT EXISTS constituentprofiles (
     updated_at        TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- RLS for constituentprofiles
+ALTER TABLE constituentprofiles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Only authenticated can access profiles" ON constituentprofiles FOR ALL TO authenticated USING (true);
+GRANT ALL ON constituentprofiles TO authenticated;
+
 -- ============================================================================
 -- TABLE: experiences
 -- ============================================================================
-CREATE TABLE IF NOT EXISTS experiences (
+CREATE TABLE experiences (
     experience_id     UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     constituent_id    UUID REFERENCES constituents(constituent_id),
     program_id        UUID REFERENCES programcatalog(program_id),
@@ -132,14 +160,20 @@ CREATE TABLE IF NOT EXISTS experiences (
     created_at        TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- RLS for experiences
+ALTER TABLE experiences ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Only authenticated can access experiences" ON experiences FOR ALL TO authenticated USING (true);
+GRANT ALL ON experiences TO authenticated;
+
 -- ============================================================================
--- TABLE: surveyresponses
+-- TABLE: surveyresponses (MAIN TABLE - PUBLIC INSERT)
 -- ============================================================================
-CREATE TABLE IF NOT EXISTS surveyresponses (
+CREATE TABLE surveyresponses (
     response_id               UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     experience_id             UUID REFERENCES experiences(experience_id),
     constituent_id            UUID REFERENCES constituents(constituent_id),
     experience_type           VARCHAR(150) NOT NULL,
+    
     -- Standard Audit Scores (1-3)
     is_present_engaged        INT NOT NULL CHECK (is_present_engaged BETWEEN 1 AND 3),
     connection_others_score   INT NOT NULL CHECK (connection_others_score BETWEEN 1 AND 3),
@@ -148,11 +182,12 @@ CREATE TABLE IF NOT EXISTS surveyresponses (
     learning_intent_score     INT NOT NULL CHECK (learning_intent_score BETWEEN 1 AND 3),
     community_benefit_score   INT NOT NULL CHECK (community_benefit_score BETWEEN 1 AND 3),
     
-    -- High Fidelity Raw Scores (1-5) - Added for Vibe Check
-    mood_before_raw           INT, -- 1-5 Scale
-    mood_after_raw            INT, -- 1-5 Scale
-    nature_connection_raw     INT, -- 1-5 Scale
+    -- High Fidelity Raw Scores (1-5)
+    mood_before_raw           INT,
+    mood_after_raw            INT,
+    nature_connection_raw     INT,
     
+    -- Other fields
     referral_source           TEXT,
     standout_moment           TEXT,
     would_recommend           BOOLEAN DEFAULT TRUE,
@@ -164,13 +199,43 @@ CREATE TABLE IF NOT EXISTS surveyresponses (
     willing_to_review         BOOLEAN DEFAULT FALSE,
     submitted_at              TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     device_type               VARCHAR(50),
-    created_at                TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    created_at                TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    is_returning_visitor      BOOLEAN DEFAULT FALSE
 );
+
+COMMENT ON COLUMN surveyresponses.is_returning_visitor IS 'True if the user self-identifies as a returning visitor';
+
+-- RLS for surveyresponses - THE CRITICAL PART
+ALTER TABLE surveyresponses ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Anonymous users CAN insert surveys
+CREATE POLICY "Allow public survey submissions" ON surveyresponses
+    FOR INSERT TO anon, authenticated
+    WITH CHECK (true);
+
+-- Policy: Only authenticated users can read
+CREATE POLICY "Only authenticated can view surveys" ON surveyresponses
+    FOR SELECT TO authenticated
+    USING (true);
+
+-- Policy: Only authenticated users can update
+CREATE POLICY "Only authenticated can update" ON surveyresponses
+    FOR UPDATE TO authenticated
+    USING (true);
+
+-- Policy: Only authenticated users can delete
+CREATE POLICY "Only authenticated can delete" ON surveyresponses
+    FOR DELETE TO authenticated
+    USING (true);
+
+-- GRANTS - CRITICAL FOR RLS TO WORK
+GRANT INSERT ON surveyresponses TO anon;
+GRANT ALL ON surveyresponses TO authenticated;
 
 -- ============================================================================
 -- TABLE: audit_log
 -- ============================================================================
-CREATE TABLE IF NOT EXISTS audit_log (
+CREATE TABLE audit_log (
     log_id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     table_name        VARCHAR(100) NOT NULL,
     record_id         UUID,
@@ -181,8 +246,13 @@ CREATE TABLE IF NOT EXISTS audit_log (
     new_values        JSONB
 );
 
+-- RLS for audit_log
+ALTER TABLE audit_log ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Only authenticated can access audit_log" ON audit_log FOR ALL TO authenticated USING (true);
+GRANT ALL ON audit_log TO authenticated;
+
 -- ============================================================================
--- INDEXES (IF NOT EXISTS logic)
+-- INDEXES
 -- ============================================================================
 CREATE INDEX IF NOT EXISTS idx_survey_experience_type ON surveyresponses(experience_type);
 CREATE INDEX IF NOT EXISTS idx_survey_age_range ON surveyresponses(age_range_bracket);
@@ -192,40 +262,12 @@ CREATE INDEX IF NOT EXISTS idx_experiences_program ON experiences(program_id);
 CREATE INDEX IF NOT EXISTS idx_experiences_date ON experiences(experience_date);
 
 -- ============================================================================
--- ROW LEVEL SECURITY
--- ============================================================================
--- Ensure RLS is enabled
-ALTER TABLE surveyresponses ENABLE ROW LEVEL SECURITY;
-
--- Drop existing policies to avoid duplicates before recreating
-DROP POLICY IF EXISTS "Allow public survey submissions" ON surveyresponses;
-DROP POLICY IF EXISTS "Only authenticated can view surveys" ON surveyresponses;
-DROP POLICY IF EXISTS "Only authenticated can update" ON surveyresponses;
-DROP POLICY IF EXISTS "Only authenticated can delete" ON surveyresponses;
-
-CREATE POLICY "Allow public survey submissions" ON surveyresponses
-    FOR INSERT TO anon, authenticated
-    WITH CHECK (true);
-
-CREATE POLICY "Only authenticated can view surveys" ON surveyresponses
-    FOR SELECT TO authenticated
-    USING (true);
-
-CREATE POLICY "Only authenticated can update" ON surveyresponses
-    FOR UPDATE TO authenticated
-    USING (true);
-
-CREATE POLICY "Only authenticated can delete" ON surveyresponses
-    FOR DELETE TO authenticated
-    USING (true);
-
--- ============================================================================
--- VIEWS
+-- VIEWS (WITHOUT SECURITY DEFINER - Fixed!)
 -- ============================================================================
 
--- Impact Dashboard View
-DROP VIEW IF EXISTS vw_impact_dashboard;
-CREATE OR REPLACE VIEW vw_impact_dashboard AS
+-- Impact Dashboard View (SECURITY INVOKER - uses caller's permissions)
+CREATE OR REPLACE VIEW vw_impact_dashboard 
+WITH (security_invoker = true) AS
 SELECT 
     experience_type,
     COUNT(*) as total_responses,
@@ -237,9 +279,9 @@ SELECT
 FROM surveyresponses
 GROUP BY experience_type;
 
--- Survey with programs view
-DROP VIEW IF EXISTS vw_survey_with_programs;
-CREATE OR REPLACE VIEW vw_survey_with_programs AS
+-- Survey with programs view (SECURITY INVOKER)
+CREATE OR REPLACE VIEW vw_survey_with_programs
+WITH (security_invoker = true) AS
 SELECT 
     sr.response_id,
     sr.experience_type,
@@ -258,3 +300,23 @@ SELECT
     ROUND((sr.is_present_engaged + sr.connection_others_score + 
            sr.connection_nature_score + sr.calmness_score)::NUMERIC / 4, 2) AS impact_score
 FROM surveyresponses sr;
+
+-- Grant view access
+GRANT SELECT ON vw_impact_dashboard TO authenticated;
+GRANT SELECT ON vw_survey_with_programs TO authenticated;
+
+-- ============================================================================
+-- SCHEMA PERMISSIONS (Ensure roles can use the schema)
+-- ============================================================================
+GRANT USAGE ON SCHEMA public TO anon, authenticated;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;
+
+-- ============================================================================
+-- VERIFICATION QUERY
+-- ============================================================================
+-- Run this to confirm everything is set up:
+-- SELECT tablename, policyname, cmd, roles FROM pg_policies WHERE schemaname = 'public';
+
+-- ============================================================================
+-- ✅ SCHEMA COMPLETE - Ready for seed_data.sql
+-- ============================================================================

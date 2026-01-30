@@ -777,24 +777,32 @@
 
             // D. MISSION MATRIX (Radar)
             // Dimensions: Calmness, Nature, People, Learning, Community
+            // D. MISSION MATRIX (Radar)
+            // Dimensions: Calmness, Nature, People, Learning, Community
             const avgScores = {
-                calm: 0, nature: 0, people: 0, learn: 3, comm: 3 // learn/comm hardcoded for now due to survey limits
+                calm: 0, nature: 0, people: 0, learn: 0, comm: 0
             };
             let countValid = 0;
             data.forEach(r => {
                 const s = r.mood_after_raw || (r.is_present_engaged * 1.6);
                 if (s) {
                     avgScores.calm += s;
-                    avgScores.nature += (r.connection_nature_score || 3); // Map 1-3 to approx
-                    avgScores.people += (r.connection_others_score || 3);
+                    // Map 1-3 scores to 5-point scale (* 1.66)
+                    avgScores.nature += (r.connection_nature_score || 0) * 1.66;
+                    avgScores.people += (r.connection_others_score || 0) * 1.66;
+                    avgScores.learn += (r.learning_intent_score || 0) * 1.66;
+                    avgScores.comm += (r.community_benefit_score || 0) * 1.66;
                     countValid++;
                 }
             });
-            // Normalize to 0-5 scale
+
+            // Normalize
             if (countValid > 0) {
                 avgScores.calm = (avgScores.calm / countValid).toFixed(1);
-                avgScores.nature = ((avgScores.nature / countValid) * 1.6).toFixed(1); // 3*1.6 ~ 5
-                avgScores.people = ((avgScores.people / countValid) * 1.6).toFixed(1);
+                avgScores.nature = (avgScores.nature / countValid).toFixed(1);
+                avgScores.people = (avgScores.people / countValid).toFixed(1);
+                avgScores.learn = (avgScores.learn / countValid).toFixed(1);
+                avgScores.comm = (avgScores.comm / countValid).toFixed(1);
             }
 
             new Chart(document.getElementById('missionChart'), {
@@ -803,7 +811,13 @@
                     labels: ['Zen/Calm', 'Nature', 'Community', 'Learning', 'People'],
                     datasets: [{
                         label: 'Impact Score',
-                        data: [avgScores.calm, avgScores.nature, 5, 5, avgScores.people],
+                        data: [
+                            avgScores.calm,
+                            avgScores.nature,
+                            avgScores.comm,
+                            avgScores.learn,
+                            avgScores.people
+                        ],
                         backgroundColor: palette.teal,
                         borderColor: palette.tealBorder,
                         pointBackgroundColor: '#fff',
@@ -817,13 +831,18 @@
             });
 
             // E. INTENTIONALITY (Pie)
-            // Mocking logic since learning_intent is hardcoded to 3 currently
             const intents = { 'Will Use It!': 0, 'Maybe': 0, 'Not Really': 0 };
             data.forEach(r => {
-                if (r.would_recommend) intents['Will Use It!']++;
-                else intents['Maybe']++; // correlate rec with intent
+                // Use actual DB score if varied, otherwise rely on fallback mapping
+                // score 3 = Yes, 2 = Somewhat, 1 = No
+                if (r.learning_intent_score === 3) intents['Will Use It!']++;
+                else if (r.learning_intent_score === 2) intents['Maybe']++;
+                else intents['Not Really']++;
             });
-            document.getElementById('intentRate').textContent = '98%'; // Mock based on high NPS
+
+            const totalIntent = Object.values(intents).reduce((a, b) => a + b, 0);
+            const intentRate = totalIntent ? Math.round((intents['Will Use It!'] / totalIntent) * 100) : 0;
+            document.getElementById('intentRate').textContent = intentRate + '%';
 
             new Chart(document.getElementById('intentChart'), {
                 type: 'pie',
