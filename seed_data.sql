@@ -1,74 +1,32 @@
 -- ============================================================================
--- EMPOWERMENT FARM - MOCK DATA POPULATION (AUDIT-COMPLIANT)
--- ============================================================================
--- Data matches JotForm survey structure: Yes(3)/Somewhat(2)/No(1)
--- Trends: connection_nature_score improves for recurring volunteers
--- Photos: ~30% of records have photo_url
+-- Empowerment Farm - Seed Data
+-- Populates dropdowns and adds mock survey responses for testing
 -- ============================================================================
 
--- ============================================================================
--- ANIMALS (Farm animals mentioned on website)
--- ============================================================================
-INSERT INTO animals (animal_name, species, breed, temperament, is_therapy_animal)
-SELECT * FROM (VALUES
-    ('Daisy', 'Cow', 'Jersey', 'Calm', TRUE),
-    ('Buttercup', 'Cow', 'Holstein', 'Gentle', TRUE),
-    ('Clover', 'Goat', 'Nigerian Dwarf', 'Playful', TRUE),
-    ('Maple', 'Goat', 'Pygmy', 'Calm', TRUE),
-    ('Patches', 'Goat', 'LaMancha', 'Friendly', TRUE),
-    ('Henrietta', 'Chicken', 'Silkie', 'Calm', TRUE),
-    ('Nugget', 'Chicken', 'Buff Orpington', 'Friendly', TRUE),
-    ('Thumper', 'Rabbit', 'Holland Lop', 'Gentle', TRUE),
-    ('Cinnamon', 'Rabbit', 'Mini Rex', 'Calm', TRUE)
-) AS v(animal_name, species, breed, temperament, is_therapy_animal)
-WHERE NOT EXISTS (
-    SELECT 1 FROM animals WHERE animal_name = v.animal_name
-);
+-- 1. Programs / Experience Types
+INSERT INTO ExperienceTypes (experience_name, category, description) VALUES
+('Cow Yoga', 'Wellness', 'Yoga session in the pasture with cows'),
+('Grief Retreats', 'Wellness', 'Supportive retreat for those grieving'),
+('Sound Bath', 'Wellness', 'Meditative sound healing session'),
+('Reiki', 'Wellness', 'Energy healing session'),
+('Forest Bathing', 'Wellness', 'Immersive nature walk for relaxation'),
+('Educational Field Trips', 'Education', 'School groups learning about farming'),
+('Seedlings for Spring', 'Education', 'Planting workshop for kids'),
+('JusTeenys Greenies', 'Education', 'Microgreens workshop for teens'),
+('Sweethearts and Songbirds', 'Education', 'Bird-focused observation and learning'),
+('Paint & Pollinators', 'Creative', 'Art session in the pollinator garden'),
+('Better Together - Hugging Can Planters', 'Creative', 'Community planting project'),
+('Tuesday Night Tuck-In', 'Community', 'Evening farm chores and animal care'),
+('Open Farm (Second Saturdays)', 'Community', 'Public open house and market'),
+('Group & Partner Programs', 'Community', 'Custom programs for partner organizations'),
+('Yoga with the Animals', 'Wellness', 'General yoga with farm animals'),
+('Farms Without Fences (Off-Site)', 'Outreach', 'Traveling farm education program');
 
--- ============================================================================
--- CONSTITUENTS (28 participants)
--- ============================================================================
-INSERT INTO constituents (constituent_id, first_name, last_name, email, role_type, enrollment_date) VALUES
--- Volunteers (10)
-('d0000001-0000-0000-0000-000000000001', 'Maria', 'Santos', 'maria.santos@email.com', 'Volunteer', '2025-06-15'),
-('d0000001-0000-0000-0000-000000000002', 'James', 'Wilson', 'james.w@email.com', 'Volunteer', '2025-07-01'),
-('d0000001-0000-0000-0000-000000000003', 'Emily', 'Chen', 'emily.chen@email.com', 'Volunteer', '2025-07-20'),
-('d0000001-0000-0000-0000-000000000004', 'Robert', 'Johnson', 'r.johnson@email.com', 'Volunteer', '2025-08-01'),
-('d0000001-0000-0000-0000-000000000005', 'Sofia', 'Martinez', 'sofia.m@email.com', 'Volunteer', '2025-08-15'),
-('d0000001-0000-0000-0000-000000000006', 'Michael', 'Brown', 'mbrown@email.com', 'Volunteer', '2025-09-01'),
-('d0000001-0000-0000-0000-000000000007', 'Linda', 'Davis', 'ldavis@email.com', 'Volunteer', '2025-09-15'),
-('d0000001-0000-0000-0000-000000000008', 'David', 'Garcia', 'dgarcia@email.com', 'Volunteer', '2025-10-01'),
-('d0000001-0000-0000-0000-000000000009', 'Patricia', 'Lee', 'plee@email.com', 'Volunteer', '2025-10-15'),
-('d0000001-0000-0000-0000-000000000010', 'Kevin', 'Yue', 'kyue@email.com', 'Volunteer', '2025-11-01'),
--- Students (10)
-('d0000001-0000-0000-0000-000000000011', 'Aiden', 'Thompson', 'aiden.t@school.edu', 'Student', '2025-08-20'),
-('d0000001-0000-0000-0000-000000000012', 'Olivia', 'White', 'olivia.w@school.edu', 'Student', '2025-08-25'),
-('d0000001-0000-0000-0000-000000000013', 'Ethan', 'Harris', 'ethan.h@school.edu', 'Student', '2025-09-01'),
-('d0000001-0000-0000-0000-000000000014', 'Ava', 'Clark', 'ava.c@school.edu', 'Student', '2025-09-10'),
-('d0000001-0000-0000-0000-000000000015', 'Noah', 'Lewis', 'noah.l@school.edu', 'Student', '2025-09-15'),
-('d0000001-0000-0000-0000-000000000016', 'Isabella', 'Walker', 'isabella.w@school.edu', 'Student', '2025-10-01'),
-('d0000001-0000-0000-0000-000000000017', 'Lucas', 'Hall', 'lucas.h@school.edu', 'Student', '2025-10-10'),
-('d0000001-0000-0000-0000-000000000018', 'Mia', 'Allen', 'mia.a@school.edu', 'Student', '2025-10-15'),
-('d0000001-0000-0000-0000-000000000019', 'Mason', 'Scott', 'mason.s@school.edu', 'Student', '2025-11-01'),
-('d0000001-0000-0000-0000-000000000020', 'Charlotte', 'Green', 'charlotte.g@school.edu', 'Student', '2025-11-10'),
--- Visitors (8)
-('d0000001-0000-0000-0000-000000000021', 'Jennifer', 'Adams', 'jadams@email.com', 'Visitor', '2025-09-01'),
-('d0000001-0000-0000-0000-000000000022', 'Thomas', 'Nelson', 'tnelson@email.com', 'Visitor', '2025-09-15'),
-('d0000001-0000-0000-0000-000000000023', 'Amanda', 'Hill', 'ahill@email.com', 'Visitor', '2025-10-01'),
-('d0000001-0000-0000-0000-000000000024', 'Christopher', 'Moore', 'cmoore@email.com', 'Visitor', '2025-10-15'),
-('d0000001-0000-0000-0000-000000000025', 'Sarah', 'Taylor', 'staylor@email.com', 'Visitor', '2025-10-20'),
-('d0000001-0000-0000-0000-000000000026', 'Daniel', 'Anderson', 'danderson@email.com', 'Visitor', '2025-11-01'),
-('d0000001-0000-0000-0000-000000000027', 'Michelle', 'Thomas', 'mthomas@email.com', 'Visitor', '2025-11-10'),
-('d0000001-0000-0000-0000-000000000028', 'Matthew', 'Jackson', 'mjackson@email.com', 'Visitor', '2025-11-15')
-ON CONFLICT (constituent_id) DO NOTHING;
-
--- ============================================================================
--- SURVEY RESPONSES (55+ records with realistic trends)
--- ============================================================================
--- Scale: 3=Yes, 2=Somewhat, 1=No
--- Trends: Recurring volunteers show improvement in connection_nature_score
--- Photos: ~30% have photo_url
--- ============================================================================
+-- 2. Mock Survey Responses (Rich Data for Analytics)
+-- Includes variations in:
+-- - Dates (Jan 2025 - Jan 2026) for "Monthly Trends"
+-- - Times (Morning, Afternoon, Evening) for "Peak Times"
+-- - Scores (Improved mood) for "Impact" metrics
 
 INSERT INTO SurveyResponses (
     experience_type, 
@@ -80,71 +38,67 @@ INSERT INTO SurveyResponses (
     additional_feedback, participant_name, photo_url, submitted_at, created_at
 ) VALUES
 
--- ========== MARIA SANTOS (Volunteer) - Long term engagement ==========
-('Cow Yoga', 2, 2, 1, 2, 2, 3, 2, 4, 2, FALSE, 'Word of Mouth', '26-40', 'First time with the cows, felt nervous but curious', TRUE, NULL, 'Maria Santos', 'https://placehold.co/400x300/228B22/white?text=CowYoga1', '2025-07-15 09:30:00', '2025-07-15 09:30:00'),
-('Tuesday Night Tuck-In', 2, 3, 2, 2, 2, 3, 3, 4, 3, TRUE, 'Word of Mouth', '26-40', 'Kids loved tucking in the chickens', TRUE, NULL, 'Maria Santos', NULL, '2025-08-12 18:15:00', '2025-08-12 18:15:00'),
-('Open Farm (Second Saturdays)', 3, 3, 2, 3, 3, 3, 3, 5, 4, TRUE, 'Word of Mouth', '26-40', 'The food forest tour was eye-opening', TRUE, 'Great for families!', 'Maria Santos', 'https://placehold.co/400x300/228B22/white?text=OpenFarm1', '2025-09-14 11:45:00', '2025-09-14 11:45:00'),
-('Cow Yoga', 3, 3, 3, 3, 3, 3, 3, 5, 5, TRUE, 'Word of Mouth', '26-40', 'Daisy came right up to me during meditation', TRUE, 'Feeling much more connected', 'Maria Santos', NULL, '2025-10-24 17:30:00', '2025-10-24 17:30:00'),
-('Paint & Pollinators', 3, 3, 3, 3, 3, 3, 4, 5, 5, TRUE, 'Word of Mouth', '26-40', 'Painting while surrounded by butterflies was magical', TRUE, 'My favorite session yet!', 'Maria Santos', 'https://placehold.co/400x300/228B22/white?text=Painting1', '2025-11-15 13:00:00', '2025-11-15 13:00:00'),
+-- ========== EARLY 2025 (Foundation) ==========
+('Open Farm (Second Saturdays)', 3, 3, 3, 3, 3, 3, 3, 4, 3, FALSE, 'Word of Mouth', '41-60', 'First visit of the year', TRUE, NULL, NULL, NULL, '2025-01-14 10:00:00', '2025-01-14 10:00:00'),
+('Cow Yoga', 2, 2, 3, 3, 2, 3, 2, 4, 3, FALSE, 'Social Media', '26-40', 'New years resolution to try new things', TRUE, NULL, NULL, NULL, '2025-01-20 17:00:00', '2025-01-20 17:00:00'),
+('Tuesday Night Tuck-In', 3, 3, 3, 3, 3, 3, 3, 5, 4, TRUE, 'Friend/Family', '0-17', 'Chilly but fun', TRUE, NULL, NULL, NULL, '2025-02-11 18:00:00', '2025-02-11 18:00:00'),
+('Open Farm (Second Saturdays)', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'Flyer/Poster', '61+', 'Lovely weather for a farm walk', TRUE, NULL, NULL, NULL, '2025-02-08 11:00:00', '2025-02-08 11:00:00'),
+('Paint & Pollinators', 3, 3, 3, 3, 3, 3, 3, 4, 4, FALSE, 'Newsletter', '41-60', 'Spring flowers are starting', TRUE, NULL, NULL, NULL, '2025-03-15 12:00:00', '2025-03-15 12:00:00'),
+('Cow Yoga', 3, 3, 3, 3, 3, 3, 3, 5, 5, TRUE, 'Social Media', '26-40', 'Best way to start spring', TRUE, NULL, NULL, NULL, '2025-03-22 17:30:00', '2025-03-22 17:30:00'),
 
--- ========== JAMES WILSON (Volunteer) - Afternoon/Evening regular ==========
+-- ========== SPRING 2025 (Growth) ==========
+('Educational Field Trips', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'School', '0-17', 'Baby chicks were so cute', TRUE, NULL, NULL, NULL, '2025-04-10 10:00:00', '2025-04-10 10:00:00'),
+('Open Farm (Second Saturdays)', 3, 3, 2, 3, 3, 3, 3, 5, 4, TRUE, 'Word of Mouth', '26-40', 'Brought the neighbors', TRUE, NULL, NULL, NULL, '2025-04-12 11:30:00', '2025-04-12 11:30:00'),
+('Tuesday Night Tuck-In', 3, 3, 3, 3, 3, 3, 4, 5, 5, TRUE, 'Parent', '0-17', 'Sunset was beautiful', TRUE, NULL, NULL, NULL, '2025-05-14 19:30:00', '2025-05-14 19:30:00'),
+('Yoga with the Animals', 3, 3, 3, 3, 3, 3, 3, 5, 5, TRUE, 'Social Media', '18-25', 'Goat yoga selfie!', TRUE, NULL, NULL, NULL, '2025-05-23 18:00:00', '2025-05-23 18:00:00'),
+('Seedlings for Spring', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'Newsletter', '41-60', 'Garden is going to look great', TRUE, NULL, NULL, NULL, '2025-06-07 09:00:00', '2025-06-07 09:00:00'),
+
+-- ========== SUMMER 2025 (Steady) ==========
+('Cow Yoga', 2, 2, 1, 2, 2, 3, 2, 4, 2, FALSE, 'Word of Mouth', '26-40', 'First time with the cows, felt nervous but curious', TRUE, NULL, 'Maria Santos', 'https://placehold.co/400x300/228B22/white?text=CowYoga1', '2025-07-15 09:30:00', '2025-07-15 09:30:00'),
 ('Yoga with the Animals', 2, 2, 2, 2, 2, 3, 3, 4, 3, FALSE, 'Social Media', '41-60', 'Different from regular yoga', TRUE, NULL, 'James Wilson', NULL, '2025-07-25 17:45:00', '2025-07-25 17:45:00'),
+('Tuesday Night Tuck-In', 2, 2, 2, 2, 3, 3, 2, 4, 3, FALSE, 'Friend/Family', '26-40', 'Story time in the pavilion was lovely', TRUE, NULL, 'Emily Chen', NULL, '2025-08-05 18:30:00', '2025-08-05 18:30:00'),
 ('Open Farm (Second Saturdays)', 3, 3, 2, 3, 2, 3, 3, 4, 4, TRUE, 'Social Media', '41-60', 'Met other volunteers', TRUE, NULL, 'James Wilson', 'https://placehold.co/400x300/228B22/white?text=OpenFarm2', '2025-08-10 10:15:00', '2025-08-10 10:15:00'),
+('Tuesday Night Tuck-In', 2, 3, 2, 2, 2, 3, 3, 4, 3, TRUE, 'Word of Mouth', '26-40', 'Kids loved tucking in the chickens', TRUE, NULL, 'Maria Santos', NULL, '2025-08-12 18:15:00', '2025-08-12 18:15:00'),
+
+-- ========== FALL 2025 (Peak Season) ==========
+('Educational Field Trips', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'School', '0-17', 'Learned about composting and plant cycles', TRUE, 'So much better than regular school!', 'Aiden Thompson', 'https://placehold.co/400x300/228B22/white?text=FieldTrip1', '2025-09-05 10:30:00', '2025-09-05 10:30:00'),
+('Open Farm (Second Saturdays)', 3, 3, 2, 3, 3, 3, 3, 5, 4, TRUE, 'Word of Mouth', '26-40', 'The food forest tour was eye-opening', TRUE, 'Great for families!', 'Maria Santos', 'https://placehold.co/400x300/228B22/white?text=OpenFarm1', '2025-09-14 11:45:00', '2025-09-14 11:45:00'),
+('Seedlings for Spring', 3, 3, 2, 3, 3, 3, 3, 5, 4, TRUE, 'Friend/Family', '26-40', 'Learning seed starting techniques', TRUE, NULL, 'Emily Chen', 'https://placehold.co/400x300/228B22/white?text=Seedlings1', '2025-09-14 09:30:00', '2025-09-14 09:30:00'),
 ('Cow Yoga', 3, 3, 3, 3, 3, 3, 2, 5, 5, TRUE, 'Social Media', '41-60', 'Buttercup is so gentle', TRUE, 'Best stress relief!', 'James Wilson', NULL, '2025-09-26 18:00:00', '2025-09-26 18:00:00'),
 ('JusTeenys Greenies', 3, 3, 3, 3, 3, 3, 4, 5, 5, TRUE, 'Social Media', '41-60', 'Growing my own microgreens now', TRUE, NULL, 'James Wilson', 'https://placehold.co/400x300/228B22/white?text=Microgreens1', '2025-10-04 10:00:00', '2025-10-04 10:00:00'),
-
--- ========== EMILY CHEN (Volunteer) - Morning/Evening mix ==========
-('Tuesday Night Tuck-In', 2, 2, 2, 2, 3, 3, 2, 4, 3, FALSE, 'Friend/Family', '26-40', 'Story time in the pavilion was lovely', TRUE, NULL, 'Emily Chen', NULL, '2025-08-05 18:30:00', '2025-08-05 18:30:00'),
-('Seedlings for Spring', 3, 3, 2, 3, 3, 3, 3, 5, 4, TRUE, 'Friend/Family', '26-40', 'Learning seed starting techniques', TRUE, NULL, 'Emily Chen', 'https://placehold.co/400x300/228B22/white?text=Seedlings1', '2025-09-14 09:30:00', '2025-09-14 09:30:00'),
-('Yoga with the Animals', 3, 3, 3, 3, 3, 3, 3, 5, 5, TRUE, 'Friend/Family', '26-40', 'Clover the goat joined my mat!', TRUE, 'Best yoga experience ever', 'Emily Chen', NULL, '2025-10-24 16:45:00', '2025-10-24 16:45:00'),
-('Paint & Pollinators', 3, 3, 3, 3, 3, 3, 4, 5, 5, TRUE, 'Friend/Family', '26-40', 'Created a beautiful butterfly painting', TRUE, NULL, 'Emily Chen', 'https://placehold.co/400x300/228B22/white?text=Painting2', '2025-11-08 12:15:00', '2025-11-08 12:15:00'),
-
--- ========== STUDENTS - School hours & After school ==========
-('Educational Field Trips', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'School', '0-17', 'Learned about composting and plant cycles', TRUE, 'So much better than regular school!', 'Aiden Thompson', 'https://placehold.co/400x300/228B22/white?text=FieldTrip1', '2025-09-05 10:30:00', '2025-09-05 10:30:00'),
-('Educational Field Trips', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'School', '0-17', 'Fed the goats and learned about animal care', TRUE, NULL, 'Olivia White', NULL, '2025-09-05 11:00:00', '2025-09-05 11:00:00'),
-('Tuesday Night Tuck-In', 3, 3, 3, 3, 3, 3, 4, 5, 5, TRUE, 'School', '0-17', 'Tucking in Henrietta the chicken was my favorite', TRUE, 'Want to come every week!', 'Ethan Harris', 'https://placehold.co/400x300/228B22/white?text=TuckIn1', '2025-09-17 18:00:00', '2025-09-17 18:00:00'),
-('Educational Field Trips', 3, 2, 3, 3, 3, 3, 3, 4, 5, FALSE, 'School', '0-17', 'The food forest was amazing', TRUE, NULL, 'Ava Clark', NULL, '2025-09-19 13:00:00', '2025-09-19 13:00:00'),
 ('Open Farm (Second Saturdays)', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'Parent', '0-17', 'Met new friends at the farm', TRUE, NULL, 'Noah Lewis', 'https://placehold.co/400x300/228B22/white?text=OpenFarm3', '2025-10-12 11:30:00', '2025-10-12 11:30:00'),
-('Tuesday Night Tuck-In', 3, 3, 3, 3, 2, 3, 4, 5, 4, TRUE, 'Parent', '0-17', 'Story time under the pavilion', TRUE, NULL, 'Isabella Walker', NULL, '2025-10-15 18:30:00', '2025-10-15 18:30:00'),
-('Educational Field Trips', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'School', '0-17', 'Hands-on learning is the best', TRUE, 'Teachers should bring us more often', 'Lucas Hall', NULL, '2025-10-22 10:00:00', '2025-10-22 10:00:00'),
-('Seedlings for Spring', 3, 3, 2, 3, 3, 3, 3, 5, 4, FALSE, 'Parent', '0-17', 'Started my own seedlings to take home', TRUE, NULL, 'Mia Allen', 'https://placehold.co/400x300/228B22/white?text=Seedlings2', '2025-11-09 09:45:00', '2025-11-09 09:45:00'),
-('Tuesday Night Tuck-In', 3, 3, 3, 3, 3, 3, 4, 5, 5, TRUE, 'Friend/Family', '0-17', 'The rabbits are so soft!', TRUE, 'Love coming here after school', 'Mason Scott', NULL, '2025-11-12 17:45:00', '2025-11-12 17:45:00'),
-('Open Farm (Second Saturdays)', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'Social Media', '0-17', 'Farm market had great snacks', TRUE, NULL, 'Charlotte Green', 'https://placehold.co/400x300/228B22/white?text=OpenFarm4', '2025-11-09 12:30:00', '2025-11-09 12:30:00'),
+('Group & Partner Programs', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'Nonprofit Partner', '0-17', 'StarAbility Foundation visit', TRUE, 'So inclusive and welcoming', NULL, NULL, '2025-10-17 14:30:00', '2025-10-17 14:30:00'),
+('Cow Yoga', 3, 3, 3, 3, 3, 3, 3, 5, 5, TRUE, 'Word of Mouth', '26-40', 'Daisy came right up to me during meditation', TRUE, 'Feeling much more connected', 'Maria Santos', NULL, '2025-10-24 17:30:00', '2025-10-24 17:30:00'),
+('Yoga with the Animals', 3, 3, 3, 3, 3, 3, 3, 5, 5, TRUE, 'Friend/Family', '26-40', 'Clover the goat joined my mat!', TRUE, 'Best yoga experience ever', 'Emily Chen', NULL, '2025-10-24 16:45:00', '2025-10-24 16:45:00'),
 
--- ========== VISITORS - Weekends & Evenings ==========
-('Cow Yoga', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'Google Search', '26-40', 'Never done yoga with cows before - transformative!', TRUE, 'Will definitely return', 'Jennifer Adams', 'https://placehold.co/400x300/228B22/white?text=CowYoga2', '2025-09-26 17:15:00', '2025-09-26 17:15:00'),
-('Open Farm (Second Saturdays)', 3, 3, 3, 3, 2, 3, 3, 4, 4, FALSE, 'Flyer/Poster', '41-60', 'Wonderful family outing', TRUE, NULL, 'Thomas Nelson', NULL, '2025-10-12 10:00:00', '2025-10-12 10:00:00'),
-('Paint & Pollinators', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'Friend/Family', '26-40', 'Relaxing and creative combination', TRUE, 'Highly recommend!', 'Amanda Hill', 'https://placehold.co/400x300/228B22/white?text=Painting3', '2025-10-12 13:00:00', '2025-10-12 13:00:00'),
-('Yoga with the Animals', 3, 3, 3, 3, 3, 3, 4, 5, 5, FALSE, 'Event Listing', '18-25', 'The goats made yoga so much more fun', TRUE, NULL, 'Christopher Moore', NULL, '2025-10-24 16:30:00', '2025-10-24 16:30:00'),
-('Tuesday Night Tuck-In', 3, 3, 3, 3, 3, 3, 3, 5, 5, TRUE, 'Word of Mouth', '26-40', 'Perfect after-school activity for my kids', TRUE, 'Great family bonding', 'Sarah Taylor', 'https://placehold.co/400x300/228B22/white?text=TuckIn2', '2025-10-22 18:15:00', '2025-10-22 18:15:00'),
-('Open Farm (Second Saturdays)', 3, 2, 3, 3, 3, 3, 2, 4, 4, FALSE, 'Google Search', '41-60', 'Peaceful morning at the farm', TRUE, NULL, 'Daniel Anderson', NULL, '2025-11-09 09:15:00', '2025-11-09 09:15:00'),
+-- ========== WINTER 2025 (Holidays) ==========
+('Paint & Pollinators', 3, 3, 3, 3, 3, 3, 4, 5, 5, TRUE, 'Word of Mouth', '26-40', 'Painting while surrounded by butterflies was magical', TRUE, 'My favorite session yet!', 'Maria Santos', 'https://placehold.co/400x300/228B22/white?text=Painting1', '2025-11-15 13:00:00', '2025-11-15 13:00:00'),
 ('Cow Yoga', 3, 3, 3, 3, 3, 3, 3, 5, 5, TRUE, 'Social Media', '26-40', 'The cows are surprisingly calming', TRUE, 'Best wellness experience in Naples', 'Michelle Thomas', 'https://placehold.co/400x300/228B22/white?text=CowYoga3', '2025-11-21 17:45:00', '2025-11-21 17:45:00'),
-('Better Together - Hugging Can Planters', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'Newsletter', '61+', 'Learned about companion planting', TRUE, 'Great for seniors like me!', 'Matthew Jackson', NULL, '2025-11-09 11:30:00', '2025-11-09 11:30:00'),
+('Tuesday Night Tuck-In', 3, 3, 3, 3, 3, 3, 4, 5, 5, TRUE, 'Word of Mouth', '0-17', 'Holiday lights were pretty', TRUE, NULL, NULL, NULL, '2025-12-09 18:00:00', '2025-12-09 18:00:00'),
+('Open Farm (Second Saturdays)', 3, 3, 3, 3, 3, 3, 3, 5, 5, TRUE, 'Friend/Family', '61+', 'Bought gifts at the market', TRUE, NULL, NULL, NULL, '2025-12-14 11:00:00', '2025-12-14 11:00:00'),
+('Yoga with the Animals', 3, 3, 3, 3, 3, 3, 3, 5, 5, TRUE, 'Friend/Family', '26-40', 'End of year relaxation', TRUE, NULL, NULL, NULL, '2025-12-28 17:00:00', '2025-12-28 17:00:00'),
+
+-- ========== 2026 (Current Year Start) ==========
+('Open Farm (Second Saturdays)', 3, 3, 3, 3, 3, 3, 3, 5, 5, TRUE, 'Word of Mouth', '26-40', 'New year new farm visit', TRUE, NULL, NULL, NULL, '2026-01-11 11:00:00', '2026-01-11 11:00:00'),
+('Cow Yoga', 3, 3, 3, 3, 3, 3, 3, 5, 5, TRUE, 'Social Media', '18-25', 'Great start to 2026', TRUE, NULL, NULL, NULL, '2026-01-24 17:00:00', '2026-01-24 17:00:00'),
 
 -- ========== Additional ANONYMOUS walk-in surveys (Peak times simulation) ==========
-('Open Farm (Second Saturdays)', 3, 3, 3, 3, 3, 3, 3, 5, 4, FALSE, 'Drove By', '26-40', 'Just stopped in on a whim - so glad I did', TRUE, NULL, NULL, NULL, '2025-09-14 11:15:00', '2025-09-14 11:15:00'),
-('Open Farm (Second Saturdays)', 2, 2, 3, 3, 2, 3, 2, 3, 4, FALSE, 'Flyer/Poster', '41-60', 'Nice escape from the city', TRUE, NULL, NULL, NULL, '2025-09-14 12:45:00', '2025-09-14 12:45:00'),
-('Tuesday Night Tuck-In', 3, 3, 3, 3, 3, 3, 3, 5, 5, TRUE, 'Word of Mouth', '26-40', 'Kids loved every minute', TRUE, NULL, NULL, 'https://placehold.co/400x300/228B22/white?text=TuckIn3', '2025-09-24 18:30:00', '2025-09-24 18:30:00'),
-('Cow Yoga', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'Social Media', '18-25', 'Instagram-worthy and actually relaxing', TRUE, NULL, NULL, 'https://placehold.co/400x300/228B22/white?text=CowYoga4', '2025-09-26 17:45:00', '2025-09-26 17:45:00'),
-('Open Farm (Second Saturdays)', 3, 3, 3, 3, 3, 3, 3, 5, 5, TRUE, 'Friend/Family', '61+', 'Brought my grandkids', TRUE, 'Wonderful for all ages', NULL, NULL, '2025-10-12 10:15:00', '2025-10-12 10:15:00'),
+('Open Farm (Second Saturdays)', 3, 3, 3, 3, 3, 3, 3, 5, 4, FALSE, 'Drove By', '26-40', 'Just stopped in on a whim', TRUE, NULL, NULL, NULL, '2025-09-14 11:15:00', '2025-09-14 11:15:00'),
+('Open Farm (Second Saturdays)', 2, 2, 3, 3, 2, 3, 2, 3, 4, FALSE, 'Flyer/Poster', '41-60', 'Nice escape from the city', TRUE, NULL, NULL, NULL, '2025-03-08 12:45:00', '2025-03-08 12:45:00'),
+('Tuesday Night Tuck-In', 3, 3, 3, 3, 3, 3, 3, 5, 5, TRUE, 'Word of Mouth', '26-40', 'Kids loved every minute', TRUE, NULL, NULL, 'https://placehold.co/400x300/228B22/white?text=TuckIn3', '2025-04-08 18:30:00', '2025-04-08 18:30:00'),
+('Cow Yoga', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'Social Media', '18-25', 'Instagram-worthy', TRUE, NULL, NULL, 'https://placehold.co/400x300/228B22/white?text=CowYoga4', '2025-05-20 17:45:00', '2025-05-20 17:45:00'),
+('Open Farm (Second Saturdays)', 3, 3, 3, 3, 3, 3, 3, 5, 5, TRUE, 'Friend/Family', '61+', 'Brought my grandkids', TRUE, 'Wonderful', NULL, NULL, '2025-11-09 10:15:00', '2025-11-09 10:15:00'),
 ('Yoga with the Animals', 3, 3, 3, 3, 3, 3, 3, 5, 5, TRUE, 'Google Search', '26-40', 'Found my new monthly ritual', TRUE, NULL, NULL, NULL, '2025-10-24 17:15:00', '2025-10-24 17:15:00'),
-('Open Farm (Second Saturdays)', 3, 2, 2, 3, 2, 3, 3, 4, 3, TRUE, 'Event Listing', '41-60', 'First visit, will return', TRUE, NULL, NULL, NULL, '2025-11-09 11:45:00', '2025-11-09 11:45:00'),
-('JusTeenys Greenies', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'Newsletter', '26-40', 'Growing greens at home now', TRUE, NULL, NULL, 'https://placehold.co/400x300/228B22/white?text=Microgreens2', '2025-11-07 10:00:00', '2025-11-07 10:00:00'),
+('Open Farm (Second Saturdays)', 3, 2, 2, 3, 2, 3, 3, 4, 3, TRUE, 'Event Listing', '41-60', 'First visit', TRUE, NULL, NULL, NULL, '2025-06-14 11:45:00', '2025-06-14 11:45:00'),
+('JusTeenys Greenies', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'Newsletter', '26-40', 'Growing greens at home', TRUE, NULL, NULL, 'https://placehold.co/400x300/228B22/white?text=Microgreens2', '2025-02-15 10:00:00', '2025-02-15 10:00:00'),
 ('Tuesday Night Tuck-In', 3, 3, 3, 3, 3, 3, 4, 5, 5, TRUE, 'Parent', '26-40', 'Best Tuesday tradition', TRUE, NULL, NULL, NULL, '2025-11-19 18:30:00', '2025-11-19 18:30:00'),
-('Sweethearts and Songbirds', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'Newsletter', '41-60', 'Made a beautiful bird feeder', TRUE, 'Great hands-on project', NULL, 'https://placehold.co/400x300/228B22/white?text=Birdfeeder1', '2025-11-09 12:15:00', '2025-11-09 12:15:00'),
+('Sweethearts and Songbirds', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'Newsletter', '41-60', 'Made a beautiful bird feeder', TRUE, 'Great project', NULL, 'https://placehold.co/400x300/228B22/white?text=Birdfeeder1', '2026-02-14 12:15:00', '2026-02-14 12:15:00'),
 
 -- ========== GROUP PROGRAMS - Mid-day activity ==========
-('Group & Partner Programs', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'Nonprofit Partner', '0-17', 'Boys & Girls Club field trip was amazing', TRUE, NULL, NULL, NULL, '2025-10-03 14:15:00', '2025-10-03 14:15:00'),
-('Group & Partner Programs', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'Nonprofit Partner', '0-17', 'StarAbility Foundation visit', TRUE, 'So inclusive and welcoming', NULL, NULL, '2025-10-17 14:30:00', '2025-10-17 14:30:00'),
-('Farms Without Fences (Off-Site)', 3, 3, 3, 3, 3, 3, 4, 5, 4, FALSE, 'School', '0-17', 'Loved when the farm came to our school', TRUE, NULL, NULL, NULL, '2025-10-25 10:00:00', '2025-10-25 10:00:00'),
-('Group & Partner Programs', 3, 3, 3, 3, 3, 3, 3, 5, 5, TRUE, 'Nonprofit Partner', '61+', 'Senior center outing was wonderful', TRUE, 'Great for all abilities', NULL, 'https://placehold.co/400x300/228B22/white?text=SeniorGroup1', '2025-11-05 11:30:00', '2025-11-05 11:30:00'),
-
--- ========== More variety for analytics (Scattered times) ==========
-('Cow Yoga', 2, 2, 2, 2, 2, 3, 2, 4, 3, FALSE, 'Google Search', '18-25', 'First yoga class ever', TRUE, 'Little nervous but good', NULL, NULL, '2025-09-26 17:50:00', '2025-09-26 17:50:00'),
-('Open Farm (Second Saturdays)', 2, 3, 2, 2, 2, 3, 2, 4, 3, FALSE, 'Drove By', '41-60', 'Curious about the farm', TRUE, NULL, NULL, NULL, '2025-10-12 10:45:00', '2025-10-12 10:45:00'),
-('Tuesday Night Tuck-In', 3, 3, 3, 3, 3, 3, 4, 5, 5, TRUE, 'Word of Mouth', '0-17', 'Best time with my family', TRUE, NULL, NULL, NULL, '2025-10-29 18:15:00', '2025-10-29 18:15:00'),
-('Paint & Pollinators', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'Newsletter', '61+', 'Peaceful painting experience', TRUE, NULL, NULL, 'https://placehold.co/400x300/228B22/white?text=Painting4', '2025-11-09 12:45:00', '2025-11-09 12:45:00'),
-('Yoga with the Animals', 3, 3, 3, 3, 3, 3, 3, 5, 5, TRUE, 'Friend/Family', '26-40', 'Monthly self-care routine now', TRUE, NULL, NULL, NULL, '2025-11-28 17:15:00', '2025-11-28 17:15:00');
+('Group & Partner Programs', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'Nonprofit Partner', '0-17', 'Boys & Girls Club field trip', TRUE, NULL, NULL, NULL, '2025-10-03 14:15:00', '2025-10-03 14:15:00'),
+('Group & Partner Programs', 3, 3, 3, 3, 3, 3, 3, 5, 5, FALSE, 'Nonprofit Partner', '0-17', 'StarAbility Foundation visit', TRUE, 'So inclusive', NULL, NULL, '2025-10-17 14:30:00', '2025-10-17 14:30:00'),
+('Farms Without Fences (Off-Site)', 3, 3, 3, 3, 3, 3, 4, 5, 4, FALSE, 'School', '0-17', 'Loved when the farm came to us', TRUE, NULL, NULL, NULL, '2025-04-25 10:00:00', '2025-04-25 10:00:00'),
+('Group & Partner Programs', 3, 3, 3, 3, 3, 3, 3, 5, 5, TRUE, 'Nonprofit Partner', '61+', 'Senior center outing', TRUE, 'Great for all abilities', NULL, 'https://placehold.co/400x300/228B22/white?text=SeniorGroup1', '2025-11-05 11:30:00', '2025-11-05 11:30:00');
 
 -- ============================================================================
 -- END OF MOCK DATA
