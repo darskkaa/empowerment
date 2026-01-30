@@ -96,36 +96,51 @@
             color: white;
         }
 
-        /* Score Pills */
+        /* Score Pills - 1-5 Scale */
         .score-pill {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-width: 3rem;
-            padding: 0.5rem 1rem;
+            min-width: 2.5rem;
+            padding: 0.375rem 0.75rem;
             border-radius: 9999px;
             font-weight: 700;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
         }
 
-        .score-excellent {
+        .score-5 {
             background: linear-gradient(135deg, #22c55e, #16a34a);
             color: white;
         }
 
-        .score-good {
+        /* GREAT */
+        .score-4 {
             background: linear-gradient(135deg, #84cc16, #65a30d);
             color: white;
         }
 
-        .score-average {
+        /* GOOD */
+        .score-3 {
             background: linear-gradient(135deg, #fbbf24, #f59e0b);
             color: white;
         }
 
-        .score-low {
+        /* OKAY */
+        .score-2 {
             background: linear-gradient(135deg, #f97316, #ea580c);
             color: white;
+        }
+
+        /* MEH */
+        .score-1 {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        /* AWFUL */
+        .score-na {
+            background: #e5e7eb;
+            color: #9ca3af;
         }
 
         #loginScreen,
@@ -157,7 +172,6 @@
             }
         }
 
-        /* Fade in animation */
         .fade-in {
             animation: fadeIn 0.5s ease-out;
         }
@@ -174,7 +188,6 @@
             }
         }
 
-        /* Pulse for live data */
         .pulse {
             animation: pulse 2s infinite;
         }
@@ -190,6 +203,19 @@
                 opacity: 0.7;
             }
         }
+
+        /* Emoji Scale Legend */
+        .emoji-legend {
+            display: flex;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .emoji-legend span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
     </style>
 </head>
 
@@ -202,7 +228,7 @@
             </div>
             <img src="logo.png" alt="Empowerment Farm" class="h-24 mx-auto mb-6">
             <h1 class="text-3xl font-bold text-farm-800 mb-1">Impact Center</h1>
-            <p class="text-gray-500 mb-8 text-sm">Analytics Dashboard • v8.0</p>
+            <p class="text-gray-500 mb-8 text-sm">Analytics Dashboard • v8.5</p>
 
             <div id="loginForm">
                 <input type="email" id="emailInput" placeholder="Email Address"
@@ -254,8 +280,20 @@
             <!-- Content -->
             <div id="dashboardContent" class="hidden space-y-8">
 
+                <!-- Scale Legend -->
+                <div class="flex items-center justify-between bg-white/50 rounded-xl px-4 py-2 text-xs text-gray-500">
+                    <span class="font-semibold">📊 Mood Scale (1-5):</span>
+                    <div class="emoji-legend">
+                        <span><span class="score-pill score-1 text-xs px-2 py-0.5">1</span> 😫 Awful</span>
+                        <span><span class="score-pill score-2 text-xs px-2 py-0.5">2</span> 😒 Meh</span>
+                        <span><span class="score-pill score-3 text-xs px-2 py-0.5">3</span> 😐 Okay</span>
+                        <span><span class="score-pill score-4 text-xs px-2 py-0.5">4</span> 🙂 Good</span>
+                        <span><span class="score-pill score-5 text-xs px-2 py-0.5">5</span> 🤩 Great!</span>
+                    </div>
+                </div>
+
                 <!-- ====================================== -->
-                <!-- HERO METRICS (Big Numbers) -->
+                <!-- HERO METRICS -->
                 <!-- ====================================== -->
                 <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
 
@@ -263,7 +301,7 @@
                     <div class="card p-6 text-center bg-gradient-to-br from-white to-farm-50">
                         <p class="text-xs font-semibold text-farm-600 uppercase tracking-wider mb-2">Total Visitors</p>
                         <h2 id="totalVisitors" class="text-5xl font-extrabold text-farm-900 metric-val">--</h2>
-                        <p class="text-xs text-gray-400 mt-2">All time responses</p>
+                        <p class="text-xs text-gray-400 mt-2">All time</p>
                     </div>
 
                     <!-- NPS Score -->
@@ -271,27 +309,70 @@
                         <p class="text-xs font-semibold text-orange-600 uppercase tracking-wider mb-2">Would Recommend
                         </p>
                         <h2 id="npsScore" class="text-5xl font-extrabold text-gray-900 metric-val">--%</h2>
-                        <p class="text-xs text-gray-400 mt-2">Net Promoter Score</p>
+                        <p class="text-xs text-gray-400 mt-2">NPS Score</p>
                     </div>
 
-                    <!-- Overall Impact Score (1-3 scale shown as percentage) -->
+                    <!-- Avg Mood Improvement -->
                     <div class="card p-6 text-center bg-gradient-to-br from-white to-blue-50">
-                        <p class="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-2">Impact Score</p>
-                        <h2 id="impactScore" class="text-5xl font-extrabold text-gray-900 metric-val">--</h2>
-                        <p class="text-xs text-gray-400 mt-2">Avg across all metrics (1-3)</p>
+                        <p class="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-2">Mood Boost</p>
+                        <h2 id="moodBoost" class="text-5xl font-extrabold text-blue-700 metric-val">+--</h2>
+                        <p class="text-xs text-gray-400 mt-2">Before → After (1-5)</p>
                     </div>
 
                     <!-- Returning Visitors -->
                     <div class="card p-6 text-center bg-gradient-to-br from-white to-purple-50">
                         <p class="text-xs font-semibold text-purple-600 uppercase tracking-wider mb-2">Returning</p>
                         <h2 id="returningRate" class="text-5xl font-extrabold text-gray-900 metric-val">--%</h2>
-                        <p class="text-xs text-gray-400 mt-2">Have visited before</p>
+                        <p class="text-xs text-gray-400 mt-2">Visited before</p>
                     </div>
 
                 </section>
 
                 <!-- ====================================== -->
-                <!-- QUICK INSIGHTS (Clickable Buttons) -->
+                <!-- THE HUMAN IMPACT (Before/After Visual) -->
+                <!-- ====================================== -->
+                <section class="card p-8 bg-gradient-to-r from-gray-50 to-green-50 border-l-8 border-farm-500">
+                    <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                        ✨ The Human Impact
+                        <span class="text-sm font-normal text-gray-500 ml-2 bg-white px-3 py-1 rounded-full shadow-sm">
+                            Before vs After (1-5 Scale)
+                        </span>
+                    </h3>
+
+                    <div class="flex items-center justify-around text-center">
+                        <div class="relative group">
+                            <div class="text-6xl mb-3 grayscale opacity-70 group-hover:grayscale-0 transition-all">😫
+                            </div>
+                            <p class="font-bold text-gray-400 uppercase text-xs tracking-wider">Before Arriving</p>
+                            <p id="avgBefore" class="text-3xl font-bold text-gray-500 mt-1">--</p>
+                        </div>
+
+                        <div class="flex-1 px-8 max-w-md">
+                            <div
+                                class="h-6 bg-gradient-to-r from-gray-200 via-yellow-200 to-green-400 rounded-full overflow-hidden relative shadow-inner">
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span class="text-xs font-bold text-gray-700 drop-shadow-sm">✨ Transformation
+                                        ✨</span>
+                                </div>
+                            </div>
+                            <div class="text-center mt-3">
+                                <span id="impactDelta"
+                                    class="inline-block bg-farm-100 text-farm-800 px-4 py-2 rounded-full font-extrabold text-lg shadow-sm">
+                                    +-- points
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="relative group">
+                            <div class="text-6xl mb-3 transform group-hover:scale-110 transition-transform">🥰</div>
+                            <p class="font-bold text-farm-600 uppercase text-xs tracking-wider">After Leaving</p>
+                            <p id="avgAfter" class="text-3xl font-bold text-farm-700 mt-1">--</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ====================================== -->
+                <!-- QUICK INSIGHTS -->
                 <!-- ====================================== -->
                 <section class="card p-6">
                     <div class="flex items-center justify-between mb-4">
@@ -324,15 +405,11 @@
                         <button onclick="showInsight('community')"
                             class="insight-btn bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-semibold hover:bg-green-200">👥
                             Community Benefit</button>
-                        <button onclick="showInsight('trends')"
-                            class="insight-btn bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm font-semibold hover:bg-purple-200">📈
-                            Monthly Trends</button>
                         <button onclick="showInsight('regulars')"
-                            class="insight-btn bg-indigo-100 text-indigo-700 px-4 py-2 rounded-full text-sm font-semibold hover:bg-indigo-200">🔄
+                            class="insight-btn bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm font-semibold hover:bg-purple-200">🔄
                             Returning Visitors</button>
                     </div>
 
-                    <!-- Insight Display Area -->
                     <div id="insightDisplay" class="mt-6 hidden fade-in">
                         <div class="bg-gray-50 rounded-xl p-6 border border-gray-100">
                             <h4 id="insightTitle" class="font-bold text-gray-800 text-lg mb-4"></h4>
@@ -342,20 +419,19 @@
                 </section>
 
                 <!-- ====================================== -->
-                <!-- MAIN GRID: Charts + Vibes -->
+                <!-- MAIN GRID -->
                 <!-- ====================================== -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                    <!-- LEFT: Program Effectiveness -->
+                    <!-- LEFT: Program & Charts -->
                     <div class="lg:col-span-2 space-y-6">
 
-                        <!-- Program Scores Table -->
+                        <!-- Program Mood Scores Table -->
                         <div class="card p-6">
                             <div class="flex items-center justify-between mb-4">
                                 <div>
-                                    <h3 class="font-bold text-gray-800 text-lg">🏆 Program Effectiveness</h3>
-                                    <p class="text-xs text-gray-500">All scores on 1-3 scale (3 = Yes, 2 = Somewhat, 1 =
-                                        No)</p>
+                                    <h3 class="font-bold text-gray-800 text-lg">🏆 Program Mood Scores</h3>
+                                    <p class="text-xs text-gray-500">Average Before/After mood on 1-5 scale</p>
                                 </div>
                             </div>
                             <div class="overflow-x-auto">
@@ -363,18 +439,10 @@
                                     <thead>
                                         <tr class="border-b-2 border-gray-200">
                                             <th class="text-left py-3 px-2 font-bold text-gray-700">Program</th>
-                                            <th class="text-center py-3 px-1 font-bold text-gray-700 text-xs">😌 Calm
-                                            </th>
-                                            <th class="text-center py-3 px-1 font-bold text-gray-700 text-xs">🌿 Nature
-                                            </th>
-                                            <th class="text-center py-3 px-1 font-bold text-gray-700 text-xs">🤝 Social
-                                            </th>
-                                            <th class="text-center py-3 px-1 font-bold text-gray-700 text-xs">📚 Learn
-                                            </th>
-                                            <th class="text-center py-3 px-1 font-bold text-gray-700 text-xs">👥 Comm
-                                            </th>
-                                            <th class="text-center py-3 px-2 font-bold text-gray-700 text-xs">⭐ Overall
-                                            </th>
+                                            <th class="text-center py-3 px-2 font-bold text-gray-700">😫 Before</th>
+                                            <th class="text-center py-3 px-2 font-bold text-gray-700">🥰 After</th>
+                                            <th class="text-center py-3 px-2 font-bold text-gray-700">🌿 Nature</th>
+                                            <th class="text-center py-3 px-2 font-bold text-gray-700">📈 Boost</th>
                                         </tr>
                                     </thead>
                                     <tbody id="programTable"></tbody>
@@ -388,7 +456,7 @@
                             <!-- Mission Radar -->
                             <div class="card p-6">
                                 <h3 class="font-bold text-gray-800 mb-1">🕸️ Mission Matrix</h3>
-                                <p class="text-xs text-gray-500 mb-4">5-Point Impact Profile (1-3 Scale)</p>
+                                <p class="text-xs text-gray-500 mb-4">Impact Profile (1-5 Scale)</p>
                                 <div class="h-56">
                                     <canvas id="missionChart"></canvas>
                                 </div>
@@ -414,7 +482,7 @@
                                 </div>
                                 <div class="text-right">
                                     <span class="text-2xl font-bold text-farm-600" id="totalImpact">--</span>
-                                    <p class="text-xs text-gray-400">total responses</p>
+                                    <p class="text-xs text-gray-400">total</p>
                                 </div>
                             </div>
                             <div class="h-40">
@@ -424,22 +492,22 @@
 
                     </div>
 
-                    <!-- RIGHT: Good Vibes Feed -->
+                    <!-- RIGHT: Wall of Love -->
                     <div class="lg:col-span-1">
                         <div class="card h-full flex flex-col bg-gradient-to-b from-orange-50 to-white">
                             <div class="p-6 border-b border-orange-100">
                                 <h3 class="font-bold text-gray-800 flex items-center gap-2 text-lg">
                                     💌 Wall of Love
                                 </h3>
-                                <p class="text-sm text-gray-500">Standout moments from visitors</p>
+                                <p class="text-sm text-gray-500">Standout moments</p>
                             </div>
 
-                            <div id="vibesFeed" class="flex-1 overflow-y-auto p-4 space-y-3 max-h-[700px]">
+                            <div id="vibesFeed" class="flex-1 overflow-y-auto p-4 space-y-3 max-h-[600px]">
                                 <div class="text-center text-gray-400 py-10">Loading...</div>
                             </div>
 
                             <div class="p-4 bg-white border-t border-orange-100 text-center">
-                                <span class="text-xs text-gray-400">Updated in real-time</span>
+                                <span class="text-xs text-gray-400">Live updates</span>
                             </div>
                         </div>
                     </div>
@@ -462,7 +530,7 @@
                     </div>
                     <div class="mt-4 md:mt-0">
                         <span class="italic">"Labels stop at the gate"</span>
-                        <span class="ml-3 text-gray-300">• v8.0</span>
+                        <span class="ml-3 text-gray-300">• v8.5</span>
                     </div>
                 </div>
             </div>
@@ -568,38 +636,41 @@
             const nps = Math.round((recs / allResponses.length) * 100);
             document.getElementById('npsScore').textContent = nps + '%';
 
-            // Overall Impact Score (avg of all 1-3 scores)
-            let totalScore = 0, scoreCount = 0;
+            // Before/After Mood (1-5 scale from mood_before_raw and mood_after_raw)
+            let sumBefore = 0, sumAfter = 0, moodCount = 0;
             allResponses.forEach(r => {
-                const scores = [r.calmness_score, r.connection_nature_score, r.connection_others_score,
-                r.learning_intent_score, r.community_benefit_score, r.is_present_engaged].filter(Boolean);
-                if (scores.length) {
-                    totalScore += scores.reduce((a, b) => a + b, 0) / scores.length;
-                    scoreCount++;
+                if (r.mood_before_raw && r.mood_after_raw) {
+                    sumBefore += r.mood_before_raw;
+                    sumAfter += r.mood_after_raw;
+                    moodCount++;
                 }
             });
-            const avgImpact = scoreCount ? (totalScore / scoreCount).toFixed(2) : '--';
-            document.getElementById('impactScore').textContent = avgImpact;
+
+            if (moodCount > 0) {
+                const avgB = (sumBefore / moodCount).toFixed(1);
+                const avgA = (sumAfter / moodCount).toFixed(1);
+                const diff = (avgA - avgB).toFixed(1);
+                document.getElementById('avgBefore').textContent = avgB;
+                document.getElementById('avgAfter').textContent = avgA;
+                document.getElementById('impactDelta').textContent = `+${diff} points`;
+                document.getElementById('moodBoost').textContent = `+${diff}`;
+            }
 
             // Returning Rate
             const returning = allResponses.filter(r => r.is_returning_visitor === true).length;
             const returnRate = Math.round((returning / allResponses.length) * 100);
             document.getElementById('returningRate').textContent = returnRate + '%';
 
-            // Program Table
+            // Render components
             renderProgramTable();
-
-            // Charts
             renderMissionRadar();
             renderDemographics();
             renderGrowthChart();
-
-            // Vibes Feed
             renderVibesFeed();
         }
 
         // ============================================
-        // PROGRAM TABLE
+        // PROGRAM TABLE (1-5 Scale)
         // ============================================
         function renderProgramTable() {
             const programs = {};
@@ -607,38 +678,33 @@
             allResponses.forEach(r => {
                 const prog = r.experience_type || 'General Visit';
                 if (!programs[prog]) {
-                    programs[prog] = { count: 0, calm: [], nature: [], social: [], learn: [], comm: [] };
+                    programs[prog] = { count: 0, before: [], after: [], nature: [] };
                 }
                 programs[prog].count++;
-                if (r.calmness_score) programs[prog].calm.push(r.calmness_score);
-                if (r.connection_nature_score) programs[prog].nature.push(r.connection_nature_score);
-                if (r.connection_others_score) programs[prog].social.push(r.connection_others_score);
-                if (r.learning_intent_score) programs[prog].learn.push(r.learning_intent_score);
-                if (r.community_benefit_score) programs[prog].comm.push(r.community_benefit_score);
+                if (r.mood_before_raw) programs[prog].before.push(r.mood_before_raw);
+                if (r.mood_after_raw) programs[prog].after.push(r.mood_after_raw);
+                if (r.nature_connection_raw) programs[prog].nature.push(r.nature_connection_raw);
             });
 
             const sorted = Object.entries(programs).sort((a, b) => b[1].count - a[1].count).slice(0, 10);
 
-            const avg = arr => arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(2) : '--';
+            const avg = arr => arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : null;
             const scoreClass = val => {
-                if (val === '--') return 'bg-gray-100 text-gray-400';
+                if (val === null) return 'score-na';
                 const n = parseFloat(val);
-                if (n >= 2.7) return 'score-excellent';
-                if (n >= 2.3) return 'score-good';
-                if (n >= 1.8) return 'score-average';
-                return 'score-low';
+                if (n >= 4.5) return 'score-5';
+                if (n >= 3.5) return 'score-4';
+                if (n >= 2.5) return 'score-3';
+                if (n >= 1.5) return 'score-2';
+                return 'score-1';
             };
 
             document.getElementById('programTable').innerHTML = sorted.map(([name, stats]) => {
-                const calm = avg(stats.calm);
+                const before = avg(stats.before);
+                const after = avg(stats.after);
                 const nature = avg(stats.nature);
-                const social = avg(stats.social);
-                const learn = avg(stats.learn);
-                const comm = avg(stats.comm);
-                const overall = [calm, nature, social, learn, comm].filter(v => v !== '--').length
-                    ? ([calm, nature, social, learn, comm].filter(v => v !== '--').map(parseFloat).reduce((a, b) => a + b, 0) /
-                        [calm, nature, social, learn, comm].filter(v => v !== '--').length).toFixed(2)
-                    : '--';
+                const boost = before && after ? (parseFloat(after) - parseFloat(before)).toFixed(1) : null;
+                const boostClass = boost ? (parseFloat(boost) > 0 ? 'text-green-600' : 'text-red-500') : 'text-gray-400';
 
                 return `
                     <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
@@ -646,31 +712,27 @@
                             <span class="font-semibold text-gray-800">${name}</span>
                             <span class="text-xs text-gray-400 ml-1">(${stats.count})</span>
                         </td>
-                        <td class="text-center py-3 px-1"><span class="score-pill ${scoreClass(calm)}">${calm}</span></td>
-                        <td class="text-center py-3 px-1"><span class="score-pill ${scoreClass(nature)}">${nature}</span></td>
-                        <td class="text-center py-3 px-1"><span class="score-pill ${scoreClass(social)}">${social}</span></td>
-                        <td class="text-center py-3 px-1"><span class="score-pill ${scoreClass(learn)}">${learn}</span></td>
-                        <td class="text-center py-3 px-1"><span class="score-pill ${scoreClass(comm)}">${comm}</span></td>
-                        <td class="text-center py-3 px-2"><span class="score-pill ${scoreClass(overall)} text-base">${overall}</span></td>
+                        <td class="text-center py-3 px-2"><span class="score-pill ${scoreClass(before)}">${before || '--'}</span></td>
+                        <td class="text-center py-3 px-2"><span class="score-pill ${scoreClass(after)}">${after || '--'}</span></td>
+                        <td class="text-center py-3 px-2"><span class="score-pill ${scoreClass(nature)}">${nature || '--'}</span></td>
+                        <td class="text-center py-3 px-2 font-bold ${boostClass}">${boost ? (parseFloat(boost) > 0 ? '+' : '') + boost : '--'}</td>
                     </tr>
                 `;
             }).join('');
         }
 
         // ============================================
-        // CHARTS
+        // CHARTS (1-5 Scale)
         // ============================================
         function renderMissionRadar() {
-            const totals = { calm: 0, nature: 0, social: 0, learn: 0, comm: 0 };
+            const totals = { before: 0, after: 0, nature: 0 };
             let count = 0;
 
             allResponses.forEach(r => {
-                if (r.calmness_score || r.connection_nature_score) {
-                    totals.calm += r.calmness_score || 0;
-                    totals.nature += r.connection_nature_score || 0;
-                    totals.social += r.connection_others_score || 0;
-                    totals.learn += r.learning_intent_score || 0;
-                    totals.comm += r.community_benefit_score || 0;
+                if (r.mood_before_raw || r.mood_after_raw) {
+                    totals.before += r.mood_before_raw || 0;
+                    totals.after += r.mood_after_raw || 0;
+                    totals.nature += r.nature_connection_raw || 0;
                     count++;
                 }
             });
@@ -680,10 +742,16 @@
             new Chart(document.getElementById('missionChart'), {
                 type: 'radar',
                 data: {
-                    labels: ['Calmness', 'Nature', 'Community', 'Learning', 'Social'],
+                    labels: ['Before Mood', 'After Mood', 'Nature Connection', 'Would Recommend', 'Experience'],
                     datasets: [{
                         label: 'Avg Score',
-                        data: [avg(totals.calm), avg(totals.nature), avg(totals.comm), avg(totals.learn), avg(totals.social)],
+                        data: [
+                            avg(totals.before),
+                            avg(totals.after),
+                            avg(totals.nature),
+                            allResponses.filter(r => r.would_recommend).length / allResponses.length * 5,
+                            avg(totals.after) // Duplicate for visual balance
+                        ],
                         backgroundColor: 'rgba(132, 204, 22, 0.25)',
                         borderColor: '#84cc16',
                         borderWidth: 3,
@@ -694,7 +762,7 @@
                     }]
                 },
                 options: {
-                    scales: { r: { min: 0, max: 3, ticks: { stepSize: 1, font: { size: 10 } } } },
+                    scales: { r: { min: 0, max: 5, ticks: { stepSize: 1, font: { size: 10 } } } },
                     plugins: { legend: { display: false } }
                 }
             });
@@ -781,7 +849,7 @@
         }
 
         // ============================================
-        // QUICK INSIGHTS (Click handlers)
+        // QUICK INSIGHTS
         // ============================================
         function showInsight(type) {
             const display = document.getElementById('insightDisplay');
@@ -790,7 +858,6 @@
 
             display.classList.remove('hidden');
 
-            // Reset button states
             document.querySelectorAll('.insight-btn').forEach(b => b.classList.remove('active'));
             event.target.classList.add('active');
 
@@ -798,15 +865,14 @@
 
             switch (type) {
                 case 'zen':
-                    title.textContent = '🧘 The Zen Factor - Which programs create the most calm?';
-                    const zenData = getProgramScores('calmness_score');
-                    html = renderScoreTable(zenData, 'Calmness Score');
+                    title.textContent = '🧘 The Zen Factor - Which programs boost mood the most?';
+                    const zenData = getProgramMoodBoost();
+                    html = renderZenTable(zenData);
                     break;
 
                 case 'mission':
-                    title.textContent = '🎯 Mission Match - Nature vs People Connection';
-                    const missionData = getMissionMatch();
-                    html = renderMissionTable(missionData);
+                    title.textContent = '🎯 Mission Match - Before/After Mood by Program';
+                    html = renderMissionSummary();
                     break;
 
                 case 'demographics':
@@ -816,9 +882,8 @@
                     break;
 
                 case 'learning':
-                    title.textContent = '💡 Learning Intent - Will they apply what they learned?';
-                    const learnData = getLearningIntent();
-                    html = renderLearnTable(learnData);
+                    title.textContent = '💡 Learning Intent - Will they use what they learned?';
+                    html = '<p class="text-gray-500">Learning intent is tracked via community_benefit_score (1-3 scale mapped from survey).</p>';
                     break;
 
                 case 'referrals':
@@ -829,13 +894,8 @@
 
                 case 'community':
                     title.textContent = '👥 Community Benefit - Do they believe community would benefit?';
-                    const commData = getProgramScores('community_benefit_score');
-                    html = renderScoreTable(commData, 'Community Score');
-                    break;
-
-                case 'trends':
-                    title.textContent = '📈 Monthly Trends - How are we doing over time?';
-                    html = '<p class="text-gray-500">See the Growth Chart below for cumulative trends.</p>';
+                    const commData = getCommunityBenefit();
+                    html = renderCommunityTable(commData);
                     break;
 
                 case 'regulars':
@@ -844,13 +904,13 @@
                     const firstTimers = allResponses.length - returning;
                     html = `
                         <div class="flex gap-4">
-                            <div class="bg-purple-100 rounded-xl p-4 flex-1 text-center">
-                                <p class="text-3xl font-bold text-purple-700">${returning}</p>
-                                <p class="text-sm text-purple-600">Returning Visitors</p>
+                            <div class="bg-purple-100 rounded-xl p-6 flex-1 text-center">
+                                <p class="text-4xl font-bold text-purple-700">${returning}</p>
+                                <p class="text-sm text-purple-600 mt-1">Returning Visitors</p>
                             </div>
-                            <div class="bg-gray-100 rounded-xl p-4 flex-1 text-center">
-                                <p class="text-3xl font-bold text-gray-700">${firstTimers}</p>
-                                <p class="text-sm text-gray-600">First-Time Visitors</p>
+                            <div class="bg-gray-100 rounded-xl p-6 flex-1 text-center">
+                                <p class="text-4xl font-bold text-gray-700">${firstTimers}</p>
+                                <p class="text-sm text-gray-600 mt-1">First-Time Visitors</p>
                             </div>
                         </div>
                     `;
@@ -860,41 +920,22 @@
             content.innerHTML = html;
         }
 
-        // Helper functions for insights
-        function getProgramScores(field) {
+        function getProgramMoodBoost() {
             const progs = {};
             allResponses.forEach(r => {
                 const p = r.experience_type || 'General';
-                if (!progs[p]) progs[p] = { sum: 0, count: 0 };
-                if (r[field]) {
-                    progs[p].sum += r[field];
-                    progs[p].count++;
-                }
+                if (!progs[p]) progs[p] = { before: [], after: [] };
+                if (r.mood_before_raw) progs[p].before.push(r.mood_before_raw);
+                if (r.mood_after_raw) progs[p].after.push(r.mood_after_raw);
             });
             return Object.entries(progs)
-                .filter(([_, v]) => v.count >= 2)
-                .map(([name, v]) => ({ name, avg: (v.sum / v.count).toFixed(2), count: v.count }))
-                .sort((a, b) => parseFloat(b.avg) - parseFloat(a.avg));
-        }
-
-        function getMissionMatch() {
-            const progs = {};
-            allResponses.forEach(r => {
-                const p = r.experience_type || 'General';
-                if (!progs[p]) progs[p] = { nature: [], people: [], count: 0 };
-                progs[p].count++;
-                if (r.connection_nature_score) progs[p].nature.push(r.connection_nature_score);
-                if (r.connection_others_score) progs[p].people.push(r.connection_others_score);
-            });
-            return Object.entries(progs)
-                .filter(([_, v]) => v.count >= 2)
-                .map(([name, v]) => ({
-                    name,
-                    nature: v.nature.length ? (v.nature.reduce((a, b) => a + b, 0) / v.nature.length).toFixed(2) : '--',
-                    people: v.people.length ? (v.people.reduce((a, b) => a + b, 0) / v.people.length).toFixed(2) : '--',
-                    count: v.count
-                }))
-                .sort((a, b) => parseFloat(b.nature || 0) - parseFloat(a.nature || 0));
+                .filter(([_, v]) => v.before.length >= 2 && v.after.length >= 2)
+                .map(([name, v]) => {
+                    const avgB = v.before.reduce((a, b) => a + b, 0) / v.before.length;
+                    const avgA = v.after.reduce((a, b) => a + b, 0) / v.after.length;
+                    return { name, before: avgB.toFixed(1), after: avgA.toFixed(1), boost: (avgA - avgB).toFixed(1), count: v.after.length };
+                })
+                .sort((a, b) => parseFloat(b.boost) - parseFloat(a.boost));
         }
 
         function getDemographics() {
@@ -907,28 +948,6 @@
             return Object.entries(ages)
                 .map(([age, count]) => ({ age, count, pct: ((count / total) * 100).toFixed(1) }))
                 .sort((a, b) => b.count - a.count);
-        }
-
-        function getLearningIntent() {
-            const progs = {};
-            allResponses.forEach(r => {
-                const p = r.experience_type || 'General';
-                if (!progs[p]) progs[p] = { yes: 0, somewhat: 0, no: 0, total: 0 };
-                progs[p].total++;
-                if (r.learning_intent_score === 3) progs[p].yes++;
-                else if (r.learning_intent_score === 2) progs[p].somewhat++;
-                else progs[p].no++;
-            });
-            return Object.entries(progs)
-                .filter(([_, v]) => v.total >= 2)
-                .map(([name, v]) => ({
-                    name,
-                    yes: v.yes,
-                    somewhat: v.somewhat,
-                    no: v.no,
-                    yesPct: ((v.yes / v.total) * 100).toFixed(1)
-                }))
-                .sort((a, b) => parseFloat(b.yesPct) - parseFloat(a.yesPct));
         }
 
         function getReferralSources() {
@@ -944,21 +963,40 @@
                 .slice(0, 8);
         }
 
-        // Render helpers
-        function renderScoreTable(data, label) {
+        function getCommunityBenefit() {
+            const progs = {};
+            allResponses.forEach(r => {
+                const p = r.experience_type || 'General';
+                if (!progs[p]) progs[p] = { scores: [], count: 0 };
+                progs[p].count++;
+                if (r.community_benefit_score) progs[p].scores.push(r.community_benefit_score);
+            });
+            return Object.entries(progs)
+                .filter(([_, v]) => v.scores.length >= 2)
+                .map(([name, v]) => ({
+                    name,
+                    avg: (v.scores.reduce((a, b) => a + b, 0) / v.scores.length).toFixed(2),
+                    count: v.count
+                }))
+                .sort((a, b) => parseFloat(b.avg) - parseFloat(a.avg));
+        }
+
+        function renderZenTable(data) {
             return `
                 <table class="w-full text-sm">
                     <thead><tr class="border-b border-gray-200">
                         <th class="text-left py-2">Program</th>
-                        <th class="text-center py-2">${label}</th>
-                        <th class="text-center py-2">Responses</th>
+                        <th class="text-center py-2">Before</th>
+                        <th class="text-center py-2">After</th>
+                        <th class="text-center py-2">Boost</th>
                     </tr></thead>
                     <tbody>
                         ${data.map(d => `
                             <tr class="border-b border-gray-100">
-                                <td class="py-2 font-medium">${d.name}</td>
-                                <td class="py-2 text-center"><span class="bg-farm-100 text-farm-700 px-3 py-1 rounded-full font-bold">${d.avg}</span></td>
-                                <td class="py-2 text-center text-gray-500">${d.count}</td>
+                                <td class="py-2 font-medium">${d.name} <span class="text-gray-400 text-xs">(${d.count})</span></td>
+                                <td class="py-2 text-center"><span class="score-pill score-${Math.round(d.before)}">${d.before}</span></td>
+                                <td class="py-2 text-center"><span class="score-pill score-${Math.round(d.after)}">${d.after}</span></td>
+                                <td class="py-2 text-center font-bold ${parseFloat(d.boost) > 0 ? 'text-green-600' : 'text-red-500'}">${parseFloat(d.boost) > 0 ? '+' : ''}${d.boost}</td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -966,29 +1004,34 @@
             `;
         }
 
-        function renderMissionTable(data) {
+        function renderMissionSummary() {
+            let sumBefore = 0, sumAfter = 0, count = 0;
+            allResponses.forEach(r => {
+                if (r.mood_before_raw && r.mood_after_raw) {
+                    sumBefore += r.mood_before_raw;
+                    sumAfter += r.mood_after_raw;
+                    count++;
+                }
+            });
+            const before = count ? (sumBefore / count).toFixed(2) : '--';
+            const after = count ? (sumAfter / count).toFixed(2) : '--';
+            const boost = count ? (sumAfter / count - sumBefore / count).toFixed(2) : '--';
+
             return `
-                <table class="w-full text-sm">
-                    <thead><tr class="border-b border-gray-200">
-                        <th class="text-left py-2">Program</th>
-                        <th class="text-center py-2">🌿 Nature</th>
-                        <th class="text-center py-2">🤝 People</th>
-                        <th class="text-center py-2">Gap</th>
-                    </tr></thead>
-                    <tbody>
-                        ${data.map(d => {
-                const gap = (parseFloat(d.nature) - parseFloat(d.people)).toFixed(2);
-                return `
-                                <tr class="border-b border-gray-100">
-                                    <td class="py-2 font-medium">${d.name}</td>
-                                    <td class="py-2 text-center"><span class="bg-green-100 text-green-700 px-3 py-1 rounded-full font-bold">${d.nature}</span></td>
-                                    <td class="py-2 text-center"><span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-bold">${d.people}</span></td>
-                                    <td class="py-2 text-center text-gray-500">${gap}</td>
-                                </tr>
-                            `;
-            }).join('')}
-                    </tbody>
-                </table>
+                <div class="grid grid-cols-3 gap-4 text-center">
+                    <div class="bg-gray-100 rounded-xl p-4">
+                        <p class="text-3xl font-bold text-gray-600">${before}</p>
+                        <p class="text-sm text-gray-500">Avg Before</p>
+                    </div>
+                    <div class="bg-green-100 rounded-xl p-4">
+                        <p class="text-3xl font-bold text-green-600">${after}</p>
+                        <p class="text-sm text-green-600">Avg After</p>
+                    </div>
+                    <div class="bg-farm-100 rounded-xl p-4">
+                        <p class="text-3xl font-bold text-farm-700">+${boost}</p>
+                        <p class="text-sm text-farm-600">Boost</p>
+                    </div>
+                </div>
             `;
         }
 
@@ -1006,31 +1049,6 @@
             `;
         }
 
-        function renderLearnTable(data) {
-            return `
-                <table class="w-full text-sm">
-                    <thead><tr class="border-b border-gray-200">
-                        <th class="text-left py-2">Program</th>
-                        <th class="text-center py-2">Yes (3)</th>
-                        <th class="text-center py-2">Somewhat (2)</th>
-                        <th class="text-center py-2">No (1)</th>
-                        <th class="text-center py-2">Yes %</th>
-                    </tr></thead>
-                    <tbody>
-                        ${data.map(d => `
-                            <tr class="border-b border-gray-100">
-                                <td class="py-2 font-medium">${d.name}</td>
-                                <td class="py-2 text-center text-green-600 font-bold">${d.yes}</td>
-                                <td class="py-2 text-center text-yellow-600">${d.somewhat}</td>
-                                <td class="py-2 text-center text-red-500">${d.no}</td>
-                                <td class="py-2 text-center"><span class="bg-pink-100 text-pink-700 px-3 py-1 rounded-full font-bold">${d.yesPct}%</span></td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-        }
-
         function renderRefTable(data) {
             return `
                 <div class="space-y-2">
@@ -1038,7 +1056,7 @@
                         <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
                             <span class="font-medium text-gray-800">${d.source}</span>
                             <div class="flex items-center gap-3">
-                                <span class="text-sm text-gray-500">${d.count} visitors</span>
+                                <span class="text-sm text-gray-500">${d.count}</span>
                                 <span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full font-bold text-sm">${d.pct}%</span>
                             </div>
                         </div>
@@ -1047,21 +1065,39 @@
             `;
         }
 
+        function renderCommunityTable(data) {
+            return `
+                <table class="w-full text-sm">
+                    <thead><tr class="border-b border-gray-200">
+                        <th class="text-left py-2">Program</th>
+                        <th class="text-center py-2">Community Score (1-3)</th>
+                        <th class="text-center py-2">Responses</th>
+                    </tr></thead>
+                    <tbody>
+                        ${data.map(d => `
+                            <tr class="border-b border-gray-100">
+                                <td class="py-2 font-medium">${d.name}</td>
+                                <td class="py-2 text-center"><span class="bg-green-100 text-green-700 px-3 py-1 rounded-full font-bold">${d.avg}</span></td>
+                                <td class="py-2 text-center text-gray-500">${d.count}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
         // ============================================
         // EXPORT CSV
         // ============================================
         function exportCSV() {
-            const headers = ['Date', 'Program', 'Age', 'Calmness', 'Nature', 'Social', 'Learning', 'Community', 'Present', 'Recommend', 'Returning', 'Referral', 'Standout'];
+            const headers = ['Date', 'Program', 'Age', 'Mood Before (1-5)', 'Mood After (1-5)', 'Nature (1-5)', 'Recommend', 'Returning', 'Referral', 'Standout'];
             const rows = allResponses.map(r => [
                 new Date(r.created_at).toLocaleDateString(),
                 r.experience_type || '',
                 r.age_range_bracket || '',
-                r.calmness_score || '',
-                r.connection_nature_score || '',
-                r.connection_others_score || '',
-                r.learning_intent_score || '',
-                r.community_benefit_score || '',
-                r.is_present_engaged || '',
+                r.mood_before_raw || '',
+                r.mood_after_raw || '',
+                r.nature_connection_raw || '',
                 r.would_recommend ? 'Yes' : 'No',
                 r.is_returning_visitor ? 'Yes' : 'No',
                 r.referral_source || '',
