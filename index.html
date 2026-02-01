@@ -902,14 +902,14 @@
         }
 
         function selectReferral(btn) {
-            document.querySelectorAll('#screen7 .card-btn').forEach(b => b.classList.remove('selected'));
+            document.querySelectorAll('#screen8 .card-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             data.referral_source = btn.dataset.value;
             setTimeout(nextScreen, 250);
         }
 
         function selectAge(btn) {
-            document.querySelectorAll('#screen8 .card-btn').forEach(b => b.classList.remove('selected'));
+            document.querySelectorAll('#screen9 .card-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             data.age_range = btn.dataset.value;
             setTimeout(nextScreen, 250);
