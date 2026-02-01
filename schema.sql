@@ -212,9 +212,9 @@ COMMENT ON COLUMN surveyresponses.is_returning_visitor IS 'True if the user self
 -- RLS for surveyresponses - THE CRITICAL PART
 ALTER TABLE surveyresponses ENABLE ROW LEVEL SECURITY;
 
--- Policy: Anonymous users CAN insert surveys
+-- Policy: Anonymous users CAN insert surveys (Fixed for Supabase)
 CREATE POLICY "Allow public survey submissions" ON surveyresponses
-    FOR INSERT TO anon, authenticated
+    FOR INSERT TO PUBLIC
     WITH CHECK (true);
 
 -- Policy: Only authenticated users can read
