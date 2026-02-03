@@ -551,7 +551,7 @@
         <div class="progress-track">
             <div class="progress-fill" id="progressBar" style="width: 0%"></div>
         </div>
-        <div class="progress-text" id="progressText">Question 1 of 8</div>
+        <div class="progress-text" id="progressText">Question 1 of 11</div>
     </div>
 
     <div class="survey-wrap">
@@ -580,115 +580,159 @@
             <h2>What did you do today?</h2>
             <p class="subtitle">Select your experience</p>
             <div class="card-grid" role="radiogroup" aria-label="Select program">
-                <button class="card-btn" data-value="Cow Yoga" onclick="selectProgram(this)"><span
-                        class="card-emoji">🐄</span> Cow Yoga</button>
-                <button class="card-btn" data-value="Yoga with the Animals" onclick="selectProgram(this)"><span
-                        class="card-emoji">🧘</span> Yoga with Animals</button>
-                <button class="card-btn" data-value="Seedlings for Spring" onclick="selectProgram(this)"><span
-                        class="card-emoji">🌱</span> Seedlings for Spring</button>
-                <button class="card-btn" data-value="Open Farm (Second Saturdays)" onclick="selectProgram(this)"><span
-                        class="card-emoji">🌾</span> Open Farm Day</button>
+                <button class="card-btn" data-value="Open Farm on Second Saturday" onclick="selectProgram(this)"><span
+                        class="card-emoji">🌾</span> Open Farm on Second Saturday</button>
+                <button class="card-btn" data-value="Yoga on the Farm" onclick="selectProgram(this)"><span
+                        class="card-emoji">🧘</span> Yoga on the Farm</button>
                 <button class="card-btn" data-value="Tuesday Night Tuck-In" onclick="selectProgram(this)"><span
-                        class="card-emoji">🐓</span> Tuesday Tuck-In</button>
-                <button class="card-btn" data-value="JusTeenys Greenies" onclick="selectProgram(this)"><span
-                        class="card-emoji">👶</span> JusTeenys Greenies</button>
+                        class="card-emoji">🐓</span> Tuesday Night Tuck-In</button>
+                <button class="card-btn" data-value="Group Program" onclick="selectProgram(this)"><span
+                        class="card-emoji">👥</span> Group Program</button>
             </div>
             <button class="skip" onclick="nextScreen()">Skip this question</button>
         </div>
 
-        <!-- SCREEN 3: Mood Before -->
+        <!-- SCREEN 3: Age (MOVED TO #3 per Tiffany request) -->
         <div class="screen" id="screen3">
-            <h2>How did you feel <em>before</em> your visit?</h2>
-            <p class="subtitle">Tap the face that best matches</p>
-            <div class="rating-group" role="radiogroup" aria-label="Mood before visit">
-                <div class="rating-item"><button class="rating-btn" data-value="1" onclick="selectMood(this, 'before')"
-                        aria-label="Very stressed">😫</button><span class="rating-label">Awful</span></div>
-                <div class="rating-item"><button class="rating-btn" data-value="2" onclick="selectMood(this, 'before')"
-                        aria-label="Stressed">😕</button><span class="rating-label">Meh</span></div>
-                <div class="rating-item"><button class="rating-btn" data-value="3" onclick="selectMood(this, 'before')"
-                        aria-label="Neutral">😐</button><span class="rating-label">Okay</span></div>
-                <div class="rating-item"><button class="rating-btn" data-value="4" onclick="selectMood(this, 'before')"
-                        aria-label="Good">🙂</button><span class="rating-label">Good</span></div>
-                <div class="rating-item"><button class="rating-btn" data-value="5" onclick="selectMood(this, 'before')"
-                        aria-label="Amazing">🤩</button><span class="rating-label">Great!</span></div>
+            <h2>What's your age range?</h2>
+            <p class="subtitle">Helps us understand our visitors</p>
+            <div class="card-grid" role="radiogroup" aria-label="Age range">
+                <button class="card-btn" data-value="0-17" onclick="selectAge(this)"><span class="card-emoji">🧒</span>
+                    Under 18</button>
+                <button class="card-btn" data-value="18-25" onclick="selectAge(this)"><span class="card-emoji">🧑</span>
+                    18-25</button>
+                <button class="card-btn" data-value="26-40" onclick="selectAge(this)"><span class="card-emoji">👨</span>
+                    26-40</button>
+                <button class="card-btn" data-value="41-60" onclick="selectAge(this)"><span
+                        class="card-emoji">👩‍🦳</span> 41-60</button>
+                <button class="card-btn" data-value="61+" onclick="selectAge(this)"><span class="card-emoji">👴</span>
+                    61+</button>
             </div>
             <button class="skip" onclick="nextScreen()">Skip this question</button>
         </div>
 
-        <!-- SCREEN 4: Mood After -->
+        <!-- SCREEN 4: Mission Q1 - Present & Engaged -->
         <div class="screen" id="screen4">
-            <h2>How do you feel <em>now</em>?</h2>
-            <p class="subtitle">After your experience</p>
-            <div class="rating-group" role="radiogroup" aria-label="Mood after visit">
-                <div class="rating-item"><button class="rating-btn" data-value="1" onclick="selectMood(this, 'after')"
-                        aria-label="Very stressed">😫</button><span class="rating-label">Awful</span></div>
-                <div class="rating-item"><button class="rating-btn" data-value="2" onclick="selectMood(this, 'after')"
-                        aria-label="Stressed">😕</button><span class="rating-label">Meh</span></div>
-                <div class="rating-item"><button class="rating-btn" data-value="3" onclick="selectMood(this, 'after')"
-                        aria-label="Neutral">😐</button><span class="rating-label">Okay</span></div>
-                <div class="rating-item"><button class="rating-btn" data-value="4" onclick="selectMood(this, 'after')"
-                        aria-label="Good">🙂</button><span class="rating-label">Good</span></div>
-                <div class="rating-item"><button class="rating-btn" data-value="5" onclick="selectMood(this, 'after')"
-                        aria-label="Amazing">🤩</button><span class="rating-label">Amazing!</span></div>
+            <h2>Did you feel present and engaged?</h2>
+            <p class="subtitle">During your experience</p>
+            <div class="nps-row" role="radiogroup" aria-label="Present and engaged">
+                <button class="nps-btn no" data-value="1" onclick="selectMission(this, 'present_engaged')"><span
+                        class="nps-emoji">👎</span><span class="nps-text">No</span></button>
+                <button class="nps-btn maybe" data-value="2" onclick="selectMission(this, 'present_engaged')"><span
+                        class="nps-emoji">🤷</span><span class="nps-text">Somewhat</span></button>
+                <button class="nps-btn yes" data-value="3" onclick="selectMission(this, 'present_engaged')"><span
+                        class="nps-emoji">✅</span><span class="nps-text">Yes</span></button>
             </div>
             <button class="skip" onclick="nextScreen()">Skip this question</button>
         </div>
 
-        <!-- SCREEN 5: Nature Connection -->
+        <!-- SCREEN 5: Mission Q2 - Connection to Others -->
         <div class="screen" id="screen5">
-            <h2>Did you feel connected to nature?</h2>
-            <p class="subtitle">Animals, plants, the outdoors...</p>
-            <div class="rating-group" role="radiogroup" aria-label="Nature connection">
-                <div class="rating-item"><button class="rating-btn" data-value="1" onclick="selectConnection(this)"
-                        aria-label="Not at all">💔</button><span class="rating-label">Nope</span></div>
-                <div class="rating-item"><button class="rating-btn" data-value="2" onclick="selectConnection(this)"
-                        aria-label="A little">🤏</button><span class="rating-label">A bit</span></div>
-                <div class="rating-item"><button class="rating-btn" data-value="3" onclick="selectConnection(this)"
-                        aria-label="Yes">💚</button><span class="rating-label">Yes!</span></div>
-                <div class="rating-item"><button class="rating-btn" data-value="4" onclick="selectConnection(this)"
-                        aria-label="Very much">🌟</button><span class="rating-label">So much!</span></div>
-                <div class="rating-item"><button class="rating-btn" data-value="5" onclick="selectConnection(this)"
-                        aria-label="Totally transformed">🥹</button><span class="rating-label">Moved</span></div>
+            <h2>Feel more connected to others?</h2>
+            <p class="subtitle">Family, peers, staff, or participants</p>
+            <div class="nps-row" role="radiogroup" aria-label="Connection to others">
+                <button class="nps-btn no" data-value="1" onclick="selectMission(this, 'connection_others')"><span
+                        class="nps-emoji">👎</span><span class="nps-text">No</span></button>
+                <button class="nps-btn maybe" data-value="2" onclick="selectMission(this, 'connection_others')"><span
+                        class="nps-emoji">🤷</span><span class="nps-text">Somewhat</span></button>
+                <button class="nps-btn yes" data-value="3" onclick="selectMission(this, 'connection_others')"><span
+                        class="nps-emoji">✅</span><span class="nps-text">Yes</span></button>
             </div>
             <button class="skip" onclick="nextScreen()">Skip this question</button>
         </div>
 
-        <!-- SCREEN 6: Skills Learned (Updated for Accessibility) -->
+        <!-- SCREEN 6: Mission Q3 - Connection to Animals/Nature -->
         <div class="screen" id="screen6">
-            <h2>Did you learn something new?</h2>
-            <p class="subtitle">About animals, plants, or yourself...</p>
-            <div class="rating-group" role="radiogroup" aria-label="Skills learned">
-                <div class="rating-item"><button class="rating-btn" data-value="0" onclick="selectSkill(this)"
-                        aria-label="Nothing new">🤷‍♀️</button><span class="rating-label">Nope</span></div>
-                <div class="rating-item"><button class="rating-btn" data-value="25" onclick="selectSkill(this)"
-                        aria-label="A little bit">🤏</button><span class="rating-label">A bit</span></div>
-                <div class="rating-item"><button class="rating-btn" data-value="50" onclick="selectSkill(this)"
-                        aria-label="Some things">🌱</button><span class="rating-label">Some</span></div>
-                <div class="rating-item"><button class="rating-btn" data-value="75" onclick="selectSkill(this)"
-                        aria-label="A lot">🧠</button><span class="rating-label">A lot</span></div>
-                <div class="rating-item"><button class="rating-btn" data-value="100" onclick="selectSkill(this)"
-                        aria-label="Yes absolutely">🤯</button><span class="rating-label">Yes!</span></div>
+            <h2>Feel more connected to nature?</h2>
+            <p class="subtitle">Animals, nature, or the environment</p>
+            <div class="nps-row" role="radiogroup" aria-label="Connection to nature">
+                <button class="nps-btn no" data-value="1" onclick="selectMission(this, 'connection_nature')"><span
+                        class="nps-emoji">👎</span><span class="nps-text">No</span></button>
+                <button class="nps-btn maybe" data-value="2" onclick="selectMission(this, 'connection_nature')"><span
+                        class="nps-emoji">🤷</span><span class="nps-text">Somewhat</span></button>
+                <button class="nps-btn yes" data-value="3" onclick="selectMission(this, 'connection_nature')"><span
+                        class="nps-emoji">✅</span><span class="nps-text">Yes</span></button>
             </div>
             <button class="skip" onclick="nextScreen()">Skip this question</button>
         </div>
 
-        <!-- SCREEN 7: Recommend (Renumbered) -->
+        <!-- SCREEN 7: Mission Q4 - Calmness/Grounded -->
         <div class="screen" id="screen7">
-            <h2>Would you tell a friend?</h2>
-            <p class="subtitle">"Hey, you should check out this place!"</p>
-            <div class="nps-row" role="radiogroup" aria-label="Recommendation">
-                <button class="nps-btn no" data-value="no" onclick="selectNPS(this)"><span
-                        class="nps-emoji">😬</span><span class="nps-text">Nah</span></button>
-                <button class="nps-btn maybe" data-value="maybe" onclick="selectNPS(this)"><span
-                        class="nps-emoji">🤔</span><span class="nps-text">Maybe</span></button>
-                <button class="nps-btn yes" data-value="yes" onclick="selectNPS(this)"><span
-                        class="nps-emoji">🙌</span><span class="nps-text">Yes!</span></button>
+            <h2>Feel calmer or more grounded?</h2>
+            <p class="subtitle">Less stressed during or after your experience</p>
+            <div class="nps-row" role="radiogroup" aria-label="Calmness">
+                <button class="nps-btn no" data-value="1" onclick="selectMission(this, 'calmness')"><span
+                        class="nps-emoji">👎</span><span class="nps-text">No</span></button>
+                <button class="nps-btn maybe" data-value="2" onclick="selectMission(this, 'calmness')"><span
+                        class="nps-emoji">🤷</span><span class="nps-text">Somewhat</span></button>
+                <button class="nps-btn yes" data-value="3" onclick="selectMission(this, 'calmness')"><span
+                        class="nps-emoji">✅</span><span class="nps-text">Yes</span></button>
             </div>
             <button class="skip" onclick="nextScreen()">Skip this question</button>
         </div>
 
-        <!-- SCREEN 8: Referral (Renumbered) -->
+        <!-- SCREEN 8: Mission Q5 - Learning Intent -->
         <div class="screen" id="screen8">
+            <h2>Will you use what you learned?</h2>
+            <p class="subtitle">To connect more intentionally with others, animals, or nature</p>
+            <div class="nps-row" role="radiogroup" aria-label="Learning intent">
+                <button class="nps-btn no" data-value="1" onclick="selectMission(this, 'learning_intent')"><span
+                        class="nps-emoji">👎</span><span class="nps-text">No</span></button>
+                <button class="nps-btn maybe" data-value="2" onclick="selectMission(this, 'learning_intent')"><span
+                        class="nps-emoji">🤷</span><span class="nps-text">Somewhat</span></button>
+                <button class="nps-btn yes" data-value="3" onclick="selectMission(this, 'learning_intent')"><span
+                        class="nps-emoji">✅</span><span class="nps-text">Yes</span></button>
+            </div>
+            <button class="skip" onclick="nextScreen()">Skip this question</button>
+        </div>
+
+        <!-- SCREEN 9: Mission Q6 - Community Benefit -->
+        <div class="screen" id="screen9">
+            <h2>Should we have more of this?</h2>
+            <p class="subtitle">Do you believe our community would benefit from more opportunities like this?</p>
+            <div class="nps-row" role="radiogroup" aria-label="Community benefit">
+                <button class="nps-btn no" data-value="1" onclick="selectMission(this, 'community_benefit')"><span
+                        class="nps-emoji">👎</span><span class="nps-text">No</span></button>
+                <button class="nps-btn maybe" data-value="2" onclick="selectMission(this, 'community_benefit')"><span
+                        class="nps-emoji">🤷</span><span class="nps-text">Somewhat</span></button>
+                <button class="nps-btn yes" data-value="3" onclick="selectMission(this, 'community_benefit')"><span
+                        class="nps-emoji">✅</span><span class="nps-text">Yes</span></button>
+            </div>
+            <button class="skip" onclick="nextScreen()">Skip this question</button>
+        </div>
+
+        <!-- SCREEN 10: Return Intent (NEW) -->
+        <div class="screen" id="screen10">
+            <h2>Will you come back to visit us?</h2>
+            <p class="subtitle">We'd love to see you again!</p>
+            <div class="nps-row" role="radiogroup" aria-label="Return intent">
+                <button class="nps-btn no" data-value="false" onclick="selectReturnIntent(this)"><span
+                        class="nps-emoji">😬</span><span class="nps-text">Nah</span></button>
+                <button class="nps-btn maybe" data-value="maybe" onclick="selectReturnIntent(this)"><span
+                        class="nps-emoji">🤔</span><span class="nps-text">Maybe</span></button>
+                <button class="nps-btn yes" data-value="true" onclick="selectReturnIntent(this)"><span
+                        class="nps-emoji">🤩</span><span class="nps-text">Yes!</span></button>
+            </div>
+            <button class="skip" onclick="nextScreen()">Skip this question</button>
+        </div>
+
+        <!-- SCREEN 11: Donation Interest (NEW - 18+ ONLY) -->
+        <div class="screen" id="screen11">
+            <h2>Support our mission?</h2>
+            <p class="subtitle">Consider making a one-time or recurring donation</p>
+            <div class="nps-row" role="radiogroup" aria-label="Donation interest">
+                <button class="nps-btn no" data-value="no" onclick="selectDonation(this)"><span
+                        class="nps-emoji">🙅</span><span class="nps-text">No thanks</span></button>
+                <button class="nps-btn maybe" data-value="maybe" onclick="selectDonation(this)"><span
+                        class="nps-emoji">🤔</span><span class="nps-text">Maybe later</span></button>
+                <button class="nps-btn yes" data-value="yes" onclick="selectDonation(this)"><span
+                        class="nps-emoji">💚</span><span class="nps-text">Yes, donate</span></button>
+            </div>
+            <button class="skip" onclick="nextScreen()">Skip this question</button>
+        </div>
+
+        <!-- SCREEN 12: Referral -->
+        <div class="screen" id="screen12">
             <h2>How did you find us?</h2>
             <p class="subtitle">Select one</p>
             <div class="ref-grid" role="radiogroup" aria-label="Referral source">
@@ -708,27 +752,8 @@
             <button class="skip" onclick="nextScreen()">Skip this question</button>
         </div>
 
-        <!-- SCREEN 9: Age (Renumbered) -->
-        <div class="screen" id="screen9">
-            <h2>What's your age range?</h2>
-            <p class="subtitle">Helps us understand our visitors</p>
-            <div class="card-grid" role="radiogroup" aria-label="Age range">
-                <button class="card-btn" data-value="0-17" onclick="selectAge(this)"><span class="card-emoji">🧒</span>
-                    Under 18</button>
-                <button class="card-btn" data-value="18-25" onclick="selectAge(this)"><span class="card-emoji">🧑</span>
-                    18-25</button>
-                <button class="card-btn" data-value="26-40" onclick="selectAge(this)"><span class="card-emoji">👨</span>
-                    26-40</button>
-                <button class="card-btn" data-value="41-60" onclick="selectAge(this)"><span
-                        class="card-emoji">👩‍🦳</span> 41-60</button>
-                <button class="card-btn" data-value="61+" onclick="selectAge(this)"><span class="card-emoji">👴</span>
-                    61+</button>
-            </div>
-            <button class="skip" onclick="nextScreen()">Skip this question</button>
-        </div>
-
-        <!-- SCREEN 10: Standout Moment (Renumbered) -->
-        <div class="screen" id="screen10">
+        <!-- SCREEN 13: Favorite Moment + Name -->
+        <div class="screen" id="screen13">
             <h2>What was your favorite part?</h2>
             <p class="subtitle">A moment, animal, or feeling... (optional)</p>
 
@@ -750,8 +775,8 @@
             <p id="errorMsg" class="error">Oops! Something went wrong. Trying again...</p>
         </div>
 
-        <!-- SCREEN 11: Thank You (Renumbered) -->
-        <div class="screen" id="screen11">
+        <!-- SCREEN 14: Thank You -->
+        <div class="screen" id="screen14">
             <div class="thank-card">
                 <div class="thank-emoji">🎉</div>
                 <h1>Thank You!</h1>
@@ -774,18 +799,27 @@
         // STATE
         // ============================================
         let currentScreen = 1;
-        const totalScreens = 11; // Increased for new skills screen
-        const totalQuestions = 9;
+        const totalScreens = 14; // Updated for new survey flow
+        const totalQuestions = 11;
         let data = {
             is_returning_visitor: false,
             program_name: null,
-            mood_before: null,
-            mood_after: null,
-            nature_connection: null,
-            would_recommend: null,
+            age_range: null, // Moved up - asked earlier
+
+            // Mission questions (NEW)
+            present_engaged: null,
+            connection_others: null,
+            connection_nature: null,
+            calmness: null,
+            learning_intent: null,
+            community_benefit: null,
+
+            // New questions
+            will_return: null,
+            donation_interest: null,
+
+            // Other
             referral_source: null,
-            age_range: null,
-            age_range: null,
             standout_moment: null,
             participant_name: null
         };
@@ -847,20 +881,18 @@
         }
 
         function nextScreen() {
-            if (currentScreen < totalScreens) showScreen(currentScreen + 1);
+            // Conditional logic: Skip donation screen if under 18
+            if (currentScreen === 10 && data.age_range === '0-17') {
+                // Skip screen 11 (donation) for minors
+                if (currentScreen + 1 < totalScreens) showScreen(currentScreen + 2);
+            } else {
+                if (currentScreen < totalScreens) showScreen(currentScreen + 1);
+            }
         }
 
         // ============================================
         // SELECTION HANDLERS
         // ============================================
-        function selectSkill(btn) {
-            const group = btn.closest('.rating-group');
-            group.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-            data.skills_learned_score = parseInt(btn.dataset.value);
-            setTimeout(nextScreen, 250);
-        }
-
         function startSurvey(isReturning) {
             data.is_returning_visitor = isReturning;
             nextScreen();
@@ -873,45 +905,48 @@
             setTimeout(nextScreen, 250);
         }
 
-        function selectMood(btn, type) {
+        // NEW: Handle mission questions (YES/SOMEWHAT/NO)
+        function selectMission(btn, questionType) {
             const screen = btn.closest('.screen');
-            screen.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
-            screen.querySelectorAll('.rating-item').forEach(i => i.classList.remove('selected'));
+            screen.querySelectorAll('.nps-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
-            btn.closest('.rating-item').classList.add('selected');
-
-            if (type === 'before') data.mood_before = parseInt(btn.dataset.value);
-            else data.mood_after = parseInt(btn.dataset.value);
-            setTimeout(nextScreen, 250);
-        }
-
-        function selectConnection(btn) {
-            document.querySelectorAll('#screen5 .rating-btn').forEach(b => b.classList.remove('selected'));
-            document.querySelectorAll('#screen5 .rating-item').forEach(i => i.classList.remove('selected'));
-            btn.classList.add('selected');
-            btn.closest('.rating-item').classList.add('selected');
-            data.nature_connection = parseInt(btn.dataset.value);
-            setTimeout(nextScreen, 250);
-        }
-
-        function selectNPS(btn) {
-            document.querySelectorAll('.nps-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-            data.would_recommend = btn.dataset.value;
-            setTimeout(nextScreen, 250);
-        }
-
-        function selectReferral(btn) {
-            document.querySelectorAll('#screen8 .card-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-            data.referral_source = btn.dataset.value;
+            data[questionType] = parseInt(btn.dataset.value); // 1, 2, or 3
             setTimeout(nextScreen, 250);
         }
 
         function selectAge(btn) {
-            document.querySelectorAll('#screen9 .card-btn').forEach(b => b.classList.remove('selected'));
+            document.querySelectorAll('#screen3 .card-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             data.age_range = btn.dataset.value;
+            setTimeout(nextScreen, 250);
+        }
+
+        function selectReturnIntent(btn) {
+            document.querySelectorAll('#screen10 .nps-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            // Store as boolean or string
+            const val = btn.dataset.value;
+            data.will_return = val === 'true' ? true : (val === 'false' ? false : null);
+            setTimeout(nextScreen, 250);
+        }
+
+        function selectDonation(btn) {
+            document.querySelectorAll('#screen11 .nps-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            data.donation_interest = btn.dataset.value; // 'yes', 'maybe', 'no'
+
+            // If user selects "Yes, donate", open donation link in new tab
+            if (data.donation_interest === 'yes') {
+                window.open('https://empowerment-farm.givecloud.co/fundraising/forms/G2EXWJD6', '_blank');
+            }
+
+            setTimeout(nextScreen, 250);
+        }
+
+        function selectReferral(btn) {
+            document.querySelectorAll('#screen12 .card-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            data.referral_source = btn.dataset.value;
             setTimeout(nextScreen, 250);
         }
 
@@ -933,40 +968,28 @@
             }
 
             try {
-                // HELPER: Map 1-5 scale to 1-3 database schema
-                // 1-2 = 1 (Low/No), 3 = 2 (Medium/Somewhat), 4-5 = 3 (High/Yes)
-                const mapScore = (val) => {
-                    const v = parseInt(val) || 3;
-                    if (v <= 2) return 1;
-                    if (v === 3) return 2;
-                    return 3;
-                };
-
                 // Map to surveyresponses table columns
                 const dbData = {
                     experience_type: data.program_name,
                     is_returning_visitor: data.is_returning_visitor,
                     age_range_bracket: data.age_range,
 
-                    // Audit Scores (Mapped 1-3)
-                    is_present_engaged: mapScore(data.mood_after),
-                    connection_others_score: mapScore(data.nature_connection),
-                    connection_nature_score: mapScore(data.nature_connection),
-                    calmness_score: mapScore(data.mood_after),
-                    learning_intent_score: 3,
-                    community_benefit_score: data.would_recommend === 'yes' ? 3 : data.would_recommend === 'maybe' ? 2 : 1,
+                    // Mission Scores (1-3 scale - already in correct format)
+                    is_present_engaged: data.present_engaged || 2,
+                    connection_others_score: data.connection_others || 2,
+                    connection_nature_score: data.connection_nature || 2,
+                    calmness_score: data.calmness || 2,
+                    learning_intent_score: data.learning_intent || 2,
+                    community_benefit_score: data.community_benefit || 2,
 
-                    // High Fidelity Scores (Raw 1-5)
-                    mood_before_raw: parseInt(data.mood_before) || null,
-                    mood_after_raw: parseInt(data.mood_after) || null,
-                    nature_connection_raw: parseInt(data.nature_connection) || null,
-                    skills_learned_score: data.skills_learned_score, // Send to DB
+                    // NEW columns
+                    will_return: data.will_return,
+                    donation_interest: data.donation_interest,
 
                     // Metadata
                     referral_source: data.referral_source,
-                    would_recommend: data.would_recommend === 'yes',
                     standout_moment: data.standout_moment,
-                    participant_name: data.participant_name, // Secure name
+                    participant_name: data.participant_name,
                     created_at: new Date().toISOString()
                 };
 

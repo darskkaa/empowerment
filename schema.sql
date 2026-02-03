@@ -46,15 +46,12 @@ CREATE POLICY "Only authenticated can modify programs" ON programcatalog FOR ALL
 GRANT SELECT ON programcatalog TO anon, authenticated;
 GRANT ALL ON programcatalog TO authenticated;
 
--- Insert programs
+-- Insert programs (Updated per Tiffany's email Feb 1, 2026)
 INSERT INTO programcatalog (program_name, program_category, description, schedule_notes, cost_notes) VALUES
-('Open Farm (Second Saturdays)', 'Open Farm', 'Self-guided tours, animal meet and greets, farm market shopping', '2nd Saturday monthly, 9AM-1PM', '$10/Adult, $25/Family'),
-('Cow Yoga', 'Yoga', 'Farmyard yoga featuring cows, relaxation and regeneration', '4th Thursday monthly, 4-6PM', '$30/Person'),
-('Yoga with the Animals', 'Yoga', 'Monthly yoga on the farm with animals, includes social hour', '4th Thursday monthly, 4-5PM', '$30/Person'),
+('Open Farm on Second Saturday', 'Open Farm', 'Self-guided tours, animal meet and greets, farm market shopping', '2nd Saturday monthly, 9AM-1PM', '$10/Adult, $25/Family'),
+('Yoga on the Farm', 'Yoga', 'Monthly yoga on the farm with animals, includes relaxation and connection to nature', '4th Thursday monthly, 4-6PM', '$30/Person'),
 ('Tuesday Night Tuck-In', 'Family Program', 'Afterschool wind-down: open play, tuck animals in for bed, story time', 'Every Tuesday 3:30-5:30PM', '$25/Family'),
-('Seedlings for Spring', 'Workshop', 'Learn the process of starting seedlings for springtime', 'Saturday workshops', 'Varies'),
-('JusTeenys Greenies', 'Partner Workshop', 'Microgreens growing workshop with local organic farm', 'Monthly', '$10/Person, $5/Child'),
-('Educational Field Trips', 'Group Program', 'Hands-on learning for grades K-12, curriculum-aligned', 'By appointment', 'Contact for pricing')
+('Group Program', 'Group Program', 'Customized group experiences including educational field trips and workshops', 'By appointment', 'Contact for pricing')
 ON CONFLICT (program_name) DO NOTHING;
 
 -- ============================================================================
@@ -204,7 +201,11 @@ CREATE TABLE surveyresponses (
     submitted_at              TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     device_type               VARCHAR(50),
     created_at                TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    is_returning_visitor      BOOLEAN DEFAULT FALSE
+    is_returning_visitor      BOOLEAN DEFAULT FALSE,
+    
+    -- New questions added Feb 2, 2026
+    will_return               BOOLEAN,
+    donation_interest         VARCHAR(10) CHECK (donation_interest IN ('yes', 'maybe', 'no'))
 );
 
 COMMENT ON COLUMN surveyresponses.is_returning_visitor IS 'True if the user self-identifies as a returning visitor';
