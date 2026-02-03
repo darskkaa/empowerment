@@ -1586,7 +1586,6 @@
             setTimeout(() => toast.remove(), 3000);
         }
 
-
         // Edit Question Logic
         function openEditQuestionModal(questionId) {
             const question = customQuestions.find(q => q.question_id === questionId);
@@ -2100,6 +2099,129 @@
 
 
         // ============================================
+        // 🤖 ASK DATA AI LOGIC (SECURE)
+        // ============================================
+
+        function toggleChat() {
+            const modal = document.getElementById('chatModal');
+            modal.classList.toggle('hidden');
+        }
+
+        function clearChat() {
+            const container = document.getElementById('chatMessages');
+            container.innerHTML = `
+                <div class="bg-slate-800/80 p-3 rounded-lg rounded-tl-none border border-slate-700">
+                    <p class="text-sm text-slate-300">Chat cleared. Ready for new questions!</p>
+                </div>`;
+        }
+
+        function handleChatEnter(e) {
+            if (e.key === 'Enter') sendChatMessage();
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+
+            if (!msg) return;
+
+            // UI Updates
+            appendMessage('user', msg);
+            input.value = '';
+            const loadingId = appendMessage('ai', 'Thinking...');
+            const container = document.getElementById(loadingId);
+
+            // Prepare Context (Summarize Data)
+            const context = prepareDataContext();
+
+            try {
+                // Call our secure Netlify Function
+                const response = await fetch("/api/ask_ai", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        messages: [{ role: "user", content: msg }],
+                        context: context
+                    })
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error?.message || 'Server Error');
+                }
+
+                const data = await response.json();
+                const reply = data.choices[0].message.content;
+
+                // Update UI (Using marked if available, else text)
+                if (window.marked) {
+                    container.innerHTML = marked.parse(reply);
+                } else {
+                    container.innerText = reply;
+                }
+
+            } catch (err) {
+                console.error(err);
+                container.textContent = "Error: " + err.message;
+            }
+        }
+
+        function appendMessage(role, text) {
+            const container = document.getElementById('chatMessages');
+            const id = 'msg-' + Date.now();
+
+            const div = document.createElement('div');
+            div.className = role === 'user'
+                ? "bg-purple-600/20 p-3 rounded-lg rounded-tr-none border border-purple-500/30 ml-8"
+                : "bg-slate-800/80 p-3 rounded-lg rounded-tl-none border border-slate-700 mr-8";
+
+            div.innerHTML = role === 'ai'
+                ? `<p class="text-sm text-slate-300" id="${id}">${text}</p>`
+                : `<p class="text-sm text-white">${text}</p>`;
+
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+            return id;
+        }
+
+        function prepareDataContext() {
+            // Summarize allResponses to fit context window
+            const total = allResponses.length;
+            if (total === 0) return "No survey responses yet.";
+
+            // 1. Program breakdown
+            const programs = {};
+            allResponses.forEach(r => {
+                const p = r.experience_type || 'Unknown';
+                programs[p] = (programs[p] || 0) + 1;
+            });
+
+            // 2. Recent Comments (Last 20) - SECURE (No names)
+            const comments = allResponses
+                .filter(r => r.standout_moment)
+                .slice(0, 20)
+                .map(r => `"${r.standout_moment}" (${r.age_range_bracket || 'Unknown Age'})`);
+
+            // 3. Averages
+            const avg = field => {
+                const vals = allResponses.map(r => r[field]).filter(v => v);
+                return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : 'N/A';
+            };
+
+            return {
+                total_responses: total,
+                program_counts: programs,
+                averages: {
+                    present_engaged: avg('is_present_engaged'),
+                    connection: avg('connection_others_score'),
+                    nature: avg('connection_nature_score'),
+                    calmness: avg('calmness_score'),
+                    return_intent_pct: document.getElementById('returnIntentScore')?.textContent || 'N/A'
+                },
+                recent_feedback_samples_anonymous: comments
+            };
+        }
+        // ============================================
         // INIT
         // ============================================
         document.addEventListener('DOMContentLoaded', () => {
@@ -2108,6 +2230,64 @@
         });
 
     </script>
-</body>
+
+    <!-- FEEDBACK TOAST -->
+    <div id="toast"
+        class="fixed bottom-5 right-5 bg-slate-800 text-white px-6 py-3 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3 border border-slate-700">
+        <span id="toastIcon"></span>
+        <span id="toastMessage" class="font-medium"></span>
+    </div>
+
+    <!-- ASK AI FLOATING BUTTON -->
+    <button onclick="toggleChat()"
+        class="fixed bottom-6 right-6 bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-4 rounded-full shadow-lg hover:scale-105 transition-transform z-40 group flex items-center gap-2">
+        <span class="text-2xl">✨</span>
+        <span
+            class="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 font-bold whitespace-nowrap">Ask
+            Data AI</span>
+    </button>
+
+    <!-- CHAT MODAL -->
+    <div id="chatModal"
+        class="fixed bottom-24 right-6 w-96 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl z-40 hidden flex flex-col overflow-hidden"
+        style="height: 500px; max-height: 80vh;">
+        <!-- Header -->
+        <div class="bg-slate-800 p-4 flex justify-between items-center border-b border-slate-700">
+            <h3 class="font-bold text-white flex items-center gap-2">
+                <span>🤖</span> Data Assistant <span
+                    class="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">Free Model</span>
+            </h3>
+            <div class="flex gap-2">
+                <button onclick="clearChat()" class="text-slate-400 hover:text-white text-xs"
+                    title="Clear Chat">🧹</button>
+                <button onclick="toggleChat()" class="text-slate-400 hover:text-white">✕</button>
+            </div>
+        </div>
+
+
+        <!-- Messages Area -->
+        <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-900">
+            <div class="bg-slate-800/80 p-3 rounded-lg rounded-tl-none border border-slate-700">
+                <p class="text-sm text-slate-300">Hi Tiffany! 👋 I can analyze your survey data. Ask me things like:</p>
+                <ul class="text-xs text-slate-400 mt-2 list-disc list-inside space-y-1">
+                    <li>"What is the general vibe today?"</li>
+                    <li>"Summarize the feedback from the yoga session."</li>
+                    <li>"Are visitors under 18 enjoying the farm?"</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="p-4 bg-slate-800 border-t border-slate-700">
+            <div class="flex gap-2">
+                <input type="text" id="chatInput" placeholder="Ask about your data..."
+                    class="flex-1 bg-slate-900 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:border-purple-500 focus:outline-none"
+                    onkeypress="handleChatEnter(event)">
+                <button onclick="sendChatMessage()"
+                    class="bg-purple-600 hover:bg-purple-500 text-white rounded-lg px-3 transition-colors">
+                    ➤
+                </button>
+            </div>
+        </div>
+    </div>
 
 </html>
