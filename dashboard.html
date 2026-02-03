@@ -2220,6 +2220,43 @@
                     percent_recommending: (allResponses.length ? Math.round((allResponses.filter(r => r.would_recommend).length / allResponses.length) * 100) + '%' : 'N/A'),
                     percent_returning: (allResponses.length ? Math.round((allResponses.filter(r => r.is_returning_visitor === true || r.is_returning_visitor === 'true').length / allResponses.length) * 100) + '%' : 'N/A')
                 },
+                demographics: (() => {
+                    const ages = {};
+                    allResponses.forEach(r => { const a = r.age_range_bracket || 'Unknown'; ages[a] = (ages[a] || 0) + 1; });
+                    return ages;
+                })(),
+                referrals: (() => {
+                    const sources = {};
+                    allResponses.forEach(r => { const s = r.referral_source || 'Not specified'; sources[s] = (sources[s] || 0) + 1; });
+                    return sources;
+                })(),
+                donations: (() => {
+                    const eligible = allResponses.filter(r => r.age_range_bracket && r.age_range_bracket !== '0-17');
+                    return {
+                        total_eligible_18plus: eligible.length,
+                        yes: eligible.filter(r => r.donation_interest === 'yes').length,
+                        maybe: eligible.filter(r => r.donation_interest === 'maybe').length,
+                        no: eligible.filter(r => r.donation_interest === 'no').length
+                    };
+                })(),
+                peak_times: (() => {
+                    const getHour = r => new Date(r.submitted_at || r.created_at).getHours();
+                    const hours = new Array(24).fill(0);
+                    allResponses.forEach(r => hours[getHour(r)]++);
+                    // Return top 3 busiest hours
+                    return hours.map((count, hr) => ({ hr, count }))
+                        .sort((a, b) => b.count - a.count)
+                        .slice(0, 3)
+                        .map(h => `${h.hr % 12 || 12}${h.hr >= 12 ? 'PM' : 'AM'} (${h.count} visits)`);
+                })(),
+                monthly_trends: (() => {
+                    const monthly = {};
+                    allResponses.forEach(r => {
+                        const key = new Date(r.created_at).toLocaleString('default', { month: 'short' });
+                        monthly[key] = (monthly[key] || 0) + 1;
+                    });
+                    return monthly;
+                })(),
                 recent_feedback_samples_anonymous: comments
             };
         }

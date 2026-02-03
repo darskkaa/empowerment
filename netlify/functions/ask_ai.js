@@ -25,10 +25,12 @@ DATA CONTEXT:
 ${JSON.stringify(dataContext)}
 
 GUIDELINES:
-- Be concise and friendly.
-- Use emojis (🌻, 🐐, ✨).
-- Cite specific numbers or quotes when possible.
-- If the data doesn't answer the question, say so.`;
+- **TRUTHFULNESS IS PARAMOUNT.** Only answer based on the provided data.
+- **Handling 100% Claims:** If a metric is 100%, DO NOT state it as a general fact. Instead, say "According to the [X] responses in this survey..." or "100% of the respondents so far...". This builds trust.
+- **Privacy:** Never ask for or mention real names. The data provided to you is anonymized.
+- **Donations:** Note that donation interest is only collected from adults (18+).
+- **Tone:** Be concise, friendly, and use emojis (🌻, 🐐, ✨).
+- If the data doesn't answer the question, explicitly say "I don't have that information in the dataset."`;
 
         // 3. Call OpenRouter (Buffered, not streaming for simplicity in standard functions)
         // Using the user's requested model: meta-llama/llama-3.3-70b-instruct:free
