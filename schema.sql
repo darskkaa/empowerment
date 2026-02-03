@@ -257,6 +257,34 @@ CREATE POLICY "Only authenticated can access audit_log" ON audit_log FOR ALL TO 
 GRANT ALL ON audit_log TO authenticated;
 
 -- ============================================================================
+-- TABLE: custom_questions (CLIENT-MANAGEABLE DYNAMIC QUESTIONS)
+-- ============================================================================
+CREATE TABLE custom_questions (
+    question_id    UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    question_text  VARCHAR(300) NOT NULL,
+    emoji          VARCHAR(10) DEFAULT '✨',
+    display_order  INT DEFAULT 0,
+    is_active      BOOLEAN DEFAULT TRUE,
+    created_by     UUID,
+    created_at     TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+COMMENT ON TABLE custom_questions IS 'Client-defined survey questions manageable from dashboard';
+
+-- RLS for custom_questions
+ALTER TABLE custom_questions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can view active questions" ON custom_questions 
+    FOR SELECT TO anon, authenticated USING (is_active = TRUE);
+CREATE POLICY "Authenticated can manage questions" ON custom_questions 
+    FOR ALL TO authenticated USING (true);
+GRANT SELECT ON custom_questions TO anon, authenticated;
+GRANT ALL ON custom_questions TO authenticated;
+
+-- Add JSONB column to surveyresponses for custom question responses
+ALTER TABLE surveyresponses ADD COLUMN IF NOT EXISTS custom_responses JSONB DEFAULT '{}'::jsonb;
+COMMENT ON COLUMN surveyresponses.custom_responses IS 'Stores responses to custom questions as {question_uuid: score(1-3)}';
+
+-- ============================================================================
 -- INDEXES
 -- ============================================================================
 CREATE INDEX IF NOT EXISTS idx_survey_experience_type ON surveyresponses(experience_type);
@@ -265,6 +293,7 @@ CREATE INDEX IF NOT EXISTS idx_survey_referral ON surveyresponses(referral_sourc
 CREATE INDEX IF NOT EXISTS idx_survey_submitted ON surveyresponses(submitted_at);
 CREATE INDEX IF NOT EXISTS idx_experiences_program ON experiences(program_id);
 CREATE INDEX IF NOT EXISTS idx_experiences_date ON experiences(experience_date);
+CREATE INDEX IF NOT EXISTS idx_custom_questions_active ON custom_questions(is_active, display_order);
 
 -- ============================================================================
 -- VIEWS (WITHOUT SECURITY DEFINER - Fixed!)

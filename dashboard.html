@@ -434,7 +434,7 @@
 
                         <!-- Will Use Learning -->
                         <div class="pbi-card p-4 text-center bg-gradient-to-br from-slate-800/50 to-slate-900/50">
-                            <p class="text-xs text-slate-400 mb-2 font-semibold">� Will Use Learning</p>
+                            <p class="text-xs text-slate-400 mb-2 font-semibold">🧠 Will Use Learning</p>
                             <h3 id="missionLearningIntentScore" class="text-3xl font-bold text-green-400">--</h3>
                             <p class="text-[10px] text-slate-500 mt-1">Avg: 1-3</p>
                         </div>
@@ -444,6 +444,29 @@
                             <p class="text-xs text-slate-400 mb-2 font-semibold">🏛️ Community Benefit</p>
                             <h3 id="missionCommunityBenefitScore" class="text-3xl font-bold text-green-400">--</h3>
                             <p class="text-[10px] text-slate-500 mt-1">Avg: 1-3</p>
+                        </div>
+                    </div>
+
+                    <!-- CUSTOM QUESTIONS SECTION -->
+                    <div class="mt-6 pt-6 border-t border-slate-700/50">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg">🎯</span>
+                                <h4 class="text-sm font-bold text-white">Custom Questions</h4>
+                                <span class="text-xs text-slate-500">(Client-defined)</span>
+                            </div>
+                            <button onclick="openAddQuestionModal()"
+                                class="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs font-bold rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-green-500/25 flex items-center gap-2">
+                                <span class="text-lg">+</span> Add Question
+                            </button>
+                        </div>
+                        <div id="customQuestionsContainer" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <!-- Custom questions will be dynamically inserted here -->
+                            <div class="pbi-card p-4 text-center bg-slate-800/30 border-dashed border-slate-600"
+                                id="noCustomQuestions">
+                                <p class="text-xs text-slate-500">No custom questions yet</p>
+                                <p class="text-[10px] text-slate-600 mt-1">Click "Add Question" to create one</p>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -689,6 +712,118 @@
                     </div>
                 </div>
 
+                <!-- ADD QUESTION MODAL -->
+                <div id="addQuestionModal"
+                    class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+                    <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md shadow-2xl relative">
+                        <button onclick="closeAddQuestionModal()"
+                            class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 rounded-full p-2 transition">
+                            ✕
+                        </button>
+
+                        <div class="p-8">
+                            <div class="flex items-center gap-3 mb-6">
+                                <div
+                                    class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
+                                    <span class="text-2xl">➕</span>
+                                </div>
+                                <div>
+                                    <h2 class="text-xl font-bold text-white">Add New Question</h2>
+                                    <p class="text-xs text-slate-400">This will appear on all future surveys</p>
+                                </div>
+                            </div>
+
+                            <!-- Question Text -->
+                            <div class="mb-6">
+                                <label
+                                    class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Question
+                                    Text</label>
+                                <input type="text" id="newQuestionText" placeholder="e.g., Did you feel inspired today?"
+                                    class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:border-green-500 focus:ring-1 focus:ring-green-500 outline-none transition">
+                            </div>
+
+                            <!-- Emoji Picker -->
+                            <div class="mb-6">
+                                <label
+                                    class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Choose
+                                    Emoji</label>
+                                <div class="grid grid-cols-8 gap-2" id="emojiPicker">
+                                    <button type="button" onclick="selectEmoji('✨')"
+                                        class="emoji-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                        data-emoji="✨">✨</button>
+                                    <button type="button" onclick="selectEmoji('🌟')"
+                                        class="emoji-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                        data-emoji="🌟">🌟</button>
+                                    <button type="button" onclick="selectEmoji('💚')"
+                                        class="emoji-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                        data-emoji="💚">💚</button>
+                                    <button type="button" onclick="selectEmoji('🌿')"
+                                        class="emoji-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                        data-emoji="🌿">🌿</button>
+                                    <button type="button" onclick="selectEmoji('🧘')"
+                                        class="emoji-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                        data-emoji="🧘">🧘</button>
+                                    <button type="button" onclick="selectEmoji('🌈')"
+                                        class="emoji-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                        data-emoji="🌈">🌈</button>
+                                    <button type="button" onclick="selectEmoji('🦋')"
+                                        class="emoji-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                        data-emoji="🦋">🦋</button>
+                                    <button type="button" onclick="selectEmoji('🐄')"
+                                        class="emoji-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                        data-emoji="🐄">🐄</button>
+                                    <button type="button" onclick="selectEmoji('🌻')"
+                                        class="emoji-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                        data-emoji="🌻">🌻</button>
+                                    <button type="button" onclick="selectEmoji('🦆')"
+                                        class="emoji-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                        data-emoji="🦆">🦆</button>
+                                    <button type="button" onclick="selectEmoji('🐔')"
+                                        class="emoji-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                        data-emoji="🐔">🐔</button>
+                                    <button type="button" onclick="selectEmoji('🐐')"
+                                        class="emoji-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                        data-emoji="🐐">🐐</button>
+                                    <button type="button" onclick="selectEmoji('🌱')"
+                                        class="emoji-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                        data-emoji="🌱">🌱</button>
+                                    <button type="button" onclick="selectEmoji('🪴')"
+                                        class="emoji-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                        data-emoji="🪴">🪴</button>
+                                    <button type="button" onclick="selectEmoji('🌾')"
+                                        class="emoji-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                        data-emoji="🌾">🌾</button>
+                                    <button type="button" onclick="selectEmoji('💫')"
+                                        class="emoji-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                        data-emoji="💫">💫</button>
+                                </div>
+                                <input type="hidden" id="selectedEmoji" value="✨">
+                            </div>
+
+                            <!-- Preview -->
+                            <div class="mb-6 p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                                <p class="text-xs text-slate-500 uppercase tracking-wider mb-2">Preview</p>
+                                <div class="flex items-center gap-3">
+                                    <span id="previewEmoji" class="text-2xl">✨</span>
+                                    <span id="previewText" class="text-white font-medium">Your question here...</span>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="flex gap-3">
+                                <button onclick="closeAddQuestionModal()"
+                                    class="flex-1 px-4 py-3 bg-slate-800 text-slate-300 font-semibold rounded-xl hover:bg-slate-700 transition">
+                                    Cancel
+                                </button>
+                                <button onclick="saveNewQuestion()"
+                                    class="flex-1 px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-xl hover:from-green-600 hover:to-emerald-700 transition shadow-lg">
+                                    Save Question
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </main>
 
@@ -727,6 +862,9 @@
         let demoChartInstance = null;
         let referralChartInstance = null;
         let peakChartInstance = null;
+
+        // Custom Questions
+        let customQuestions = [];
 
         // ============================================
         // AUTH
@@ -886,6 +1024,7 @@
             renderResponseTable(allResponses);
             renderMissionBreakdown(); // NEW
             renderDonationPipeline(); // NEW
+            loadCustomQuestions(); // CUSTOM QUESTIONS
         }
 
         // Response Explorer & Modal
@@ -1129,6 +1268,163 @@
         document.getElementById('detailModal').addEventListener('click', (e) => {
             if (e.target === document.getElementById('detailModal')) closeModal();
         });
+
+        // ============================================
+        // CUSTOM QUESTIONS MANAGEMENT
+        // ============================================
+
+        function openAddQuestionModal() {
+            document.getElementById('addQuestionModal').classList.remove('hidden');
+            document.getElementById('newQuestionText').value = '';
+            document.getElementById('selectedEmoji').value = '✨';
+            document.getElementById('previewEmoji').textContent = '✨';
+            document.getElementById('previewText').textContent = 'Your question here...';
+            // Reset emoji selection
+            document.querySelectorAll('.emoji-btn').forEach(btn => btn.classList.remove('ring-2', 'ring-green-500'));
+            document.querySelector('.emoji-btn[data-emoji="✨"]').classList.add('ring-2', 'ring-green-500');
+        }
+
+        function closeAddQuestionModal() {
+            document.getElementById('addQuestionModal').classList.add('hidden');
+        }
+
+        function selectEmoji(emoji) {
+            document.getElementById('selectedEmoji').value = emoji;
+            document.getElementById('previewEmoji').textContent = emoji;
+            // Update visual selection
+            document.querySelectorAll('.emoji-btn').forEach(btn => btn.classList.remove('ring-2', 'ring-green-500'));
+            document.querySelector(`.emoji-btn[data-emoji="${emoji}"]`).classList.add('ring-2', 'ring-green-500');
+        }
+
+        // Live preview update
+        document.getElementById('newQuestionText')?.addEventListener('input', (e) => {
+            document.getElementById('previewText').textContent = e.target.value || 'Your question here...';
+        });
+
+        async function saveNewQuestion() {
+            const questionText = document.getElementById('newQuestionText').value.trim();
+            const emoji = document.getElementById('selectedEmoji').value;
+
+            if (!questionText) {
+                alert('Please enter a question!');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('custom_questions')
+                    .insert([{
+                        question_text: questionText,
+                        emoji: emoji,
+                        display_order: customQuestions.length,
+                        is_active: true
+                    }])
+                    .select();
+
+                if (error) throw error;
+
+                // Add to local array and re-render
+                customQuestions.push(data[0]);
+                renderCustomQuestions();
+                closeAddQuestionModal();
+
+                // Show success feedback
+                showToast('✅ Question added! It will appear on new surveys.');
+            } catch (err) {
+                console.error('Error saving question:', err);
+                alert('Failed to save question. Please try again.');
+            }
+        }
+
+        async function loadCustomQuestions() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('custom_questions')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('display_order');
+
+                if (error) throw error;
+                customQuestions = data || [];
+                renderCustomQuestions();
+            } catch (err) {
+                console.error('Error loading custom questions:', err);
+            }
+        }
+
+        function renderCustomQuestions() {
+            const container = document.getElementById('customQuestionsContainer');
+            const noQuestionsEl = document.getElementById('noCustomQuestions');
+
+            if (customQuestions.length === 0) {
+                noQuestionsEl.style.display = 'block';
+                return;
+            }
+
+            noQuestionsEl.style.display = 'none';
+
+            // Calculate averages for each custom question
+            const questionAverages = {};
+            customQuestions.forEach(q => {
+                const scores = [];
+                allResponses.forEach(r => {
+                    if (r.custom_responses && r.custom_responses[q.question_id]) {
+                        scores.push(r.custom_responses[q.question_id]);
+                    }
+                });
+                questionAverages[q.question_id] = scores.length
+                    ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2)
+                    : null;
+            });
+
+            // Render cards
+            const cardsHtml = customQuestions.map(q => {
+                const avg = questionAverages[q.question_id];
+                const scoreClass = avg >= 2.7 ? 'text-green-400' : avg >= 2.0 ? 'text-yellow-400' : avg ? 'text-orange-400' : 'text-slate-500';
+
+                return `
+                    <div class="pbi-card p-4 text-center bg-gradient-to-br from-slate-800/50 to-slate-900/50 relative group">
+                        <button onclick="deleteCustomQuestion('${q.question_id}')" 
+                            class="absolute top-2 right-2 text-slate-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition text-xs">
+                            ✕
+                        </button>
+                        <p class="text-xs text-slate-400 mb-2 font-semibold">${q.emoji} ${q.question_text}</p>
+                        <h3 class="${scoreClass} text-3xl font-bold">${avg || '--'}</h3>
+                        <p class="text-[10px] text-slate-500 mt-1">${avg ? `${allResponses.filter(r => r.custom_responses?.[q.question_id]).length} responses` : 'No responses yet'}</p>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = cardsHtml;
+        }
+
+        async function deleteCustomQuestion(questionId) {
+            if (!confirm('Delete this question? It will no longer appear in surveys.')) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('custom_questions')
+                    .update({ is_active: false })
+                    .eq('question_id', questionId);
+
+                if (error) throw error;
+
+                customQuestions = customQuestions.filter(q => q.question_id !== questionId);
+                renderCustomQuestions();
+                showToast('🗑️ Question removed.');
+            } catch (err) {
+                console.error('Error deleting question:', err);
+                alert('Failed to delete question.');
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-4 right-4 bg-slate-800 text-white px-6 py-3 rounded-xl shadow-lg z-50 animate-pulse';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
 
 
         // Program Table

@@ -701,6 +701,18 @@
             <button class="skip" onclick="nextScreen()">Skip this question</button>
         </div>
 
+        <!-- SCREEN 9b: DYNAMIC CUSTOM QUESTIONS (inserted dynamically) -->
+        <div class="screen" id="screenCustomQuestions" style="display:none;">
+            <h2>A few more questions...</h2>
+            <p class="subtitle">From our team 🌱</p>
+            <div id="customQuestionsFormContainer">
+                <!-- Custom questions will be dynamically inserted here -->
+                <p style="color:#9ca3af; font-size:0.9rem;">Loading...</p>
+            </div>
+            <button class="btn" onclick="nextScreenAfterCustom()">Continue →</button>
+            <button class="skip" onclick="nextScreenAfterCustom()">Skip</button>
+        </div>
+
         <!-- SCREEN 10: Return Intent (NEW) -->
         <div class="screen" id="screen10">
             <h2>Will you come back to visit us?</h2>
@@ -821,9 +833,13 @@
             // Other
             referral_source: null,
             standout_moment: null,
-            participant_name: null
+            participant_name: null,
+
+            // Custom questions
+            custom_responses: {} // {question_uuid: score(1-3)}
         };
         let supabaseClient = null;
+        let customQuestions = []; // Loaded from database
 
         // ============================================
         // INIT
@@ -860,6 +876,71 @@
                     supabaseClient = null;
                 }
             }
+
+            // Fetch custom questions after Supabase is ready
+            await loadSurveyCustomQuestions();
+        }
+
+        // ============================================
+        // CUSTOM QUESTIONS (SURVEY SIDE)
+        // ============================================
+        async function loadSurveyCustomQuestions() {
+            if (!supabaseClient) return;
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('custom_questions')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('display_order');
+
+                if (error) throw error;
+                customQuestions = data || [];
+
+                if (customQuestions.length > 0) {
+                    renderSurveyCustomQuestions();
+                }
+            } catch (err) {
+                console.warn('⚠️ Could not load custom questions:', err);
+            }
+        }
+
+        function renderSurveyCustomQuestions() {
+            const container = document.getElementById('customQuestionsFormContainer');
+            if (!container || customQuestions.length === 0) return;
+
+            const html = customQuestions.map(q => `
+                <div class="custom-q-item" style="margin-bottom: 24px; text-align: center;">
+                    <p style="font-size: 1.1rem; font-weight: 700; color: #166534; margin-bottom: 12px;">
+                        ${q.emoji} ${q.question_text}
+                    </p>
+                    <div class="nps-row" role="radiogroup" aria-label="${q.question_text}">
+                        <button class="nps-btn no" data-value="1" onclick="selectCustomQuestion(this, '${q.question_id}')">
+                            <span class="nps-emoji">😐</span><span class="nps-text">No</span>
+                        </button>
+                        <button class="nps-btn maybe" data-value="2" onclick="selectCustomQuestion(this, '${q.question_id}')">
+                            <span class="nps-emoji">😊</span><span class="nps-text">Somewhat</span>
+                        </button>
+                        <button class="nps-btn yes" data-value="3" onclick="selectCustomQuestion(this, '${q.question_id}')">
+                            <span class="nps-emoji">😍</span><span class="nps-text">Yes!</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = html;
+        }
+
+        function selectCustomQuestion(btn, questionId) {
+            const parent = btn.closest('.custom-q-item');
+            parent.querySelectorAll('.nps-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            data.custom_responses[questionId] = parseInt(btn.dataset.value);
+        }
+
+        function nextScreenAfterCustom() {
+            // Go to screen 10 (Return Intent)
+            showScreen(10);
         }
 
         // ============================================
@@ -881,6 +962,18 @@
         }
 
         function nextScreen() {
+            // After screen 9 (Community Benefit), show custom questions if any exist
+            if (currentScreen === 9 && customQuestions.length > 0) {
+                // Show the custom questions screen
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById('screenCustomQuestions').style.display = 'flex';
+                document.getElementById('screenCustomQuestions').classList.add('active');
+                currentScreen = 'custom'; // Special marker
+                updateProgress();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+
             // Conditional logic: Skip donation screen if under 18
             if (currentScreen === 10 && data.age_range === '0-17') {
                 // Skip screen 11 (donation) for minors
@@ -990,7 +1083,12 @@
                     referral_source: data.referral_source,
                     standout_moment: data.standout_moment,
                     participant_name: data.participant_name,
-                    created_at: new Date().toISOString()
+                    created_at: new Date().toISOString(),
+
+                    // Custom question responses (JSONB)
+                    custom_responses: Object.keys(data.custom_responses).length > 0
+                        ? data.custom_responses
+                        : null
                 };
 
                 console.log('📤 Inserting into surveyresponses:', dbData);
