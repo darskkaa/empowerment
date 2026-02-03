@@ -812,8 +812,8 @@
         // STATE
         // ============================================
         let currentScreen = 1;
-        const totalScreens = 14; // Updated for new survey flow
-        const totalQuestions = 11;
+        let totalScreens = 14; // Updated for new survey flow
+        let totalQuestions = 11;
         let data = {
             is_returning_visitor: false,
             program_name: null,
@@ -1116,7 +1116,7 @@
             if (!supabaseClient) {
                 console.warn('⚠️ No Supabase client - showing thank you anyway');
                 alert("⚠️ TEST METHOD WARNING:\n\nDetailed database saving is disabled because the app is running locally without a server.\n\nYour survey 'submission' was simulated. To save to the real database, please deploy to Netlify or run a local server.");
-                showScreen(totalScreens);
+                showScreen('screen14');
                 launchConfetti();
                 return;
             }
@@ -1172,7 +1172,7 @@
                     if (donationLink) donationLink.style.display = 'none';
                 }
 
-                showScreen(totalScreens);
+                showScreen('screen14');
                 launchConfetti();
             } catch (e) {
                 console.error('❌ Submit error:', e.message || e);
@@ -1185,7 +1185,7 @@
                 }
 
                 // Still show thank you - don't block user experience
-                showScreen(totalScreens);
+                showScreen('screen14');
                 launchConfetti();
             }
         }
