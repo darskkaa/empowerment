@@ -2262,6 +2262,26 @@
                     });
                     return monthly;
                 })(),
+                custom_questions: (() => {
+                    if (typeof customQuestions === 'undefined' || !customQuestions.length) return "No custom questions active.";
+                    return customQuestions.map(q => {
+                        const scores = [];
+                        allResponses.forEach(r => {
+                            if (r.custom_responses && r.custom_responses[q.question_id]) {
+                                scores.push(r.custom_responses[q.question_id]);
+                            }
+                        });
+                        const avg = scores.length ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2) : 'N/A';
+                        return {
+                            question: q.question_text,
+                            emoji: q.emoji,
+                            average_score_1_to_3: avg,
+                            response_count: scores.length
+                        };
+                    });
+                })(),
+                willing_to_review_pct: (allResponses.length ? Math.round((allResponses.filter(r => r.willing_to_review).length / allResponses.length) * 100) + '%' : 'N/A'),
+                additional_feedback_samples: allResponses.filter(r => r.additional_feedback && r.additional_feedback.length > 3).slice(0, 5).map(r => r.additional_feedback),
                 recent_feedback_samples_anonymous: comments
             };
         }
