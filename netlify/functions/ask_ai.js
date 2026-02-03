@@ -41,7 +41,7 @@ GUIDELINES:
                 "X-Title": "Empowerment Farm Dashboard"
             },
             body: JSON.stringify({
-                model: "openrouter/free",
+                model: "arcee-ai/trinity-large-preview:free",
                 messages: [
                     { role: "system", content: systemPrompt },
                     ...messages
