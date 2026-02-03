@@ -2217,7 +2217,8 @@
                     nature: avg('connection_nature_score'),
                     calmness: avg('calmness_score'),
                     return_intent_pct: document.getElementById('returnIntentScore')?.textContent || 'N/A',
-                    percent_recommending: (allResponses.length ? Math.round((allResponses.filter(r => r.would_recommend).length / allResponses.length) * 100) + '%' : 'N/A')
+                    percent_recommending: (allResponses.length ? Math.round((allResponses.filter(r => r.would_recommend).length / allResponses.length) * 100) + '%' : 'N/A'),
+                    percent_returning: (allResponses.length ? Math.round((allResponses.filter(r => r.is_returning_visitor === true || r.is_returning_visitor === 'true').length / allResponses.length) * 100) + '%' : 'N/A')
                 },
                 recent_feedback_samples_anonymous: comments
             };
