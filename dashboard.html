@@ -465,7 +465,8 @@
                                 </div>
                                 <div>
                                     <h3 class="font-bold text-white">Program Performance</h3>
-                                    <p class="text-xs text-slate-400">Mood scores by experience (1-5 scale)</p>
+                                    <p class="text-xs text-slate-400">Mission impact by program (1-3 scale:
+                                        YES/SOMEWHAT/NO)</p>
                                 </div>
                             </div>
                             <div class="overflow-x-auto">
@@ -473,14 +474,14 @@
                                     <thead>
                                         <tr class="border-b border-slate-700/50">
                                             <th class="text-left py-3 px-2 font-semibold text-slate-400">Program</th>
-                                            <th class="text-center py-3 px-2 font-semibold text-slate-400">😫 Before
+                                            <th class="text-center py-3 px-2 font-semibold text-slate-400">✨ Present
                                             </th>
-                                            <th class="text-center py-3 px-2 font-semibold text-slate-400">🥰 After</th>
-                                            <th class="text-center py-3 px-2 font-semibold text-slate-400">🌿 Nature
+                                            <th class="text-center py-3 px-2 font-semibold text-slate-400">💚 Connect
                                             </th>
-                                            <th class="text-center py-3 px-2 font-semibold text-slate-400">🎓 Skills
+                                            <th class="text-center py-3 px-2 font-semibold text-slate-400">🧘 Calm</th>
+                                            <th class="text-center py-3 px-2 font-semibold text-slate-400">🧠 Learning
                                             </th>
-                                            <th class="text-center py-3 px-2 font-semibold text-slate-400">📈 Boost</th>
+                                            <th class="text-center py-3 px-2 font-semibold text-slate-400">📊 Avg</th>
                                         </tr>
                                     </thead>
                                     <tbody id="programTable"></tbody>
@@ -1134,8 +1135,27 @@
             const programs = {};
             allResponses.forEach(r => {
                 const prog = r.experience_type || 'General';
-                if (!programs[prog]) programs[prog] = { count: 0, before: [], after: [], nature: [], skills: [] };
+                if (!programs[prog]) programs[prog] = {
+                    count: 0,
+                    present: [],
+                    connection: [],
+                    calm: [],
+                    learning: [],
+                    // Legacy data (for backward compatibility)
+                    before: [],
+                    after: [],
+                    nature: [],
+                    skills: []
+                };
                 programs[prog].count++;
+
+                // NEW: Collect mission scores
+                if (r.is_present_engaged != null) programs[prog].present.push(r.is_present_engaged);
+                if (r.connection_others_score != null) programs[prog].connection.push(r.connection_others_score);
+                if (r.calmness_score != null) programs[prog].calm.push(r.calmness_score);
+                if (r.learning_intent_score != null) programs[prog].learning.push(r.learning_intent_score);
+
+                // LEGACY: Still collect old data for backward compatibility
                 if (r.mood_before_raw) programs[prog].before.push(r.mood_before_raw);
                 if (r.mood_after_raw) programs[prog].after.push(r.mood_after_raw);
                 if (r.nature_connection_raw) programs[prog].nature.push(r.nature_connection_raw);
@@ -1144,36 +1164,78 @@
 
             const sorted = Object.entries(programs).sort((a, b) => b[1].count - a[1].count).slice(0, 8);
             const avg = arr => arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : null;
-            const scoreClass = val => {
+
+            // Score class for 1-3 scale (mission scores)
+            const missionScoreClass = val => {
                 if (!val) return 'bg-slate-700 text-slate-400';
                 const n = parseFloat(val);
-                if (n >= 4.5) return 'score-5';
-                if (n >= 3.5) return 'score-4';
-                if (n >= 2.5) return 'score-3';
-                if (n >= 1.5) return 'score-2';
-                return 'score-1';
+                if (n >= 2.7) return 'score-5';  // YES (close to 3)
+                if (n >= 2.3) return 'score-4';  // YES/SOMEWHAT
+                if (n >= 2.0) return 'score-3';  // SOMEWHAT (2)
+                if (n >= 1.5) return 'score-2';  // SOMEWHAT/NO
+                return 'score-1';  // NO (1)
             };
 
             document.getElementById('programTable').innerHTML = sorted.map(([name, stats]) => {
-                const before = avg(stats.before);
-                const after = avg(stats.after);
-                const nature = avg(stats.nature);
-                const skills = stats.skills.length ? Math.round(stats.skills.reduce((a, b) => a + b, 0) / stats.skills.length) : '--';
-                const boost = before && after ? (parseFloat(after) - parseFloat(before)).toFixed(1) : null;
+                // Prefer mission scores, fall back to legacy
+                const hasMissionData = stats.present.length > 0 || stats.connection.length > 0;
 
-                return `
-                    <tr class="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
-                        <td class="py-3 px-2">
-                            <span class="font-semibold text-white">${name}</span>
-                            <span class="text-xs text-slate-500 ml-1">(${stats.count})</span>
-                        </td>
-                        <td class="text-center py-3 px-2"><span class="score-badge ${scoreClass(before)}">${before || '--'}</span></td>
-                        <td class="text-center py-3 px-2"><span class="score-badge ${scoreClass(after)}">${after || '--'}</span></td>
-                        <td class="text-center py-3 px-2"><span class="score-badge ${scoreClass(nature)}">${nature || '--'}</span></td>
-                        <td class="text-center py-3 px-2 font-bold text-pink-400">${skills}</td>
-                        <td class="text-center py-3 px-2 font-bold ${boost && parseFloat(boost) > 0 ? 'text-green-400' : 'text-slate-500'}">${boost ? (parseFloat(boost) > 0 ? '+' : '') + boost : '--'}</td>
-                    </tr>
-                `;
+                if (hasMissionData) {
+                    // NEW DATA: Show mission scores
+                    const present = avg(stats.present);
+                    const connection = avg(stats.connection);
+                    const calm = avg(stats.calm);
+                    const learning = avg(stats.learning);
+
+                    // Calculate overall average from all 4 shown metrics
+                    const allScores = [...stats.present, ...stats.connection, ...stats.calm, ...stats.learning];
+                    const overallAvg = allScores.length ? (allScores.reduce((a, b) => a + b, 0) / allScores.length).toFixed(2) : null;
+
+                    return `
+                        <tr class="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
+                            <td class="py-3 px-2">
+                                <span class="font-semibold text-white">${name}</span>
+                                <span class="text-xs text-slate-500 ml-1">(${stats.count})</span>
+                            </td>
+                            <td class="text-center py-3 px-2"><span class="score-badge ${missionScoreClass(present)}">${present || '--'}</span></td>
+                            <td class="text-center py-3 px-2"><span class="score-badge ${missionScoreClass(connection)}">${connection || '--'}</span></td>
+                            <td class="text-center py-3 px-2"><span class="score-badge ${missionScoreClass(calm)}">${calm || '--'}</span></td>
+                            <td class="text-center py-3 px-2"><span class="score-badge ${missionScoreClass(learning)}">${learning || '--'}</span></td>
+                            <td class="text-center py-3 px-2"><span class="score-badge ${missionScoreClass(overallAvg)}">${overallAvg || '--'}</span></td>
+                        </tr>
+                    `;
+                } else {
+                    // LEGACY DATA: Show old mood scores (backward compatibility)
+                    const before = avg(stats.before);
+                    const after = avg(stats.after);
+                    const nature = avg(stats.nature);
+                    const skills = stats.skills.length ? Math.round(stats.skills.reduce((a, b) => a + b, 0) / stats.skills.length) : '--';
+                    const boost = before && after ? (parseFloat(after) - parseFloat(before)).toFixed(1) : null;
+
+                    const legacyScoreClass = val => {
+                        if (!val) return 'bg-slate-700 text-slate-400';
+                        const n = parseFloat(val);
+                        if (n >= 4.5) return 'score-5';
+                        if (n >= 3.5) return 'score-4';
+                        if (n >= 2.5) return 'score-3';
+                        if (n >= 1.5) return 'score-2';
+                        return 'score-1';
+                    };
+
+                    return `
+                        <tr class="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
+                            <td class="py-3 px-2">
+                                <span class="font-semibold text-white">${name}</span>
+                                <span class="text-xs text-slate-500 ml-1">(${stats.count}) [legacy]</span>
+                            </td>
+                            <td class="text-center py-3 px-2"><span class="score-badge ${legacyScoreClass(before)}">${before || '--'}</span></td>
+                            <td class="text-center py-3 px-2"><span class="score-badge ${legacyScoreClass(after)}">${after || '--'}</span></td>
+                            <td class="text-center py-3 px-2"><span class="score-badge ${legacyScoreClass(nature)}">${nature || '--'}</span></td>
+                            <td class="text-center py-3 px-2 font-bold text-pink-400">${skills}</td>
+                            <td class="text-center py-3 px-2 font-bold ${boost && parseFloat(boost) > 0 ? 'text-green-400' : 'text-slate-500'}">${boost ? (parseFloat(boost) > 0 ? '+' : '') + boost : '--'}</td>
+                        </tr>
+                    `;
+                }
             }).join('');
         }
 
