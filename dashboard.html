@@ -852,10 +852,11 @@
                 const avgB = (sumBefore / moodCount).toFixed(1);
                 const avgA = (sumAfter / moodCount).toFixed(1);
                 const diff = (avgA - avgB).toFixed(1);
-                document.getElementById('avgBefore').textContent = avgB;
-                document.getElementById('avgAfter').textContent = avgA;
-                document.getElementById('impactDelta').textContent = `+${diff} pts`;
-                document.getElementById('moodBoost').textContent = `+${diff}`;
+                // Legacy elements removed from DOM, suppressing updates to avoid errors
+                // document.getElementById('avgBefore').textContent = avgB;
+                // document.getElementById('avgAfter').textContent = avgA;
+                // document.getElementById('impactDelta').textContent = `+${diff} pts`;
+                // document.getElementById('moodBoost').textContent = `+${diff}`;
             }
 
             // Returning Rate
@@ -1133,6 +1134,12 @@
         // Program Table
         function renderProgramTable() {
             const programs = {};
+
+            // Helper: Map 1-5 scale to 1-3 scale (4-5=YES, 3=SOMEWHAT, 1-2=NO)
+            const map5to3 = (val) => val >= 4 ? 3 : val >= 3 ? 2 : 1;
+            // Helper: Map 0-100 scale to 1-3 scale (>75=YES, 40-75=SOMEWHAT, <40=NO)
+            const map100to3 = (val) => val > 75 ? 3 : val >= 40 ? 2 : 1;
+
             allResponses.forEach(r => {
                 const prog = r.experience_type || 'General';
                 if (!programs[prog]) programs[prog] = {
@@ -1149,13 +1156,36 @@
                 };
                 programs[prog].count++;
 
-                // NEW: Collect mission scores
-                if (r.is_present_engaged != null) programs[prog].present.push(r.is_present_engaged);
-                if (r.connection_others_score != null) programs[prog].connection.push(r.connection_others_score);
-                if (r.calmness_score != null) programs[prog].calm.push(r.calmness_score);
-                if (r.learning_intent_score != null) programs[prog].learning.push(r.learning_intent_score);
+                // 1. ✨ Present & Engaged
+                if (r.is_present_engaged != null) {
+                    programs[prog].present.push(r.is_present_engaged);
+                } else if (r.mood_after_raw != null) {
+                    // Fallback: Map 'Mood After' to 'Present'
+                    programs[prog].present.push(map5to3(r.mood_after_raw));
+                }
 
-                // LEGACY: Still collect old data for backward compatibility
+                // 2. 💚 Connected to Others
+                if (r.connection_others_score != null) {
+                    programs[prog].connection.push(r.connection_others_score);
+                }
+
+                // 3. 🧘 Calm & Grounded
+                if (r.calmness_score != null) {
+                    programs[prog].calm.push(r.calmness_score);
+                } else if (r.nature_connection_raw != null) {
+                    // Proxy: Nature connection -> Calm
+                    programs[prog].calm.push(map5to3(r.nature_connection_raw));
+                }
+
+                // 4. 🧠 Will Use Learning
+                if (r.learning_intent_score != null) {
+                    programs[prog].learning.push(r.learning_intent_score);
+                } else if (r.skills_learned_score != null) {
+                    // Proxy: Skills learned -> Will use learning
+                    programs[prog].learning.push(map100to3(r.skills_learned_score));
+                }
+
+                // LEGACY: Still collect old data just in case
                 if (r.mood_before_raw) programs[prog].before.push(r.mood_before_raw);
                 if (r.mood_after_raw) programs[prog].after.push(r.mood_after_raw);
                 if (r.nature_connection_raw) programs[prog].nature.push(r.nature_connection_raw);
