@@ -42,6 +42,9 @@ GUIDELINES:
             },
             body: JSON.stringify({
                 model: "arcee-ai/trinity-large-preview:free",
+                provider: {
+                    data_collection: "deny"
+                },
                 messages: [
                     { role: "system", content: systemPrompt },
                     ...messages
