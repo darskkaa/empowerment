@@ -41,7 +41,7 @@ GUIDELINES:
                 "X-Title": "Empowerment Farm Dashboard"
             },
             body: JSON.stringify({
-                model: "google/gemini-2.0-flash-exp:free",
+                model: "openrouter/free",
                 messages: [
                     { role: "system", content: systemPrompt },
                     ...messages
