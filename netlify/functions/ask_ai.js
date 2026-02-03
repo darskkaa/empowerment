@@ -41,7 +41,7 @@ GUIDELINES:
                 "X-Title": "Empowerment Farm Dashboard"
             },
             body: JSON.stringify({
-                model: "meta-llama/llama-3.3-70b-instruct:free",
+                model: "google/gemini-2.0-flash-lite-preview-02-05:free",
                 messages: [
                     { role: "system", content: systemPrompt },
                     ...messages
