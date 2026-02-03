@@ -863,6 +863,7 @@
                     if (c.SUPABASE_URL && c.ANON_KEY) {
                         supabaseClient = window.supabase.createClient(c.SUPABASE_URL, c.ANON_KEY);
                         console.log('✅ Supabase ready (Production Mode)');
+                        await loadSurveyCustomQuestions(); // Call before returning
                         return;
                     }
                 }
@@ -890,19 +891,47 @@
 
             try {
                 const { data, error } = await supabaseClient
-                    .from('custom_questions')
+                    .from('custom_questions') // Correct table name
                     .select('*')
                     .eq('is_active', true)
                     .order('display_order');
 
                 if (error) throw error;
                 customQuestions = data || [];
+                console.log(`✅ Loaded ${customQuestions.length} custom questions`);
+
+                // DEBUGGING: Visual feedback
+                const statusDiv = document.createElement('div');
+                statusDiv.style.position = 'fixed';
+                statusDiv.style.bottom = '10px';
+                statusDiv.style.left = '10px';
+                statusDiv.style.background = 'rgba(0,0,0,0.8)';
+                statusDiv.style.color = 'lime';
+                statusDiv.style.padding = '5px 10px';
+                statusDiv.style.borderRadius = '5px';
+                statusDiv.style.zIndex = '9999';
+                statusDiv.style.fontSize = '12px';
+                statusDiv.textContent = `DB: Connected | Questions: ${customQuestions.length}`;
+                document.body.appendChild(statusDiv);
 
                 if (customQuestions.length > 0) {
                     renderSurveyCustomQuestions();
+                } else {
+                    console.log('ℹ️ No custom questions to render');
                 }
             } catch (err) {
                 console.warn('⚠️ Could not load custom questions:', err);
+                const statusDiv = document.createElement('div');
+                statusDiv.style.position = 'fixed';
+                statusDiv.style.bottom = '10px';
+                statusDiv.style.left = '10px';
+                statusDiv.style.background = 'red';
+                statusDiv.style.color = 'white';
+                statusDiv.style.padding = '5px 10px';
+                statusDiv.style.borderRadius = '5px';
+                statusDiv.style.zIndex = '9999';
+                statusDiv.textContent = 'DB Error: ' + err.message;
+                document.body.appendChild(statusDiv);
             }
         }
 

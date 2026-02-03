@@ -845,6 +845,96 @@
                     </div>
                 </div>
 
+                <!-- EDIT QUESTION MODAL -->
+                <div id="editQuestionModal"
+                    class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div class="bg-slate-900 rounded-2xl p-6 max-w-md w-full border border-slate-700 shadow-2xl">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl">✏️</span>
+                                <div>
+                                    <h3 class="text-xl font-bold text-white">Edit Question</h3>
+                                    <p class="text-xs text-slate-400">Update text or emoji</p>
+                                </div>
+                            </div>
+                            <button onclick="closeEditQuestionModal()"
+                                class="text-slate-400 hover:text-white text-2xl">&times;</button>
+                        </div>
+
+                        <!-- Data Integrity Warning -->
+                        <div id="editResponseWarning"
+                            class="hidden mb-4 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+                            <p class="text-xs text-amber-400">⚠️ <span id="editResponseCount">0</span> responses use
+                                this question. Editing text won't affect stored data (linked by ID).</p>
+                        </div>
+
+                        <input type="hidden" id="editQuestionId">
+
+                        <!-- Question Text -->
+                        <div class="mb-4">
+                            <label class="block text-xs text-slate-400 uppercase tracking-wider mb-2">Question
+                                Text</label>
+                            <input type="text" id="editQuestionText"
+                                class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+                                placeholder="Your question here..." oninput="updateEditPreview()">
+                        </div>
+
+                        <!-- Emoji Picker -->
+                        <div class="mb-4">
+                            <label class="block text-xs text-slate-400 uppercase tracking-wider mb-2">Choose
+                                Emoji</label>
+                            <div class="grid grid-cols-8 gap-2">
+                                <button type="button" onclick="selectEditEmoji('✨')"
+                                    class="emoji-edit-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                    data-emoji="✨">✨</button>
+                                <button type="button" onclick="selectEditEmoji('🌟')"
+                                    class="emoji-edit-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                    data-emoji="🌟">🌟</button>
+                                <button type="button" onclick="selectEditEmoji('💚')"
+                                    class="emoji-edit-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                    data-emoji="💚">💚</button>
+                                <button type="button" onclick="selectEditEmoji('🌿')"
+                                    class="emoji-edit-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                    data-emoji="🌿">🌿</button>
+                                <button type="button" onclick="selectEditEmoji('🐐')"
+                                    class="emoji-edit-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                    data-emoji="🐐">🐐</button>
+                                <button type="button" onclick="selectEditEmoji('🌱')"
+                                    class="emoji-edit-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                    data-emoji="🌱">🌱</button>
+                                <button type="button" onclick="selectEditEmoji('🐄')"
+                                    class="emoji-edit-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                    data-emoji="🐄">🐄</button>
+                                <button type="button" onclick="selectEditEmoji('🌻')"
+                                    class="emoji-edit-btn p-2 text-xl bg-slate-800 hover:bg-slate-700 rounded-lg transition"
+                                    data-emoji="🌻">🌻</button>
+                            </div>
+                            <input type="hidden" id="editSelectedEmoji" value="✨">
+                        </div>
+
+                        <!-- Preview -->
+                        <div class="mb-6 p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                            <p class="text-xs text-slate-500 uppercase tracking-wider mb-2">Preview</p>
+                            <div class="flex items-center justify-center gap-3">
+                                <span id="editPreviewEmoji" class="text-2xl">✨</span>
+                                <span id="editPreviewText" class="text-white font-medium">Your question here...</span>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="flex gap-3">
+                            <button onclick="closeEditQuestionModal()"
+                                class="flex-1 px-4 py-3 bg-slate-800 text-slate-300 font-semibold rounded-xl hover:bg-slate-700 transition">
+                                Cancel
+                            </button>
+                            <button onclick="saveEditedQuestion()"
+                                class="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold rounded-xl hover:from-blue-600 hover:to-indigo-700 transition shadow-lg">
+                                Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </main>
 
@@ -1379,7 +1469,12 @@
 
             // Defensive check - if elements don't exist, stop
             if (!container || !noQuestionsEl) {
-                console.warn('⚠️ Custom questions container or "no questions" element not found in DOM');
+                console.error('⚠️ DOM Error: Missing elements', {
+                    container: !!container,
+                    noQuestionsEl: !!noQuestionsEl,
+                    containerId: 'customQuestionsContainer',
+                    noQuestionsId: 'noCustomQuestions'
+                });
                 return;
             }
 
@@ -1411,25 +1506,35 @@
                     : null;
             });
 
+            // Clear only the dynamically added cards (keep noQuestionsEl)
+            Array.from(container.children).forEach(child => {
+                if (child.id !== 'noCustomQuestions') {
+                    child.remove();
+                }
+            });
+
             // Render cards
-            const cardsHtml = customQuestions.map(q => {
+            customQuestions.forEach(q => {
                 const avg = questionAverages[q.question_id];
                 const scoreClass = avg >= 2.7 ? 'text-green-400' : avg >= 2.0 ? 'text-yellow-400' : avg ? 'text-orange-400' : 'text-slate-500';
+                const responseCount = allResponses.filter(r => r.custom_responses?.[q.question_id]).length;
 
-                return `
-                    <div class="pbi-card p-4 text-center bg-gradient-to-br from-slate-800/50 to-slate-900/50 relative group">
+                const card = document.createElement('div');
+                card.className = 'pbi-card p-4 text-center bg-gradient-to-br from-slate-800/50 to-slate-900/50 relative group custom-q-card';
+                card.dataset.questionId = q.question_id;
+                card.innerHTML = `
+                    <div class="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                        <button onclick="openEditQuestionModal('${q.question_id}')" 
+                            class="text-slate-500 hover:text-blue-400 text-xs p-1" title="Edit">✏️</button>
                         <button onclick="deleteCustomQuestion('${q.question_id}')" 
-                            class="absolute top-2 right-2 text-slate-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition text-xs">
-                            ✕
-                        </button>
-                        <p class="text-xs text-slate-400 mb-2 font-semibold">${q.emoji} ${q.question_text}</p>
-                        <h3 class="${scoreClass} text-3xl font-bold">${avg || '--'}</h3>
-                        <p class="text-[10px] text-slate-500 mt-1">${avg ? `${allResponses.filter(r => r.custom_responses?.[q.question_id]).length} responses` : 'No responses yet'}</p>
+                            class="text-slate-500 hover:text-red-400 text-xs p-1" title="Archive">✕</button>
                     </div>
+                    <p class="text-xs text-slate-400 mb-2 font-semibold">${q.emoji} ${q.question_text}</p>
+                    <h3 class="${scoreClass} text-3xl font-bold">${avg || '--'}</h3>
+                    <p class="text-[10px] text-slate-500 mt-1">${responseCount ? `${responseCount} responses` : 'No responses yet'}</p>
                 `;
-            }).join('');
-
-            container.innerHTML = cardsHtml;
+                container.appendChild(card);
+            });
         }
 
         async function deleteCustomQuestion(questionId) {
@@ -1461,7 +1566,102 @@
         }
 
 
-        // Program Table
+        // Edit Question Logic
+        function openEditQuestionModal(questionId) {
+            const question = customQuestions.find(q => q.question_id === questionId);
+            if (!question) return;
+
+            // Populate fields
+            document.getElementById('editQuestionId').value = question.question_id;
+            document.getElementById('editQuestionText').value = question.question_text;
+            document.getElementById('editSelectedEmoji').value = question.emoji || '✨';
+
+            // Update preview
+            document.getElementById('editPreviewText').textContent = question.question_text;
+            document.getElementById('editPreviewEmoji').textContent = question.emoji || '✨';
+
+            // Highlight selected emoji
+            document.querySelectorAll('.emoji-edit-btn').forEach(btn => {
+                btn.classList.remove('ring-2', 'ring-green-500');
+                if (btn.dataset.emoji === (question.emoji || '✨')) {
+                    btn.classList.add('ring-2', 'ring-green-500');
+                }
+            });
+
+            // Check usage for integrity warning
+            let usageCount = 0;
+            allResponses.forEach(r => {
+                if (r.custom_responses && r.custom_responses[questionId]) {
+                    usageCount++;
+                }
+            });
+
+            const warningEl = document.getElementById('editResponseWarning');
+            if (usageCount > 0) {
+                document.getElementById('editResponseCount').textContent = usageCount;
+                warningEl.classList.remove('hidden');
+            } else {
+                warningEl.classList.add('hidden');
+            }
+
+            document.getElementById('editQuestionModal').classList.remove('hidden');
+        }
+
+        function closeEditQuestionModal() {
+            document.getElementById('editQuestionModal').classList.add('hidden');
+        }
+
+        function selectEditEmoji(emoji) {
+            document.getElementById('editSelectedEmoji').value = emoji;
+            document.getElementById('editPreviewEmoji').textContent = emoji;
+            // Update visual selection
+            document.querySelectorAll('.emoji-edit-btn').forEach(btn => btn.classList.remove('ring-2', 'ring-green-500'));
+            const selectedBtn = document.querySelector(`.emoji-edit-btn[data-emoji="${emoji}"]`);
+            if (selectedBtn) selectedBtn.classList.add('ring-2', 'ring-green-500');
+        }
+
+        function updateEditPreview() {
+            const text = document.getElementById('editQuestionText').value;
+            document.getElementById('editPreviewText').textContent = text || 'Your question here...';
+        }
+
+        async function saveEditedQuestion() {
+            const questionId = document.getElementById('editQuestionId').value;
+            const newText = document.getElementById('editQuestionText').value.trim();
+            const newEmoji = document.getElementById('editSelectedEmoji').value;
+
+            if (!newText) {
+                alert('Please enter a question!');
+                return;
+            }
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('custom_questions')
+                    .update({
+                        question_text: newText,
+                        emoji: newEmoji
+                    })
+                    .eq('question_id', questionId)
+                    .select();
+
+                if (error) throw error;
+
+                // Update local array
+                const index = customQuestions.findIndex(q => q.question_id === questionId);
+                if (index !== -1) {
+                    customQuestions[index] = data[0];
+                }
+
+                renderCustomQuestions();
+                closeEditQuestionModal();
+                showToast('✅ Question updated successfully!');
+
+            } catch (err) {
+                console.error('Error updating question:', err);
+                alert('Failed to update question. Please try again.');
+            }
+        }
         function renderProgramTable() {
             const programs = {};
 
@@ -1868,7 +2068,15 @@
             a.click();
         }
 
-        initSupabase();
+
+        // ============================================
+        // INIT
+        // ============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Dashboard DOM Loaded');
+            initSupabase();
+        });
+
     </script>
 </body>
 

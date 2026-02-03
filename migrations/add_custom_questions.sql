@@ -20,10 +20,12 @@ COMMENT ON TABLE custom_questions IS 'Client-defined survey questions manageable
 ALTER TABLE custom_questions ENABLE ROW LEVEL SECURITY;
 
 -- Policy: Anyone can view active questions (for survey form)
+DROP POLICY IF EXISTS "Anyone can view active questions" ON custom_questions;
 CREATE POLICY "Anyone can view active questions" ON custom_questions 
     FOR SELECT TO anon, authenticated USING (is_active = TRUE);
 
 -- Policy: Authenticated users can manage questions (for dashboard)
+DROP POLICY IF EXISTS "Authenticated can manage questions" ON custom_questions;
 CREATE POLICY "Authenticated can manage questions" ON custom_questions 
     FOR ALL TO authenticated USING (true);
 
