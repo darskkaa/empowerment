@@ -886,12 +886,15 @@
         // ============================================
         // CUSTOM QUESTIONS (SURVEY SIDE)
         // ============================================
+        // ============================================
+        // CUSTOM QUESTIONS (SURVEY SIDE)
+        // ============================================
         async function loadSurveyCustomQuestions() {
             if (!supabaseClient) return;
 
             try {
                 const { data, error } = await supabaseClient
-                    .from('custom_questions') // Correct table name
+                    .from('custom_questions')
                     .select('*')
                     .eq('is_active', true)
                     .order('display_order');
@@ -900,51 +903,35 @@
                 customQuestions = data || [];
                 console.log(`✅ Loaded ${customQuestions.length} custom questions`);
 
-                // DEBUGGING: Visual feedback
-                const statusDiv = document.createElement('div');
-                statusDiv.style.position = 'fixed';
-                statusDiv.style.bottom = '10px';
-                statusDiv.style.left = '10px';
-                statusDiv.style.background = 'rgba(0,0,0,0.8)';
-                statusDiv.style.color = 'lime';
-                statusDiv.style.padding = '5px 10px';
-                statusDiv.style.borderRadius = '5px';
-                statusDiv.style.zIndex = '9999';
-                statusDiv.style.fontSize = '12px';
-                statusDiv.textContent = `DB: Connected | Questions: ${customQuestions.length}`;
-                document.body.appendChild(statusDiv);
+                // Update total count
+                totalQuestions = 11 + customQuestions.length;
+                totalScreens = 14 + customQuestions.length;
+                updateProgress();
 
                 if (customQuestions.length > 0) {
                     renderSurveyCustomQuestions();
-                } else {
-                    console.log('ℹ️ No custom questions to render');
                 }
             } catch (err) {
                 console.warn('⚠️ Could not load custom questions:', err);
-                const statusDiv = document.createElement('div');
-                statusDiv.style.position = 'fixed';
-                statusDiv.style.bottom = '10px';
-                statusDiv.style.left = '10px';
-                statusDiv.style.background = 'red';
-                statusDiv.style.color = 'white';
-                statusDiv.style.padding = '5px 10px';
-                statusDiv.style.borderRadius = '5px';
-                statusDiv.style.zIndex = '9999';
-                statusDiv.textContent = 'DB Error: ' + err.message;
-                document.body.appendChild(statusDiv);
             }
         }
 
         function renderSurveyCustomQuestions() {
-            const container = document.getElementById('customQuestionsFormContainer');
-            if (!container || customQuestions.length === 0) return;
+            const container = document.querySelector('.survey-wrap');
+            // Insert AFTER screen 9 (Community Benefit) and BEFORE screen 10 (Return Intent)
+            const screen9 = document.getElementById('screen9');
 
-            const html = customQuestions.map(q => `
-                <div class="custom-q-item" style="margin-bottom: 24px; text-align: center;">
-                    <p style="font-size: 1.1rem; font-weight: 700; color: #166534; margin-bottom: 12px;">
-                        ${q.emoji} ${q.question_text}
-                    </p>
-                    <div class="nps-row" role="radiogroup" aria-label="${q.question_text}">
+            customQuestions.forEach((q, index) => {
+                const screenId = `custom-q-${index}`;
+                const div = document.createElement('div');
+                div.className = 'screen';
+                div.id = screenId;
+                div.dataset.customIndex = index;
+
+                div.innerHTML = `
+                    <h2>${q.question_text}</h2>
+                    <p class="subtitle">Custom Question ${index + 1}</p>
+                    <div class="nps-row" role="radiogroup">
                         <button class="nps-btn no" data-value="1" onclick="selectCustomQuestion(this, '${q.question_id}')">
                             <span class="nps-emoji">👎</span><span class="nps-text">No</span>
                         </button>
@@ -955,61 +942,105 @@
                             <span class="nps-emoji">✅</span><span class="nps-text">Yes</span>
                         </button>
                     </div>
-                </div>
-            `).join('');
+                    <button class="skip" onclick="nextScreen()">Skip this question</button>
+                `;
 
-            container.innerHTML = html;
+                // Insert after the previous screen (chain them)
+                container.insertBefore(div, document.getElementById('screen10'));
+            });
         }
 
         function selectCustomQuestion(btn, questionId) {
-            const parent = btn.closest('.custom-q-item');
-            parent.querySelectorAll('.nps-btn').forEach(b => b.classList.remove('selected'));
+            const screen = btn.closest('.screen');
+            screen.querySelectorAll('.nps-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             data.custom_responses[questionId] = parseInt(btn.dataset.value);
-        }
-
-        function nextScreenAfterCustom() {
-            // Go to screen 10 (Return Intent)
-            showScreen(10);
+            setTimeout(nextScreen, 250);
         }
 
         // ============================================
         // NAVIGATION
         // ============================================
         function updateProgress() {
-            const pct = ((currentScreen - 1) / totalQuestions) * 100;
+            // Calculate current question number
+            let qNum = 0;
+            if (typeof currentScreen === 'string' && currentScreen.startsWith('custom-q-')) {
+                const idx = parseInt(currentScreen.split('-')[2]);
+                qNum = 9 + 1 + idx; // 9 standard before + 1 (1-based) + index
+            } else if (typeof currentScreen === 'number') {
+                if (currentScreen <= 9) qNum = currentScreen - 1; // Screen 1 is "Welcome", Q1 starts at Screen 4? 
+                // Wait, logic check: 
+                // screen1=Welcome (Not Q)
+                // screen2=Program (Q1)
+                // screen3=Age (Q2)
+                // screen4=Mission1 (Q3)
+                // ...
+                // screen9=Mission6 (Q8)
+                // screen10=Return (Q9 + CustomCount)
+                // The math is getting complex. Let's simplify progress bar 0-100%.
+
+                // Simplified relative progress
+                // Let's just track "steps taken" vs "total steps"
+                if (currentScreen === 1) qNum = 0;
+                else if (currentScreen <= 9) qNum = currentScreen - 1;
+                else if (currentScreen >= 10) qNum = 9 + customQuestions.length + (currentScreen - 9 - 1);
+            }
+
+            const pct = (qNum / totalQuestions) * 100;
             document.getElementById('progressBar').style.width = Math.min(pct, 100) + '%';
-            const q = Math.min(currentScreen - 1, totalQuestions);
-            document.getElementById('progressText').textContent = q === 0 ? 'Ready to start' : `Question ${q} of ${totalQuestions}`;
+            document.getElementById('progressText').textContent = qNum === 0 ? 'Ready to start' : `Question ${qNum} of ${totalQuestions}`;
         }
 
-        function showScreen(n) {
+        function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById('screen' + n).classList.add('active');
-            currentScreen = n;
+            document.getElementById(id).classList.add('active');
+
+            // State tracking
+            if (id.startsWith('screen')) {
+                currentScreen = parseInt(id.replace('screen', ''));
+            } else {
+                currentScreen = id;
+            }
+
             updateProgress();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function nextScreen() {
-            // After screen 9 (Community Benefit), show custom questions if any exist
-            if (currentScreen === 9 && customQuestions.length > 0) {
-                // Show the custom questions screen
-                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-                document.getElementById('screenCustomQuestions').style.display = 'flex';
-                document.getElementById('screenCustomQuestions').classList.add('active');
-                currentScreen = 'custom'; // Special marker
-                updateProgress();
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+            // LOGIC FLOW:
+            // 1 -> 2 -> ... -> 9
+            // 9 -> Custom 0 -> Custom 1 ...
+            // Custom Last -> 10
+            // 10 -> 11 (Skip if minor) -> 12 -> 13 -> 14
+
+            if (currentScreen === 9) {
+                if (customQuestions.length > 0) {
+                    showScreen('custom-q-0');
+                    return;
+                } else {
+                    showScreen('screen10');
+                    return;
+                }
+            }
+
+            if (typeof currentScreen === 'string' && currentScreen.startsWith('custom-q-')) {
+                const idx = parseInt(currentScreen.split('-')[2]);
+                if (idx < customQuestions.length - 1) {
+                    showScreen(`custom-q-${idx + 1}`);
+                } else {
+                    showScreen('screen10');
+                }
                 return;
             }
 
-            // Conditional logic: Skip donation screen if under 18
-            if (currentScreen === 10 && data.age_range === '0-17') {
-                // Skip screen 11 (donation) for minors
-                if (currentScreen + 1 < totalScreens) showScreen(currentScreen + 2);
-            } else {
-                if (currentScreen < totalScreens) showScreen(currentScreen + 1);
+            // Standard Numbered Screens
+            if (typeof currentScreen === 'number') {
+                // Conditional logic re-check
+                if (currentScreen === 10 && data.age_range === '0-17') {
+                    showScreen('screen12'); // Skip 11 (donation)
+                } else {
+                    if (currentScreen < 14) showScreen('screen' + (currentScreen + 1));
+                }
             }
         }
 
@@ -1018,7 +1049,7 @@
         // ============================================
         function startSurvey(isReturning) {
             data.is_returning_visitor = isReturning;
-            nextScreen();
+            showScreen('screen2'); // Use showScreen explicitly
         }
 
         function selectProgram(btn) {
