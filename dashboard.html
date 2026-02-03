@@ -1377,8 +1377,21 @@
             const container = document.getElementById('customQuestionsContainer');
             const noQuestionsEl = document.getElementById('noCustomQuestions');
 
+            // Defensive check - if elements don't exist, stop
+            if (!container || !noQuestionsEl) {
+                console.warn('⚠️ Custom questions container or "no questions" element not found in DOM');
+                return;
+            }
+
             if (customQuestions.length === 0) {
                 noQuestionsEl.style.display = 'block';
+                // Clear any existing custom question cards (keeping only the "no questions" placeholder)
+                // We need to be careful not to remove the "noQuestionsEl" itself if it's inside the container
+                // But based on structure, it is a direct child.
+                // Let's hide all other children
+                Array.from(container.children).forEach(child => {
+                    if (child.id !== 'noCustomQuestions') child.style.display = 'none';
+                });
                 return;
             }
 
