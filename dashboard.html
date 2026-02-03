@@ -2220,6 +2220,11 @@
                     percent_recommending: (allResponses.length ? Math.round((allResponses.filter(r => r.would_recommend).length / allResponses.length) * 100) + '%' : 'N/A'),
                     percent_returning: (allResponses.length ? Math.round((allResponses.filter(r => r.is_returning_visitor === true || r.is_returning_visitor === 'true').length / allResponses.length) * 100) + '%' : 'N/A')
                 },
+                counts: {
+                    will_return_yes: allResponses.filter(r => r.will_return === true).length,
+                    returning_visitors: allResponses.filter(r => r.is_returning_visitor === true || r.is_returning_visitor === 'true').length,
+                    would_recommend_yes: allResponses.filter(r => r.would_recommend).length
+                },
                 demographics: (() => {
                     const ages = {};
                     allResponses.forEach(r => { const a = r.age_range_bracket || 'Unknown'; ages[a] = (ages[a] || 0) + 1; });
