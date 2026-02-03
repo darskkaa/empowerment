@@ -799,7 +799,8 @@
                 </div>
                 <div class="link-row">
                     <a href="https://empowermentfarm.org" class="link-btn">🌻 Visit Website</a>
-                    <a href="https://empowerment-farm.givecloud.co/fundraising/forms/G2EXWJD6" class="link-btn">💚
+                    <a href="https://empowerment-farm.givecloud.co/fundraising/forms/G2EXWJD6" class="link-btn"
+                        id="donationLink">💚
                         Donate</a>
                 </div>
             </div>
@@ -1104,11 +1105,25 @@
                 }
 
                 console.log('✅ Successfully inserted:', result);
+
+                // Hide donation link for minors
+                if (data.age_range === '0-17') {
+                    const donationLink = document.getElementById('donationLink');
+                    if (donationLink) donationLink.style.display = 'none';
+                }
+
                 showScreen(totalScreens);
                 launchConfetti();
             } catch (e) {
                 console.error('❌ Submit error:', e.message || e);
                 alert("❌ SUBMISSION ERROR:\n" + (e.message || JSON.stringify(e)) + "\n\nPlease take a screenshot of this and send it to support.");
+
+                // Hide donation link for minors (also on error)
+                if (data.age_range === '0-17') {
+                    const donationLink = document.getElementById('donationLink');
+                    if (donationLink) donationLink.style.display = 'none';
+                }
+
                 // Still show thank you - don't block user experience
                 showScreen(totalScreens);
                 launchConfetti();
