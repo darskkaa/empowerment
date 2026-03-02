@@ -72,6 +72,16 @@ A secure, mobile-optimized digital survey and analytics platform for Empowerment
    *Note: Do not use the `sb_publishable_` key format.*
 3. Deploy! 🚀
 
+### 4. Deploy to Vercel (alternative)
+1. Push this repo to GitHub, then go to [vercel.com](https://vercel.com) and sign in with GitHub.
+2. Click **Add New… → Project** and import the `empowerment` repo.
+3. Leave **Build Command** and **Output Directory** empty (static site + API routes).
+4. In **Environment Variables**, add:
+   - `SUPABASE_URL` = your Supabase project URL  
+   - `ANON_KEY` = your Supabase anon key (JWT, starts with `eyJ...`)  
+   - `OPENROUTER_API_KEY` = your OpenRouter API key (for dashboard AI chat; optional).
+5. Click **Deploy**. Your site will be at `https://your-project.vercel.app` (and `/api/get_config`, `/api/ask_ai` for the backend).
+
 ---
 
 ## 📂 Project Structure
@@ -83,10 +93,16 @@ A secure, mobile-optimized digital survey and analytics platform for Empowerment
 ├── manifest.json           # PWA Configuration (Install to Home Screen)
 ├── logo.png                # App Icon
 ├── netlify.toml            # Netlify Build Config
+├── vercel.json             # Vercel rewrites (optional)
+│
+├── api/                    # Vercel serverless API routes
+│   ├── get_config.js       # Supabase config (env only)
+│   └── ask_ai.js           # Dashboard AI chat (OpenRouter)
 │
 ├── netlify/
 │   └── functions/
-│       └── get_config.js   # Secure API Key Proxy (Hides credentials)
+│       ├── get_config.js   # Netlify: API key proxy
+│       └── ask_ai.js       # Netlify: AI chat
 │
 └── sql/                    # Database Scripts
     ├── schema.sql          # 🔥 MASTER SCHEMA (Run this to reset DB)
