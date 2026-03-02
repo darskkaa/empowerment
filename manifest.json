@@ -1,6 +1,6 @@
 {
-    "name": "Empowerment Farm Survey",
-    "short_name": "Empowerment",
+    "name": "Emp Farm Survey",
+    "short_name": "Emp Farm",
     "start_url": "./index.html",
     "display": "standalone",
     "background_color": "#14532d",

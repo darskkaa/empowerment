@@ -18,7 +18,7 @@ export const handler = async (event, context) => {
         // 2. Prepare System Prompt with Data
         // We inject the data here, keeping it hidden from the client-side network tab (mostly)
         // although the client sent it, so it's moot. But this keeps the prompt logic central.
-        const systemPrompt = `You are a helpful data analyst for Empowerment Farm.
+        const systemPrompt = `You are a helpful data analyst for Emp Farm.
 Your goal is to answer questions based on the SURVEY DATA provided below.
 
 DATA CONTEXT:
@@ -39,8 +39,8 @@ GUIDELINES:
             headers: {
                 "Authorization": `Bearer ${apiKey}`,
                 "Content-Type": "application/json",
-                "HTTP-Referer": "https://empowermentfarm.io", // Placeholder
-                "X-Title": "Empowerment Farm Dashboard"
+                "HTTP-Referer": "https://empfarm.netlify.app",
+                "X-Title": "Emp Farm Dashboard"
             },
             body: JSON.stringify({
                 model: "arcee-ai/trinity-large-preview:free",

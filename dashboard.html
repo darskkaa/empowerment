@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Empowerment Farm | Impact Center</title>
+    <title>Emp Farm | Impact Center</title>
     <meta name="robots" content="noindex, nofollow">
 
     <!-- Tailwind CSS -->
@@ -271,7 +271,7 @@
     <div id="loginScreen" class="active min-h-screen flex items-center justify-center p-4">
         <div class="pbi-card p-10 w-full max-w-md text-center">
             <!-- Logo in Login -->
-            <img src="logo.png" alt="Empowerment Farm" class="h-20 mx-auto mb-6 drop-shadow-lg">
+            <img src="logo.png" alt="Emp Farm" class="h-20 mx-auto mb-6 drop-shadow-lg">
 
             <h1 class="text-3xl font-bold text-white mb-2">Impact Center</h1>
             <p class="text-slate-400 mb-8 text-sm">Analytics Dashboard</p>
@@ -297,10 +297,10 @@
             <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
                 <div class="flex items-center gap-4">
                     <!-- Logo in Header -->
-                    <img src="logo.png" alt="Empowerment Farm" class="h-16 w-auto drop-shadow-md">
+                    <img src="logo.png" alt="Emp Farm" class="h-16 w-auto drop-shadow-md">
                     <div>
                         <h1 class="font-extrabold text-white text-xl leading-none">Impact Center</h1>
-                        <p class="text-xs text-green-400 font-semibold tracking-wide uppercase mt-0.5">Empowerment Farm
+                        <p class="text-xs text-green-400 font-semibold tracking-wide uppercase mt-0.5">Emp Farm
                         </p>
                     </div>
                 </div>
@@ -964,7 +964,7 @@
             <div class="max-w-7xl mx-auto px-4 py-6">
                 <div class="flex flex-col md:flex-row items-center justify-between text-xs text-slate-500">
                     <div class="flex items-center gap-4">
-                        <span class="font-semibold text-green-400">Empowerment Farm</span>
+                        <span class="font-semibold text-green-400">Emp Farm</span>
                         <span class="text-slate-700">|</span>
                         <span>Naples, FL</span>
                     </div>
@@ -2093,7 +2093,7 @@
             const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
             const a = document.createElement('a');
             a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
-            a.download = `empowerment_farm_${new Date().toISOString().split('T')[0]}.csv`;
+            a.download = `emp_farm_${new Date().toISOString().split('T')[0]}.csv`;
             a.click();
         }
 
