@@ -79,7 +79,8 @@ A secure, mobile-optimized digital survey and analytics platform for Empowerment
 4. In **Environment Variables**, add:
    - `SUPABASE_URL` = your Supabase project URL  
    - `ANON_KEY` = your Supabase anon key (JWT, starts with `eyJ...`)  
-   - `OPENROUTER_API_KEY` = your OpenRouter API key (for dashboard AI chat; optional).
+   - `OPENROUTER_API_KEY` = your OpenRouter API key (for dashboard AI chat; optional).  
+   **Tip:** Avoid copy-pasting env **names** from docs—trailing/leading spaces (e.g. `HELLO_WORLD `) cause Vercel’s “invalid characters” error. Type the name or trim the pasted value.
 5. Click **Deploy**. Your site will be at `https://your-project.vercel.app` (and `/api/get_config`, `/api/ask_ai` for the backend).
 
 ---
