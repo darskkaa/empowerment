@@ -1,7 +1,7 @@
 # Empowerment Farm Digital Ecosystem 🌿
 
-**Live Demo:** [https://empfarm.netlify.app/](https://empfarm.netlify.app/)  
-**Admin:** [https://empfarm.netlify.app/dashboard.html](https://empfarm.netlify.app/dashboard.html)
+**Live Demo:** [https://empfarm.vercel.app/](https://empfarm.vercel.app/) (or your Vercel project URL)  
+**Admin:** [https://empfarm.vercel.app/dashboard.html](https://empfarm.vercel.app/dashboard.html)
 
 A secure, mobile-optimized digital survey and analytics platform for Empowerment Farm. This application tracks therapeutic outcomes of farm-based activities without requiring diagnostic labels ("Labels Stop at the Gate").
 
@@ -44,7 +44,7 @@ A secure, mobile-optimized digital survey and analytics platform for Empowerment
 
 ### 🔒 **Enterprise-Grade Security**
 - **Row Level Security (RLS)**: Database policies strictly control access. `anon` users can ONLY insert.
-- **Secure Proxy**: Netlify Functions (`get_config.js`) hide API keys from the public client.
+- **Secure Proxy**: Vercel API routes (`/api/get_config`) keep Supabase keys server-side.
 - **PII Protection**: Names and emails are separated from survey data in the schema design.
 
 ---
@@ -64,15 +64,7 @@ A secure, mobile-optimized digital survey and analytics platform for Empowerment
 1. Go to **Authentication > Providers** and ensure **Email** is enabled.
 2. Go to **Authentication > Users** and "Invite" the admin email (e.g., your email) to access the dashboard.
 
-### 3. Deploy to Netlify
-1. Connect this repo to Netlify.
-2. Go to **Site Settings > Environment Variables** and add **EXACTLY** these two:
-   - `SUPABASE_URL`: Your Project URL
-   - `ANON_KEY`: Your JWT `anon` key (starts with `eyJ...`)
-   *Note: Do not use the `sb_publishable_` key format.*
-3. Deploy! 🚀
-
-### 4. Deploy to Vercel (alternative)
+### 3. Deploy to Vercel
 1. Push this repo to GitHub, then go to [vercel.com](https://vercel.com) and sign in with GitHub.
 2. Click **Add New… → Project** and import the `empowerment` repo.
 3. Leave **Build Command** and **Output Directory** empty (static site + API routes).
@@ -93,17 +85,11 @@ A secure, mobile-optimized digital survey and analytics platform for Empowerment
 ├── dashboard.html          # Admin Dashboard (Protected, Chart.js)
 ├── manifest.json           # PWA Configuration (Install to Home Screen)
 ├── logo.png                # App Icon
-├── netlify.toml            # Netlify Build Config
-├── vercel.json             # Vercel rewrites (optional)
+├── vercel.json             # Vercel rewrites
 │
 ├── api/                    # Vercel serverless API routes
 │   ├── get_config.js       # Supabase config (env only)
 │   └── ask_ai.js           # Dashboard AI chat (OpenRouter)
-│
-├── netlify/
-│   └── functions/
-│       ├── get_config.js   # Netlify: API key proxy
-│       └── ask_ai.js       # Netlify: AI chat
 │
 └── sql/                    # Database Scripts
     ├── schema.sql          # 🔥 MASTER SCHEMA (Run this to reset DB)
@@ -120,7 +106,7 @@ A secure, mobile-optimized digital survey and analytics platform for Empowerment
 This project uses a **"Defense in Depth"** strategy:
 
 1.  **Frontend**: The Dashboard is hidden behind an Email Magic Link login.
-2.  **Middle Layer**: API keys are never hardcoded in the frontend source. They are fetched dynamically from secure Netlify Functions.
+2.  **Middle Layer**: API keys are never hardcoded in the frontend. They are fetched from Vercel API routes (`/api/get_config`).
 3.  **Database (RLS)**:
     *   **Implicit Deny**: All access is denied by default.
     *   **Public Access**: `anon` role can **only** `INSERT` into `surveyresponses`. They cannot `SELECT`, `UPDATE`, or `DELETE`.
@@ -139,7 +125,7 @@ This project uses a **"Defense in Depth"** strategy:
 
 **401 Unauthorized Error:**
 - **Cause**: Mismatched API keys or using the wrong key format (`sb_publishable_` vs `eyJ...`).
-- **Fix**: Ensure Netlify `ANON_KEY` matches the **JWT** `anon` key from Supabase Dashboard.
+- **Fix**: Ensure Vercel env `ANON_KEY` matches the **JWT** `anon` key from Supabase Dashboard (no spaces in the variable name).
 
 ---
 

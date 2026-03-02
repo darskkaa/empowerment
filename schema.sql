@@ -213,9 +213,9 @@ COMMENT ON COLUMN surveyresponses.is_returning_visitor IS 'True if the user self
 -- RLS for surveyresponses - THE CRITICAL PART
 ALTER TABLE surveyresponses ENABLE ROW LEVEL SECURITY;
 
--- Policy: Anonymous users CAN insert surveys (Fixed for Supabase)
+-- Policy: Anonymous users CAN insert surveys (explicit anon for Supabase/PostgREST)
 CREATE POLICY "Allow public survey submissions" ON surveyresponses
-    FOR INSERT TO PUBLIC
+    FOR INSERT TO anon, authenticated
     WITH CHECK (true);
 
 -- Policy: Only authenticated users can read
@@ -236,6 +236,8 @@ CREATE POLICY "Only authenticated can delete" ON surveyresponses
 -- GRANTS - CRITICAL FOR RLS TO WORK
 GRANT INSERT ON surveyresponses TO anon;
 GRANT ALL ON surveyresponses TO authenticated;
+-- Required for default uuid_generate_v4() on insert as anon
+GRANT EXECUTE ON FUNCTION uuid_generate_v4() TO anon;
 
 -- ============================================================================
 -- TABLE: audit_log

@@ -2135,7 +2135,7 @@
             const context = prepareDataContext();
 
             try {
-                // Call our secure Netlify Function
+                // Call Vercel API (env vars stay server-side)
                 const response = await fetch("/api/ask_ai", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },

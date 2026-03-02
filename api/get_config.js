@@ -14,9 +14,13 @@ export default async function handler(req, res) {
     process.env.ANON_KEY_SUPABASE_ANON_KEY ||
     null;
 
+  // Trim to avoid 401 from accidental whitespace in env vars
+  const url = typeof supabaseUrl === "string" ? supabaseUrl.trim() : null;
+  const key = typeof anonKey === "string" ? anonKey.trim() : null;
+
   res.setHeader("Content-Type", "application/json");
   res.status(200).json({
-    SUPABASE_URL: supabaseUrl,
-    ANON_KEY: anonKey,
+    SUPABASE_URL: url,
+    ANON_KEY: key,
   });
 }

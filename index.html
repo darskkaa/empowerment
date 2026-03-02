@@ -10,8 +10,8 @@
     <meta name="description" content="Share your experience at Emp Farm">
     <meta name="theme-color" content="#166534">
 
-    <!-- PWA / iOS -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <!-- PWA / iOS (mobile-web-app-capable is standard; apple-* kept for older iOS) -->
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="logo.png">
 
@@ -846,17 +846,12 @@
         // INIT
         // ============================================
         async function initSupabase() {
-            // ==========================================
-            // 🔧 LOCAL TESTING CONFIG
-            // If running locally (file://), you can verify DB connection
-            // by adding your keys here. DO NOT COMMIT REAL KEYS!
-            // ==========================================
-            const LOCAL_URL = "https://axqffzxzwwbtjkcfzngu.supabase.co";
-            const LOCAL_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4cWZmenh6d3didGprY2Z6bmd1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1Mzg4OTksImV4cCI6MjA4NTExNDg5OX0.Go7DC3HhFhOSwxyXqC74hXGBK6aertzVy6q2OwKiT0g";
-            // ==========================================
+            // Local fallback: leave empty so production always uses /api/get_config (no 401 from stale keys).
+            const LOCAL_URL = "";
+            const LOCAL_KEY = "";
 
             try {
-                // 1. Try to fetch from Netlify function (PRODUCTION)
+                // Fetch from Vercel API (env vars stay server-side)
                 const res = await fetch('/api/get_config');
                 if (res.ok) {
                     const c = await res.json();
@@ -1115,7 +1110,7 @@
 
             if (!supabaseClient) {
                 console.warn('⚠️ No Supabase client - showing thank you anyway');
-                alert("⚠️ TEST METHOD WARNING:\n\nDetailed database saving is disabled because the app is running locally without a server.\n\nYour survey 'submission' was simulated. To save to the real database, please deploy to Netlify or run a local server.");
+                alert("⚠️ TEST METHOD WARNING:\n\nDetailed database saving is disabled because the app is running locally without a server.\n\nYour survey 'submission' was simulated. To save to the real database, please deploy to Vercel or run a local server.");
                 showScreen('screen14');
                 launchConfetti();
                 return;
