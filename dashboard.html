@@ -2180,11 +2180,31 @@
                 programs[p] = (programs[p] || 0) + 1;
             });
 
-            // 2. Recent Comments (Last 20) - SECURE (No names)
+            // 2. Recent Comments (Last 20) - SECURE (No names), with program so AI can answer by program
             const comments = allResponses
                 .filter(r => r.standout_moment)
                 .slice(0, 20)
-                .map(r => `"${r.standout_moment}" (${r.age_range_bracket || 'Unknown Age'})`);
+                .map(r => `[${r.experience_type || 'Unknown'}] "${r.standout_moment}" (${r.age_range_bracket || 'Unknown Age'})`);
+
+            // 2b. Reviews BY PROGRAM so AI can list/summarize "Yoga on the Farm reviews" etc.
+            const reviewsByProgram = {};
+            allResponses.forEach(r => {
+                const program = r.experience_type || 'Unknown';
+                if (!reviewsByProgram[program]) reviewsByProgram[program] = [];
+                const dateStr = r.submitted_at || r.created_at
+                    ? new Date(r.submitted_at || r.created_at).toLocaleDateString()
+                    : '—';
+                reviewsByProgram[program].push({
+                    date: dateStr,
+                    standout: r.standout_moment || null,
+                    additional: r.additional_feedback || null,
+                    impact_score: r.impact_score ?? (r.calmness_score != null ? r.calmness_score : null)
+                });
+            });
+            // Keep most recent 25 per program (allResponses is already newest first)
+            Object.keys(reviewsByProgram).forEach(p => {
+                reviewsByProgram[p] = reviewsByProgram[p].slice(0, 25);
+            });
 
             // 3. Averages
             const avg = field => {
@@ -2193,9 +2213,10 @@
             };
 
             return {
-                _data_scope: "Metrics are overall or by program; demographics are counts by age and referral. There is no satisfaction or enjoyment broken down by age—only overall averages.",
+                _data_scope: "Each response has experience_type (program name). reviews_by_program lists recent feedback per program (date, standout_moment, additional_feedback). You CAN list or summarize reviews by program (e.g. 'Yoga on the Farm reviews'). Demographics are counts by age; no satisfaction broken down by age.",
                 total_responses: total,
                 program_counts: programs,
+                reviews_by_program: reviewsByProgram,
                 averages: {
                     present_engaged: avg('is_present_engaged'),
                     connection: avg('connection_others_score'),
