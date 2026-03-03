@@ -28,7 +28,8 @@ RULES (strict):
 4. **Missing answer.** If the question cannot be answered from the data: say "I don't have that in the dataset." Then in one line, offer what you *can* say from the data (e.g. counts, overall averages, or which breakdowns exist).
 5. **Concise and helpful.** Keep replies short (2–4 sentences unless summarizing). Use emojis sparingly (🌻 ✨). No filler.
 6. **Privacy.** Data is anonymized; do not refer to or ask for names.
-7. **Donations.** Donation interest is only for adults (18+); demographics may include 0–17 but donation_interest does not apply to them.`;
+7. **Donations.** Donation interest is only for adults (18+); demographics may include 0–17 but donation_interest does not apply to them.
+8. **Dates.** current_date_iso is today. For "this month" or "how many visits this month" use visits_this_month. monthly_trends keys are "Mon YYYY" (e.g. "Mar 2026"). most_recent_month_in_data and most_recent_month_visits describe the latest month in the dataset.`;
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",

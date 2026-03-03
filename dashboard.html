@@ -2206,26 +2206,108 @@
                 reviewsByProgram[p] = reviewsByProgram[p].slice(0, 25);
             });
 
-            // 3. Averages
+            // 3. Averages and helpers
             const avg = field => {
-                const vals = allResponses.map(r => r[field]).filter(v => v);
+                const vals = allResponses.map(r => r[field]).filter(v => v != null && v !== '');
                 return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2) : 'N/A';
             };
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth();
+            const withValidDate = r => {
+                const t = r.submitted_at || r.created_at;
+                return t && !isNaN(new Date(t).getTime());
+            };
+            const visitsThisMonth = allResponses.filter(r => {
+                if (!withValidDate(r)) return false;
+                const d = new Date(r.submitted_at || r.created_at);
+                return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+            }).length;
+            // monthly_trends with YEAR so "this month" / "last month" is unambiguous
+            const monthlyTrendsWithYear = {};
+            allResponses.forEach(r => {
+                if (!r.created_at || isNaN(new Date(r.created_at).getTime())) return;
+                const d = new Date(r.created_at);
+                const key = d.toLocaleString('default', { month: 'short' }) + ' ' + d.getFullYear();
+                monthlyTrendsWithYear[key] = (monthlyTrendsWithYear[key] || 0) + 1;
+            });
+            const latestDate = allResponses.filter(withValidDate).length
+                ? new Date(Math.max(...allResponses.filter(withValidDate).map(r => new Date(r.submitted_at || r.created_at))))
+                : null;
+            const mostRecentMonthLabel = latestDate ? latestDate.toLocaleString('default', { month: 'short' }) + ' ' + latestDate.getFullYear() : null;
+            const mostRecentMonthVisits = mostRecentMonthLabel ? (monthlyTrendsWithYear[mostRecentMonthLabel] || 0) : 0;
+            // Impact = (present + connection_others + connection_nature + calmness) / 4
+            const impact = r => {
+                const a = r.is_present_engaged, b = r.connection_others_score, c = r.connection_nature_score, d = r.calmness_score;
+                if (a == null || b == null || c == null || d == null) return null;
+                return ((a + b + c + d) / 4).toFixed(2);
+            };
+            const perProgramMetrics = {};
+            allResponses.forEach(r => {
+                const program = r.experience_type || 'Unknown';
+                if (!perProgramMetrics[program]) perProgramMetrics[program] = { n: 0, present: [], connection: [], nature: [], calmness: [], learning: [], community: [], impact: [] };
+                const pm = perProgramMetrics[program];
+                pm.n++;
+                if (r.is_present_engaged != null) pm.present.push(r.is_present_engaged);
+                if (r.connection_others_score != null) pm.connection.push(r.connection_others_score);
+                if (r.connection_nature_score != null) pm.nature.push(r.connection_nature_score);
+                if (r.calmness_score != null) pm.calmness.push(r.calmness_score);
+                if (r.learning_intent_score != null) pm.learning.push(r.learning_intent_score);
+                if (r.community_benefit_score != null) pm.community.push(r.community_benefit_score);
+                const imp = impact(r);
+                if (imp != null) pm.impact.push(parseFloat(imp));
+            });
+            Object.keys(perProgramMetrics).forEach(p => {
+                const pm = perProgramMetrics[p];
+                const avgArr = arr => arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(2) : 'N/A';
+                perProgramMetrics[p] = {
+                    count: pm.n,
+                    avg_present: avgArr(pm.present),
+                    avg_connection: avgArr(pm.connection),
+                    avg_nature: avgArr(pm.nature),
+                    avg_calmness: avgArr(pm.calmness),
+                    avg_learning_intent: avgArr(pm.learning),
+                    avg_community_benefit: avgArr(pm.community),
+                    avg_impact: avgArr(pm.impact)
+                };
+            });
+            const moodWithBoth = allResponses.filter(r => r.mood_before_raw != null && r.mood_after_raw != null);
+            const moodBeforeAvg = moodWithBoth.length ? (moodWithBoth.reduce((s, r) => s + r.mood_before_raw, 0) / moodWithBoth.length).toFixed(2) : 'N/A';
+            const moodAfterAvg = moodWithBoth.length ? (moodWithBoth.reduce((s, r) => s + r.mood_after_raw, 0) / moodWithBoth.length).toFixed(2) : 'N/A';
+            const moodImprovement = moodWithBoth.length && moodBeforeAvg !== 'N/A' && moodAfterAvg !== 'N/A' ? (parseFloat(moodAfterAvg) - parseFloat(moodBeforeAvg)).toFixed(2) : 'N/A';
+            const deviceCounts = {};
+            allResponses.forEach(r => { if (r.device_type) { const d = r.device_type; deviceCounts[d] = (deviceCounts[d] || 0) + 1; } });
+            const returnIntentPct = total ? Math.round((allResponses.filter(r => r.will_return === true).length / total) * 100) : 0;
 
             return {
-                _data_scope: "Each response has experience_type (program name). reviews_by_program lists recent feedback per program (date, standout_moment, additional_feedback). You CAN list or summarize reviews by program (e.g. 'Yoga on the Farm reviews'). Demographics are counts by age; no satisfaction broken down by age.",
+                _data_scope: "Live survey data only (no program catalog, zones, animals, experiences, constituents, or audit). Dates: current_date_iso is today; visits_this_month = visits in current calendar month; monthly_trends keys are 'Mon YYYY' (e.g. 'Mar 2026'). Use visits_this_month for 'how many this month'. reviews_by_program has full standout_moment and additional_feedback per response. per_program_metrics has all score averages by program. Answer in detail from this data only.",
+                current_date_iso: now.toISOString().slice(0, 10),
                 total_responses: total,
                 program_counts: programs,
                 reviews_by_program: reviewsByProgram,
+                monthly_trends: monthlyTrendsWithYear,
+                visits_this_month: visitsThisMonth,
+                most_recent_month_in_data: mostRecentMonthLabel,
+                most_recent_month_visits: mostRecentMonthVisits,
+                per_program_metrics: perProgramMetrics,
                 averages: {
                     present_engaged: avg('is_present_engaged'),
                     connection: avg('connection_others_score'),
                     nature: avg('connection_nature_score'),
                     calmness: avg('calmness_score'),
-                    return_intent_pct: document.getElementById('returnIntentScore')?.textContent || 'N/A',
-                    percent_recommending: (allResponses.length ? Math.round((allResponses.filter(r => r.would_recommend).length / allResponses.length) * 100) + '%' : 'N/A'),
-                    percent_returning: (allResponses.length ? Math.round((allResponses.filter(r => r.is_returning_visitor === true || r.is_returning_visitor === 'true').length / allResponses.length) * 100) + '%' : 'N/A')
+                    learning_intent: avg('learning_intent_score'),
+                    community_benefit: avg('community_benefit_score'),
+                    impact_score: (() => { const vals = allResponses.map(impact).filter(v => v != null); return vals.length ? (vals.reduce((a, b) => a + parseFloat(b), 0) / vals.length).toFixed(2) : 'N/A'; })(),
+                    return_intent_pct: total ? returnIntentPct + '%' : 'N/A',
+                    percent_recommending: (total ? Math.round((allResponses.filter(r => r.would_recommend).length / total) * 100) + '%' : 'N/A'),
+                    percent_returning: (total ? Math.round((allResponses.filter(r => r.is_returning_visitor === true || r.is_returning_visitor === 'true').length / total) * 100) + '%' : 'N/A'),
+                    mood_before_avg: moodBeforeAvg,
+                    mood_after_avg: moodAfterAvg,
+                    mood_improvement: moodImprovement,
+                    mood_response_count: moodWithBoth.length,
+                    skills_learned_avg: avg('skills_learned_score')
                 },
+                device_type_counts: Object.keys(deviceCounts).length ? deviceCounts : null,
                 counts: {
                     will_return_yes: allResponses.filter(r => r.will_return === true).length,
                     returning_visitors: allResponses.filter(r => r.is_returning_visitor === true || r.is_returning_visitor === 'true').length,
@@ -2251,27 +2333,13 @@
                     };
                 })(),
                 peak_times: (() => {
-                    const withValidDate = r => {
-                        const t = r.submitted_at || r.created_at;
-                        return t && !isNaN(new Date(t).getTime());
-                    };
                     const getHour = r => new Date(r.submitted_at || r.created_at).getHours();
                     const hours = new Array(24).fill(0);
                     allResponses.filter(withValidDate).forEach(r => hours[getHour(r)]++);
-                    // Return top 3 busiest hours
                     return hours.map((count, hr) => ({ hr, count }))
                         .sort((a, b) => b.count - a.count)
                         .slice(0, 3)
                         .map(h => `${h.hr % 12 || 12}${h.hr >= 12 ? 'PM' : 'AM'} (${h.count} visits)`);
-                })(),
-                monthly_trends: (() => {
-                    const monthly = {};
-                    allResponses.forEach(r => {
-                        if (!r.created_at || isNaN(new Date(r.created_at).getTime())) return;
-                        const key = new Date(r.created_at).toLocaleString('default', { month: 'short' });
-                        monthly[key] = (monthly[key] || 0) + 1;
-                    });
-                    return monthly;
                 })(),
                 custom_questions: (() => {
                     if (typeof customQuestions === 'undefined' || !customQuestions.length) return "No custom questions active.";
