@@ -403,57 +403,35 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <!-- Present & Engaged -->
-                        <div class="pbi-card p-4 text-center bg-gradient-to-br from-slate-800/50 to-slate-900/50">
-                            <p class="text-xs text-slate-400 mb-2 font-semibold">✨ Present & Engaged</p>
-                            <h3 id="missionIsPresentEngaged" class="text-3xl font-bold text-green-400">--</h3>
-                            <p class="text-[10px] text-slate-500 mt-1">Avg: 1-3</p>
+                    <!-- Core Questions (from core_questions_config: reorder, edit, remove) -->
+                    <div class="mt-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-lg">📋</span>
+                                <h4 class="text-sm font-bold text-white">Core Mission Questions</h4>
+                                <span class="text-xs text-slate-500">(Reorder, edit text, or remove from survey)</span>
+                            </div>
                         </div>
-
-                        <!-- Connection to Others -->
-                        <div class="pbi-card p-4 text-center bg-gradient-to-br from-slate-800/50 to-slate-900/50">
-                            <p class="text-xs text-slate-400 mb-2 font-semibold">💚 Connected to Others</p>
-                            <h3 id="missionConnectionOthersScore" class="text-3xl font-bold text-green-400">--</h3>
-                            <p class="text-[10px] text-slate-500 mt-1">Avg: 1-3</p>
+                        <div id="coreQuestionsContainer" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <!-- Core question cards injected by renderCoreQuestions() -->
                         </div>
-
-                        <!-- Connection to Nature -->
-                        <div class="pbi-card p-4 text-center bg-gradient-to-br from-slate-800/50 to-slate-900/50">
-                            <p class="text-xs text-slate-400 mb-2 font-semibold">🌍 Connected to Nature</p>
-                            <h3 id="missionConnectionNatureScore" class="text-3xl font-bold text-green-400">--</h3>
-                            <p class="text-[10px] text-slate-500 mt-1">Avg: 1-3</p>
-                        </div>
-
-                        <!-- Calm & Grounded -->
-                        <div class="pbi-card p-4 text-center bg-gradient-to-br from-slate-800/50 to-slate-900/50">
-                            <p class="text-xs text-slate-400 mb-2 font-semibold">🧘 Calm & Grounded</p>
-                            <h3 id="missionCalmnessScore" class="text-3xl font-bold text-green-400">--</h3>
-                            <p class="text-[10px] text-slate-500 mt-1">Avg: 1-3</p>
-                        </div>
-
-                        <!-- Will Use Learning -->
-                        <div class="pbi-card p-4 text-center bg-gradient-to-br from-slate-800/50 to-slate-900/50">
-                            <p class="text-xs text-slate-400 mb-2 font-semibold">🧠 Will Use Learning</p>
-                            <h3 id="missionLearningIntentScore" class="text-3xl font-bold text-green-400">--</h3>
-                            <p class="text-[10px] text-slate-500 mt-1">Avg: 1-3</p>
-                        </div>
-
-                        <!-- Community Benefit -->
-                        <div class="pbi-card p-4 text-center bg-gradient-to-br from-slate-800/50 to-slate-900/50">
-                            <p class="text-xs text-slate-400 mb-2 font-semibold">🏛️ Community Benefit</p>
-                            <h3 id="missionCommunityBenefitScore" class="text-3xl font-bold text-green-400">--</h3>
-                            <p class="text-[10px] text-slate-500 mt-1">Avg: 1-3</p>
+                        <div id="archivedCoreSection" class="mt-6 pt-4 border-t border-slate-700/50">
+                            <h4 class="text-sm font-bold text-slate-400 mb-3">Archived core questions</h4>
+                            <div id="archivedCoreContainer" class="flex flex-wrap gap-2"></div>
+                            <p id="noArchivedCore" class="text-xs text-slate-500">No archived core questions.</p>
                         </div>
                     </div>
 
                     <!-- CUSTOM QUESTIONS SECTION -->
                     <div class="mt-6 pt-6 border-t border-slate-700/50">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center gap-2">
-                                <span class="text-lg">🎯</span>
-                                <h4 class="text-sm font-bold text-white">Custom Questions</h4>
-                                <span class="text-xs text-slate-500">(Client-defined)</span>
+                        <div class="flex items-start justify-between mb-4 gap-4">
+                            <div class="flex flex-col gap-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-lg">🎯</span>
+                                    <h4 class="text-sm font-bold text-white">Custom Questions</h4>
+                                    <span class="text-xs text-slate-500">(Client-defined)</span>
+                                </div>
+                                <p class="text-xs text-slate-400">To add a new mission-style question, use <strong>Add Question</strong> below; it uses the same scale and appears after the core set.</p>
                             </div>
                             <button onclick="openAddQuestionModal()"
                                 class="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs font-bold rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg hover:shadow-green-500/25 flex items-center gap-2">
@@ -934,6 +912,36 @@
                             </div>
                         </div>
 
+                        <!-- Edit Core Question Modal -->
+                        <div id="editCoreModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                            <div class="bg-slate-900 rounded-2xl p-6 max-w-md w-full border border-slate-700 shadow-2xl">
+                                <div class="flex items-center justify-between mb-6">
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-2xl">📋</span>
+                                        <div>
+                                            <h3 class="text-xl font-bold text-white">Edit Core Question</h3>
+                                            <p class="text-xs text-slate-400">Update text or emoji (survey order unchanged)</p>
+                                        </div>
+                                    </div>
+                                    <button onclick="closeEditCoreModal()" class="text-slate-400 hover:text-white text-2xl">&times;</button>
+                                </div>
+                                <input type="hidden" id="editCoreId">
+                                <input type="hidden" id="editCoreCode">
+                                <div class="mb-4">
+                                    <label class="block text-xs text-slate-400 uppercase tracking-wider mb-2">Question text</label>
+                                    <input type="text" id="editCoreText" class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:border-green-500 outline-none transition" placeholder="Question text">
+                                </div>
+                                <div class="mb-4">
+                                    <label class="block text-xs text-slate-400 uppercase tracking-wider mb-2">Emoji</label>
+                                    <input type="text" id="editCoreEmoji" class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:border-green-500 outline-none transition" placeholder="✨" maxlength="10">
+                                </div>
+                                <div class="flex gap-3">
+                                    <button onclick="closeEditCoreModal()" class="flex-1 px-4 py-3 bg-slate-800 text-slate-300 font-semibold rounded-xl hover:bg-slate-700 transition">Cancel</button>
+                                    <button onclick="saveEditedCoreQuestion()" class="flex-1 px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-xl">Save</button>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
         </main>
 
@@ -976,6 +984,17 @@
         // Custom Questions
         let customQuestions = [];
         let archivedQuestions = [];
+        // Core Questions (from core_questions_config)
+        let coreQuestions = [];
+        let archivedCoreQuestions = [];
+        const CORE_CODE_TO_COLUMN = {
+            present_engaged: 'is_present_engaged',
+            connection_others: 'connection_others_score',
+            connection_nature: 'connection_nature_score',
+            calmness: 'calmness_score',
+            learning_intent: 'learning_intent_score',
+            community_benefit: 'community_benefit_score'
+        };
         // Program catalog for AI context (when is Yoga?, what programs?, etc.)
         let programCatalog = [];
 
@@ -1062,6 +1081,8 @@
             }
 
             renderDashboard();
+            loadCoreQuestions().then(() => renderCoreQuestions());
+            loadArchivedCoreQuestions().then(() => renderArchivedCoreQuestions());
             // Always load custom questions so Add Question works even when there are 0 responses
             loadCustomQuestions();
             loadArchivedQuestions().then(() => renderArchivedQuestions());
@@ -1421,6 +1442,197 @@
         });
 
         // ============================================
+        // CORE QUESTIONS MANAGEMENT (core_questions_config)
+        // ============================================
+        async function loadCoreQuestions() {
+            try {
+                if (!supabaseClient) { coreQuestions = []; return; }
+                const { data, error } = await supabaseClient
+                    .from('core_questions_config')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('display_order');
+                if (error) throw error;
+                coreQuestions = data || [];
+            } catch (err) {
+                console.error('Error loading core questions:', err);
+                coreQuestions = [];
+            }
+        }
+
+        function renderCoreQuestions() {
+            const container = document.getElementById('coreQuestionsContainer');
+            if (!container) return;
+            container.innerHTML = '';
+            coreQuestions.forEach((q, index) => {
+                const col = CORE_CODE_TO_COLUMN[q.code];
+                const scores = col ? allResponses.map(r => r[col]).filter(v => v != null) : [];
+                const avg = scores.length ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2) : null;
+                const scoreClass = avg >= 2.7 ? 'text-green-400' : avg >= 2.0 ? 'text-yellow-400' : avg ? 'text-orange-400' : 'text-slate-500';
+                const text = (q.current_text && q.current_text.trim()) ? q.current_text.trim() : (q.default_text || '');
+                const emoji = (q.emoji && q.emoji.trim()) ? q.emoji.trim() : '✨';
+                const canReorder = coreQuestions.length > 1;
+                const moveUp = canReorder && index > 0 ? `<button onclick="moveCoreQuestion('${q.core_id}', 'up')" class="text-slate-500 hover:text-white text-xs p-1" title="Move up">▲</button>` : '';
+                const moveDown = canReorder && index < coreQuestions.length - 1 ? `<button onclick="moveCoreQuestion('${q.core_id}', 'down')" class="text-slate-500 hover:text-white text-xs p-1" title="Move down">▼</button>` : '';
+                const card = document.createElement('div');
+                card.className = 'pbi-card p-4 text-center bg-gradient-to-br from-slate-800/50 to-slate-900/50 relative group';
+                card.dataset.coreId = q.core_id;
+                card.innerHTML = `
+                    <div class="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                        ${moveUp}${moveDown}
+                        <button onclick="openEditCoreModal('${q.core_id}')" class="text-slate-500 hover:text-blue-400 text-xs p-1" title="Edit">✏️</button>
+                        <button onclick="archiveCoreQuestion('${q.core_id}')" class="text-slate-500 hover:text-red-400 text-xs p-1" title="Remove from survey">✕</button>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-2 font-semibold">${emoji} ${text}</p>
+                    <h3 class="${scoreClass} text-3xl font-bold">${avg || '--'}</h3>
+                    <p class="text-[10px] text-slate-500 mt-1">${scores.length ? scores.length + ' responses' : 'No responses yet'}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        async function moveCoreQuestion(coreId, direction) {
+            const index = coreQuestions.findIndex(q => q.core_id === coreId);
+            if (index === -1) return;
+            const newIndex = direction === 'up' ? index - 1 : index + 1;
+            if (newIndex < 0 || newIndex >= coreQuestions.length) return;
+            const a = coreQuestions[index];
+            const b = coreQuestions[newIndex];
+            try {
+                await supabaseClient.from('core_questions_config').update({ display_order: newIndex }).eq('core_id', a.core_id);
+                await supabaseClient.from('core_questions_config').update({ display_order: index }).eq('core_id', b.core_id);
+            } catch (err) {
+                console.error('Error reordering core:', err);
+                alert('Failed to update order.');
+                return;
+            }
+            [coreQuestions[index], coreQuestions[newIndex]] = [coreQuestions[newIndex], coreQuestions[index]];
+            await normalizeCoreDisplayOrder();
+            renderCoreQuestions();
+            showToast('Order updated.');
+        }
+
+        async function normalizeCoreDisplayOrder() {
+            if (!supabaseClient || coreQuestions.length === 0) return;
+            try {
+                await Promise.all(coreQuestions.map((q, i) =>
+                    supabaseClient.from('core_questions_config').update({ display_order: i, updated_at: new Date().toISOString() }).eq('core_id', q.core_id)
+                ));
+                coreQuestions.forEach((q, i) => { q.display_order = i; });
+            } catch (err) {
+                console.error('Error normalizing core display order:', err);
+            }
+        }
+
+        async function archiveCoreQuestion(coreId) {
+            if (!confirm('Remove this question from the survey? You can restore it from Archived core questions.')) return;
+            try {
+                const { error } = await supabaseClient.from('core_questions_config').update({ is_active: false }).eq('core_id', coreId);
+                if (error) throw error;
+                coreQuestions = coreQuestions.filter(q => q.core_id !== coreId);
+                renderCoreQuestions();
+                loadArchivedCoreQuestions().then(() => renderArchivedCoreQuestions());
+                showToast('Core question removed from survey.');
+            } catch (err) {
+                console.error('Error archiving core question:', err);
+                alert('Failed to remove question.');
+            }
+        }
+
+        function openEditCoreModal(coreId) {
+            const q = coreQuestions.find(x => x.core_id === coreId);
+            if (!q) return;
+            document.getElementById('editCoreId').value = q.core_id;
+            document.getElementById('editCoreCode').value = q.code;
+            document.getElementById('editCoreText').value = (q.current_text && q.current_text.trim()) ? q.current_text.trim() : (q.default_text || '');
+            document.getElementById('editCoreEmoji').value = (q.emoji && q.emoji.trim()) ? q.emoji.trim() : '✨';
+            document.getElementById('editCoreModal').classList.remove('hidden');
+        }
+
+        function closeEditCoreModal() {
+            document.getElementById('editCoreModal').classList.add('hidden');
+        }
+
+        async function saveEditedCoreQuestion() {
+            const coreId = document.getElementById('editCoreId').value;
+            const text = document.getElementById('editCoreText').value.trim();
+            const emoji = document.getElementById('editCoreEmoji').value.trim() || '✨';
+            try {
+                const { data, error } = await supabaseClient
+                    .from('core_questions_config')
+                    .update({ current_text: text || null, emoji: emoji, updated_at: new Date().toISOString() })
+                    .eq('core_id', coreId)
+                    .select();
+                if (error) throw error;
+                const idx = coreQuestions.findIndex(q => q.core_id === coreId);
+                if (idx !== -1 && data && data[0]) coreQuestions[idx] = data[0];
+                renderCoreQuestions();
+                closeEditCoreModal();
+                showToast('Core question updated.');
+            } catch (err) {
+                console.error('Error saving core question:', err);
+                alert('Failed to save.');
+            }
+        }
+
+        async function loadArchivedCoreQuestions() {
+            try {
+                if (!supabaseClient) { archivedCoreQuestions = []; return; }
+                const { data, error } = await supabaseClient
+                    .from('core_questions_config')
+                    .select('*')
+                    .eq('is_active', false)
+                    .order('display_order');
+                if (error) throw error;
+                archivedCoreQuestions = data || [];
+            } catch (err) {
+                console.error('Error loading archived core:', err);
+                archivedCoreQuestions = [];
+            }
+        }
+
+        function renderArchivedCoreQuestions() {
+            const container = document.getElementById('archivedCoreContainer');
+            const noEl = document.getElementById('noArchivedCore');
+            if (!container || !noEl) return;
+            container.innerHTML = '';
+            if (archivedCoreQuestions.length === 0) {
+                noEl.classList.remove('hidden');
+                return;
+            }
+            noEl.classList.add('hidden');
+            archivedCoreQuestions.forEach(q => {
+                const chip = document.createElement('span');
+                chip.className = 'inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800/70 border border-slate-600 rounded-lg text-xs text-slate-300';
+                const text = (q.current_text && q.current_text.trim()) ? q.current_text.trim() : (q.default_text || '');
+                chip.innerHTML = `<span>${(q.emoji || '✨')} ${text}</span> <button onclick="restoreCoreQuestion('${q.core_id}')" class="text-green-400 hover:text-green-300 font-medium" title="Restore">Restore</button>`;
+                container.appendChild(chip);
+            });
+        }
+
+        async function restoreCoreQuestion(coreId) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('core_questions_config')
+                    .update({ is_active: true, display_order: coreQuestions.length, updated_at: new Date().toISOString() })
+                    .eq('core_id', coreId)
+                    .select();
+                if (error) throw error;
+                if (data && data[0]) {
+                    coreQuestions.push(data[0]);
+                    archivedCoreQuestions = archivedCoreQuestions.filter(q => q.core_id !== coreId);
+                    await normalizeCoreDisplayOrder();
+                    renderCoreQuestions();
+                    renderArchivedCoreQuestions();
+                    showToast('Core question restored.');
+                }
+            } catch (err) {
+                console.error('Error restoring core question:', err);
+                alert('Failed to restore.');
+            }
+        }
+
+        // ============================================
         // CUSTOM QUESTIONS MANAGEMENT
         // ============================================
 
@@ -1474,8 +1686,9 @@
 
                 if (error) throw error;
 
-                // Add to local array and re-render
+                // Add to local array, normalize order, re-render
                 customQuestions.push(data[0]);
+                await normalizeCustomDisplayOrder();
                 renderCustomQuestions();
                 closeAddQuestionModal();
 
@@ -1631,8 +1844,21 @@
                 return;
             }
             [customQuestions[index], customQuestions[newIndex]] = [customQuestions[newIndex], customQuestions[index]];
+            await normalizeCustomDisplayOrder();
             renderCustomQuestions();
             showToast('Order updated.');
+        }
+
+        async function normalizeCustomDisplayOrder() {
+            if (!supabaseClient || customQuestions.length === 0) return;
+            try {
+                await Promise.all(customQuestions.map((q, i) =>
+                    supabaseClient.from('custom_questions').update({ display_order: i }).eq('question_id', q.question_id)
+                ));
+                customQuestions.forEach((q, i) => { q.display_order = i; });
+            } catch (err) {
+                console.error('Error normalizing custom display order:', err);
+            }
         }
 
         async function loadArchivedQuestions() {
@@ -1683,6 +1909,7 @@
                 if (data && data[0]) {
                     customQuestions.push(data[0]);
                     archivedQuestions = archivedQuestions.filter(q => q.question_id !== questionId);
+                    await normalizeCustomDisplayOrder();
                     renderCustomQuestions();
                     renderArchivedQuestions();
                     showToast('Question restored. It will appear on new surveys.');

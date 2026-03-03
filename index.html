@@ -611,95 +611,8 @@
             <button class="skip" onclick="nextScreen()">Skip this question</button>
         </div>
 
-        <!-- SCREEN 4: Mission Q1 - Present & Engaged -->
-        <div class="screen" id="screen4">
-            <h2>Did you feel present and engaged?</h2>
-            <p class="subtitle">During your experience</p>
-            <div class="nps-row" role="radiogroup" aria-label="Present and engaged">
-                <button class="nps-btn no" data-value="1" onclick="selectMission(this, 'present_engaged')"><span
-                        class="nps-emoji">👎</span><span class="nps-text">No</span></button>
-                <button class="nps-btn maybe" data-value="2" onclick="selectMission(this, 'present_engaged')"><span
-                        class="nps-emoji">🤷</span><span class="nps-text">Somewhat</span></button>
-                <button class="nps-btn yes" data-value="3" onclick="selectMission(this, 'present_engaged')"><span
-                        class="nps-emoji">✅</span><span class="nps-text">Yes</span></button>
-            </div>
-            <button class="skip" onclick="nextScreen()">Skip this question</button>
-        </div>
-
-        <!-- SCREEN 5: Mission Q2 - Connection to Others -->
-        <div class="screen" id="screen5">
-            <h2>Feel more connected to others?</h2>
-            <p class="subtitle">Family, peers, staff, or participants</p>
-            <div class="nps-row" role="radiogroup" aria-label="Connection to others">
-                <button class="nps-btn no" data-value="1" onclick="selectMission(this, 'connection_others')"><span
-                        class="nps-emoji">👎</span><span class="nps-text">No</span></button>
-                <button class="nps-btn maybe" data-value="2" onclick="selectMission(this, 'connection_others')"><span
-                        class="nps-emoji">🤷</span><span class="nps-text">Somewhat</span></button>
-                <button class="nps-btn yes" data-value="3" onclick="selectMission(this, 'connection_others')"><span
-                        class="nps-emoji">✅</span><span class="nps-text">Yes</span></button>
-            </div>
-            <button class="skip" onclick="nextScreen()">Skip this question</button>
-        </div>
-
-        <!-- SCREEN 6: Mission Q3 - Connection to Animals/Nature -->
-        <div class="screen" id="screen6">
-            <h2>Feel more connected to nature?</h2>
-            <p class="subtitle">Animals, nature, or the environment</p>
-            <div class="nps-row" role="radiogroup" aria-label="Connection to nature">
-                <button class="nps-btn no" data-value="1" onclick="selectMission(this, 'connection_nature')"><span
-                        class="nps-emoji">👎</span><span class="nps-text">No</span></button>
-                <button class="nps-btn maybe" data-value="2" onclick="selectMission(this, 'connection_nature')"><span
-                        class="nps-emoji">🤷</span><span class="nps-text">Somewhat</span></button>
-                <button class="nps-btn yes" data-value="3" onclick="selectMission(this, 'connection_nature')"><span
-                        class="nps-emoji">✅</span><span class="nps-text">Yes</span></button>
-            </div>
-            <button class="skip" onclick="nextScreen()">Skip this question</button>
-        </div>
-
-        <!-- SCREEN 7: Mission Q4 - Calmness/Grounded -->
-        <div class="screen" id="screen7">
-            <h2>Feel calmer or more grounded?</h2>
-            <p class="subtitle">Less stressed during or after your experience</p>
-            <div class="nps-row" role="radiogroup" aria-label="Calmness">
-                <button class="nps-btn no" data-value="1" onclick="selectMission(this, 'calmness')"><span
-                        class="nps-emoji">👎</span><span class="nps-text">No</span></button>
-                <button class="nps-btn maybe" data-value="2" onclick="selectMission(this, 'calmness')"><span
-                        class="nps-emoji">🤷</span><span class="nps-text">Somewhat</span></button>
-                <button class="nps-btn yes" data-value="3" onclick="selectMission(this, 'calmness')"><span
-                        class="nps-emoji">✅</span><span class="nps-text">Yes</span></button>
-            </div>
-            <button class="skip" onclick="nextScreen()">Skip this question</button>
-        </div>
-
-        <!-- SCREEN 8: Mission Q5 - Learning Intent -->
-        <div class="screen" id="screen8">
-            <h2>Will you use what you learned?</h2>
-            <p class="subtitle">To connect more intentionally with others, animals, or nature</p>
-            <div class="nps-row" role="radiogroup" aria-label="Learning intent">
-                <button class="nps-btn no" data-value="1" onclick="selectMission(this, 'learning_intent')"><span
-                        class="nps-emoji">👎</span><span class="nps-text">No</span></button>
-                <button class="nps-btn maybe" data-value="2" onclick="selectMission(this, 'learning_intent')"><span
-                        class="nps-emoji">🤷</span><span class="nps-text">Somewhat</span></button>
-                <button class="nps-btn yes" data-value="3" onclick="selectMission(this, 'learning_intent')"><span
-                        class="nps-emoji">✅</span><span class="nps-text">Yes</span></button>
-            </div>
-            <button class="skip" onclick="nextScreen()">Skip this question</button>
-        </div>
-
-        <!-- SCREEN 9: Mission Q6 - Community Benefit -->
-        <div class="screen" id="screen9">
-            <h2>Should we have more of this?</h2>
-            <p class="subtitle">Do you believe our community would benefit from more opportunities like this?</p>
-            <div class="nps-row" role="radiogroup" aria-label="Community benefit">
-                <button class="nps-btn no" data-value="1" onclick="selectMission(this, 'community_benefit')"><span
-                        class="nps-emoji">👎</span><span class="nps-text">No</span></button>
-                <button class="nps-btn maybe" data-value="2" onclick="selectMission(this, 'community_benefit')"><span
-                        class="nps-emoji">🤷</span><span class="nps-text">Somewhat</span></button>
-                <button class="nps-btn yes" data-value="3" onclick="selectMission(this, 'community_benefit')"><span
-                        class="nps-emoji">✅</span><span class="nps-text">Yes</span></button>
-            </div>
-            <button class="skip" onclick="nextScreen()">Skip this question</button>
-        </div>
+        <!-- Core mission questions (injected from core_questions_config) -->
+        <div id="coreMissionContainer"></div>
 
         <!-- SCREEN 9b: DYNAMIC CUSTOM QUESTIONS (inserted dynamically) -->
         <div class="screen" id="screenCustomQuestions" style="display:none;">
@@ -841,6 +754,8 @@
         };
         let supabaseClient = null;
         let customQuestions = []; // Loaded from database
+        let coreQuestions = []; // Loaded from core_questions_config
+        let allScreens = []; // Ordered list of screen IDs for navigation
 
         // ============================================
         // INIT
@@ -859,7 +774,9 @@
                     if (c.SUPABASE_URL && c.ANON_KEY) {
                         supabaseClient = window.supabase.createClient(c.SUPABASE_URL, c.ANON_KEY);
                         console.log('✅ Supabase ready (Production Mode)');
-                        await loadSurveyCustomQuestions(); // Call before returning
+                        await loadSurveyCoreQuestions();
+                        await loadSurveyCustomQuestions();
+                        buildAllScreens();
                         return;
                     }
                 }
@@ -875,8 +792,67 @@
                 }
             }
 
-            // Fetch custom questions after Supabase is ready
+            await loadSurveyCoreQuestions();
             await loadSurveyCustomQuestions();
+            buildAllScreens();
+        }
+
+        // ============================================
+        // CORE QUESTIONS (from core_questions_config)
+        // ============================================
+        async function loadSurveyCoreQuestions() {
+            if (!supabaseClient) {
+                coreQuestions = [];
+                return;
+            }
+            try {
+                const { data: rows, error } = await supabaseClient
+                    .from('core_questions_config')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('display_order');
+                if (error) throw error;
+                coreQuestions = rows || [];
+                console.log('✅ Loaded ' + coreQuestions.length + ' core mission questions');
+                renderSurveyCoreQuestions();
+            } catch (err) {
+                console.warn('⚠️ Could not load core questions:', err);
+                coreQuestions = [];
+            }
+        }
+
+        function renderSurveyCoreQuestions() {
+            const container = document.getElementById('coreMissionContainer');
+            if (!container) return;
+            container.innerHTML = '';
+            coreQuestions.forEach((q, index) => {
+                const text = (q.current_text && q.current_text.trim()) ? q.current_text.trim() : (q.default_text || '');
+                const emoji = (q.emoji && q.emoji.trim()) ? q.emoji.trim() : '✨';
+                const div = document.createElement('div');
+                div.className = 'screen';
+                div.id = 'core-q-' + index;
+                div.dataset.code = q.code;
+                div.innerHTML = `
+                    <h2><span aria-hidden="true">${emoji}</span> ${text}</h2>
+                    <p class="subtitle">During your experience</p>
+                    <div class="nps-row" role="radiogroup" aria-label="${q.code}">
+                        <button class="nps-btn no" data-value="1" onclick="selectMission(this, '${q.code}')"><span class="nps-emoji">👎</span><span class="nps-text">No</span></button>
+                        <button class="nps-btn maybe" data-value="2" onclick="selectMission(this, '${q.code}')"><span class="nps-emoji">🤷</span><span class="nps-text">Somewhat</span></button>
+                        <button class="nps-btn yes" data-value="3" onclick="selectMission(this, '${q.code}')"><span class="nps-emoji">✅</span><span class="nps-text">Yes</span></button>
+                    </div>
+                    <button class="skip" onclick="nextScreen()">Skip this question</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function buildAllScreens() {
+            const coreIds = coreQuestions.map((_, i) => 'core-q-' + i);
+            const customIds = customQuestions.map((_, i) => 'custom-q-' + i);
+            allScreens = ['screen2', 'screen3'].concat(coreIds).concat(customIds).concat(['screen10', 'screen11', 'screen12', 'screen13', 'screen14']);
+            totalQuestions = allScreens.length;
+            totalScreens = allScreens.length + 1; // +1 for screen1 (welcome)
+            updateProgress();
         }
 
         // ============================================
@@ -897,12 +873,7 @@
 
                 if (error) throw error;
                 customQuestions = data || [];
-                console.log(`✅ Loaded ${customQuestions.length} custom questions`);
-
-                // Update total count: 8 (screens 2-9) + custom + 4 (10=return, 11=donation, 12=referral, 13=favorite)
-                totalQuestions = 12 + customQuestions.length;
-                totalScreens = 14 + customQuestions.length;
-                updateProgress();
+                console.log('✅ Loaded ' + customQuestions.length + ' custom questions');
 
                 if (customQuestions.length > 0) {
                     renderSurveyCustomQuestions();
@@ -959,91 +930,36 @@
         // NAVIGATION
         // ============================================
         function updateProgress() {
-            // Calculate current question number
-            let qNum = 0;
-            if (typeof currentScreen === 'string' && currentScreen.startsWith('custom-q-')) {
-                const idx = parseInt(currentScreen.split('-')[2]);
-                qNum = 9 + 1 + idx; // 9 standard before + 1 (1-based) + index
-            } else if (typeof currentScreen === 'number') {
-                if (currentScreen <= 9) qNum = currentScreen - 1; // Screen 1 is "Welcome", Q1 starts at Screen 4? 
-                // Wait, logic check: 
-                // screen1=Welcome (Not Q)
-                // screen2=Program (Q1)
-                // screen3=Age (Q2)
-                // screen4=Mission1 (Q3)
-                // ...
-                // screen9=Mission6 (Q8)
-                // screen10=Return (Q9 + CustomCount)
-                // The math is getting complex. Let's simplify progress bar 0-100%.
-
-                // Simplified relative progress
-                // Let's just track "steps taken" vs "total steps"
-                if (currentScreen === 1) qNum = 0;
-                else if (currentScreen <= 9) qNum = currentScreen - 1;
-                else if (currentScreen === 10) qNum = 9 + customQuestions.length;
-                else if (currentScreen === 11) qNum = 10 + customQuestions.length;
-                else if (currentScreen === 12) qNum = data.age_range === '0-17' ? 10 + customQuestions.length : 11 + customQuestions.length;
-                else if (currentScreen === 13) qNum = data.age_range === '0-17' ? 11 + customQuestions.length : 12 + customQuestions.length;
-                else qNum = 12 + customQuestions.length;
-            }
-
-            const totalSteps = (data.age_range === '0-17' ? 11 : 12) + customQuestions.length;
+            if (allScreens.length === 0) return;
+            const idx = allScreens.indexOf(typeof currentScreen === 'string' ? currentScreen : 'screen' + currentScreen);
+            const qNum = idx >= 0 ? idx : 0;
+            const totalSteps = allScreens.length;
             const pct = totalSteps > 0 ? (qNum / totalSteps) * 100 : 0;
-            document.getElementById('progressBar').style.width = Math.min(pct, 100) + '%';
-            document.getElementById('progressText').textContent = qNum === 0 ? 'Ready to start' : `Question ${qNum} of ${totalSteps}`;
+            const bar = document.getElementById('progressBar');
+            const text = document.getElementById('progressText');
+            if (bar) bar.style.width = Math.min(pct, 100) + '%';
+            if (text) text.textContent = qNum === 0 ? 'Ready to start' : 'Question ' + qNum + ' of ' + totalSteps;
         }
 
         function showScreen(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-
-            // State tracking
-            if (id.startsWith('screen')) {
-                currentScreen = parseInt(id.replace('screen', ''));
-            } else {
-                currentScreen = id;
-            }
-
+            el.classList.add('active');
+            currentScreen = id;
             updateProgress();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function nextScreen() {
-            // LOGIC FLOW:
-            // 1 -> 2 -> ... -> 9
-            // 9 -> Custom 0 -> Custom 1 ...
-            // Custom Last -> 10
-            // 10 -> 11 (Skip if minor) -> 12 -> 13 -> 14
-
-            if (currentScreen === 9) {
-                if (customQuestions.length > 0) {
-                    showScreen('custom-q-0');
-                    return;
-                } else {
-                    showScreen('screen10');
-                    return;
-                }
+            const currentId = typeof currentScreen === 'string' ? currentScreen : 'screen' + currentScreen;
+            let idx = allScreens.indexOf(currentId);
+            if (idx < 0 || idx >= allScreens.length - 1) return;
+            let nextId = allScreens[idx + 1];
+            if (nextId === 'screen11' && data.age_range === '0-17') {
+                nextId = 'screen12';
             }
-
-            if (typeof currentScreen === 'string' && currentScreen.startsWith('custom-q-')) {
-                const idx = parseInt(currentScreen.split('-')[2]);
-                if (idx < customQuestions.length - 1) {
-                    showScreen(`custom-q-${idx + 1}`);
-                } else {
-                    showScreen('screen10');
-                }
-                return;
-            }
-
-            // Standard Numbered Screens
-            if (typeof currentScreen === 'number') {
-                // Conditional logic re-check
-                if (currentScreen === 10 && data.age_range === '0-17') {
-                    showScreen('screen12'); // Skip 11 (donation)
-                } else {
-                    if (currentScreen < 14) showScreen('screen' + (currentScreen + 1));
-                }
-            }
+            showScreen(nextId);
         }
 
         // ============================================
@@ -1124,19 +1040,32 @@
             }
 
             try {
+                // Code -> surveyresponses column for core mission questions (must match schema)
+                const CORE_CODE_TO_COLUMN = {
+                    present_engaged: 'is_present_engaged',
+                    connection_others: 'connection_others_score',
+                    connection_nature: 'connection_nature_score',
+                    calmness: 'calmness_score',
+                    learning_intent: 'learning_intent_score',
+                    community_benefit: 'community_benefit_score'
+                };
+                const defaultScore = 2;
+                const missionScores = {};
+                Object.values(CORE_CODE_TO_COLUMN).forEach(col => { missionScores[col] = defaultScore; });
+                coreQuestions.forEach(q => {
+                    if (q && q.code && CORE_CODE_TO_COLUMN[q.code] != null && (data[q.code] === 1 || data[q.code] === 2 || data[q.code] === 3)) {
+                        missionScores[CORE_CODE_TO_COLUMN[q.code]] = data[q.code];
+                    }
+                });
+
                 // Map to surveyresponses table columns
                 const dbData = {
                     experience_type: data.program_name || 'General Visit',
                     is_returning_visitor: data.is_returning_visitor,
                     age_range_bracket: data.age_range || 'Unknown',
 
-                    // Mission Scores (1-3 scale - already in correct format)
-                    is_present_engaged: data.present_engaged || 2,
-                    connection_others_score: data.connection_others || 2,
-                    connection_nature_score: data.connection_nature || 2,
-                    calmness_score: data.calmness || 2,
-                    learning_intent_score: data.learning_intent || 2,
-                    community_benefit_score: data.community_benefit || 2,
+                    // Mission Scores (1-3 scale) from active core questions, default 2 for others
+                    ...missionScores,
 
                     // NEW columns
                     will_return: data.will_return,
