@@ -813,7 +813,7 @@
         // ============================================
         let currentScreen = 1;
         let totalScreens = 14; // Updated for new survey flow
-        let totalQuestions = 11;
+        let totalQuestions = 12; // 8 (screens 2-9) + 4 (10-13); custom count added when loaded
         let data = {
             is_returning_visitor: false,
             program_name: null,
@@ -898,8 +898,8 @@
                 customQuestions = data || [];
                 console.log(`✅ Loaded ${customQuestions.length} custom questions`);
 
-                // Update total count
-                totalQuestions = 11 + customQuestions.length;
+                // Update total count: 8 (screens 2-9) + custom + 4 (10=return, 11=donation, 12=referral, 13=favorite)
+                totalQuestions = 12 + customQuestions.length;
                 totalScreens = 14 + customQuestions.length;
                 updateProgress();
 
@@ -923,9 +923,10 @@
                 div.id = screenId;
                 div.dataset.customIndex = index;
 
+                const emoji = (q.emoji && q.emoji.trim()) ? q.emoji.trim() : '✨';
                 div.innerHTML = `
-                    <h2>${q.question_text}</h2>
-                    <p class="subtitle">Custom Question ${index + 1}</p>
+                    <h2><span class="custom-q-emoji" aria-hidden="true">${emoji}</span> ${q.question_text}</h2>
+                    <p class="subtitle">From our team</p>
                     <div class="nps-row" role="radiogroup">
                         <button class="nps-btn no" data-value="1" onclick="selectCustomQuestion(this, '${q.question_id}')">
                             <span class="nps-emoji">👎</span><span class="nps-text">No</span>
@@ -978,12 +979,17 @@
                 // Let's just track "steps taken" vs "total steps"
                 if (currentScreen === 1) qNum = 0;
                 else if (currentScreen <= 9) qNum = currentScreen - 1;
-                else if (currentScreen >= 10) qNum = 9 + customQuestions.length + (currentScreen - 9 - 1);
+                else if (currentScreen === 10) qNum = 9 + customQuestions.length;
+                else if (currentScreen === 11) qNum = 10 + customQuestions.length;
+                else if (currentScreen === 12) qNum = data.age_range === '0-17' ? 10 + customQuestions.length : 11 + customQuestions.length;
+                else if (currentScreen === 13) qNum = data.age_range === '0-17' ? 11 + customQuestions.length : 12 + customQuestions.length;
+                else qNum = 12 + customQuestions.length;
             }
 
-            const pct = (qNum / totalQuestions) * 100;
+            const totalSteps = (data.age_range === '0-17' ? 11 : 12) + customQuestions.length;
+            const pct = totalSteps > 0 ? (qNum / totalSteps) * 100 : 0;
             document.getElementById('progressBar').style.width = Math.min(pct, 100) + '%';
-            document.getElementById('progressText').textContent = qNum === 0 ? 'Ready to start' : `Question ${qNum} of ${totalQuestions}`;
+            document.getElementById('progressText').textContent = qNum === 0 ? 'Ready to start' : `Question ${qNum} of ${totalSteps}`;
         }
 
         function showScreen(id) {

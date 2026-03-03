@@ -967,6 +967,8 @@
 
         // Custom Questions
         let customQuestions = [];
+        // Program catalog for AI context (when is Yoga?, what programs?, etc.)
+        let programCatalog = [];
 
         // ============================================
         // AUTH
@@ -1035,7 +1037,15 @@
             if (error) return console.error(error);
             allResponses = data || [];
 
+            // Load program catalog for AI context (schedule, cost, description)
+            try {
+                const { data: progData } = await supabaseClient.from('programcatalog').select('program_name, description, schedule_notes, cost_notes, program_category').eq('is_active', true);
+                programCatalog = progData || [];
+            } catch (e) { programCatalog = []; }
+
             renderDashboard();
+            // Always load custom questions so Add Question works even when there are 0 responses
+            loadCustomQuestions();
             document.getElementById('loadingState').classList.add('hidden');
             document.getElementById('dashboardContent').classList.remove('hidden');
         }
@@ -1044,7 +1054,28 @@
         // RENDER
         // ============================================
         function renderDashboard() {
-            if (!allResponses.length) return;
+            if (!allResponses.length) {
+                document.getElementById('totalVisitors').textContent = '0';
+                document.getElementById('totalImpact').textContent = '0';
+                const npsEl = document.getElementById('npsScore');
+                if (npsEl) npsEl.textContent = '--';
+                const missionEl = document.getElementById('missionScore');
+                if (missionEl) missionEl.textContent = '--';
+                const retEl = document.getElementById('returningRate');
+                if (retEl) retEl.textContent = '0%';
+                const intentEl = document.getElementById('returnIntentRate');
+                if (intentEl) intentEl.textContent = '0%';
+                renderProgramTable();
+                renderGrowthChart();
+                renderDemographics();
+                renderReferralChart();
+                renderVibesFeed();
+                renderPeakTimes();
+                renderResponseTable(allResponses);
+                renderMissionBreakdown();
+                renderDonationPipeline();
+                return;
+            }
 
             // Metrics
             document.getElementById('totalVisitors').textContent = allResponses.length;
@@ -1126,7 +1157,6 @@
             renderResponseTable(allResponses);
             renderMissionBreakdown(); // NEW
             renderDonationPipeline(); // NEW
-            loadCustomQuestions(); // CUSTOM QUESTIONS
         }
 
         // Response Explorer & Modal
@@ -1996,7 +2026,7 @@
             if (returnData.length) {
                 const yesCount = returnData.filter(v => v === true).length; // Check for boolean true
                 const pct = Math.round((yesCount / returnData.length) * 100);
-                const returnElem = document.getElementById('returnIntentScore');
+                const returnElem = document.getElementById('returnIntentRate');
                 if (returnElem) returnElem.textContent = pct + '%';
             }
         }
@@ -2280,7 +2310,7 @@
             const returnIntentPct = total ? Math.round((allResponses.filter(r => r.will_return === true).length / total) * 100) : 0;
 
             return {
-                _data_scope: "Live survey data only (no program catalog, zones, animals, experiences, constituents, or audit). Dates: current_date_iso is today; visits_this_month = visits in current calendar month; monthly_trends keys are 'Mon YYYY' (e.g. 'Mar 2026'). Use visits_this_month for 'how many this month'. reviews_by_program has full standout_moment and additional_feedback per response. per_program_metrics has all score averages by program. Answer in detail from this data only.",
+                _data_scope: "Live survey data and program_info when available. program_info lists program name, description, schedule_notes, cost_notes. per_program_metrics has mission score averages by program. return_intent_pct and all averages are computed from data. Dates: current_date_iso is today; visits_this_month = visits in current calendar month; monthly_trends keys are 'Mon YYYY'. Answer from this data only.",
                 _data_dictionary: {
                     connection_and_calmness_scores: "averages.connection, averages.nature, averages.calmness; per_program_metrics[program].avg_connection, avg_nature, avg_calmness",
                     best_month_most_visits: "monthly_trends (month with highest count)",
@@ -2348,6 +2378,7 @@
                         .slice(0, 3)
                         .map(h => `${h.hr % 12 || 12}${h.hr >= 12 ? 'PM' : 'AM'} (${h.count} visits)`);
                 })(),
+                program_info: (typeof programCatalog !== 'undefined' && programCatalog.length) ? programCatalog : null,
                 custom_questions: (() => {
                     if (typeof customQuestions === 'undefined' || !customQuestions.length) return "No custom questions active.";
                     return customQuestions.map(q => {
