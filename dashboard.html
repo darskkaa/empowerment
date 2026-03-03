@@ -2281,6 +2281,13 @@
 
             return {
                 _data_scope: "Live survey data only (no program catalog, zones, animals, experiences, constituents, or audit). Dates: current_date_iso is today; visits_this_month = visits in current calendar month; monthly_trends keys are 'Mon YYYY' (e.g. 'Mar 2026'). Use visits_this_month for 'how many this month'. reviews_by_program has full standout_moment and additional_feedback per response. per_program_metrics has all score averages by program. Answer in detail from this data only.",
+                _data_dictionary: {
+                    connection_and_calmness_scores: "averages.connection, averages.nature, averages.calmness; per_program_metrics[program].avg_connection, avg_nature, avg_calmness",
+                    best_month_most_visits: "monthly_trends (month with highest count)",
+                    peak_times: "peak_times",
+                    donation_interest_pipeline: "donations (total_eligible_18plus, yes, maybe, no)",
+                    program_feedback: "reviews_by_program[program], per_program_metrics[program]"
+                },
                 current_date_iso: now.toISOString().slice(0, 10),
                 total_responses: total,
                 program_counts: programs,
