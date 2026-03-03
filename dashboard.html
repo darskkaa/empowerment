@@ -2116,12 +2116,19 @@
                 });
 
                 if (!response.ok) {
-                    const err = await response.json();
-                    throw new Error(err.error?.message || 'Server Error');
+                    let errMsg = 'Server Error';
+                    try {
+                        const err = await response.json();
+                        errMsg = err?.error?.message || errMsg;
+                    } catch (_) {
+                        errMsg = response.statusText || errMsg;
+                    }
+                    throw new Error(errMsg);
                 }
 
                 const data = await response.json();
-                const reply = data.choices[0].message.content;
+                const reply = data?.choices?.[0]?.message?.content;
+                if (reply == null) throw new Error('Invalid response from assistant.');
 
                 // Update UI (Using marked if available, else text)
                 if (window.marked) {
@@ -2136,6 +2143,12 @@
             }
         }
 
+        function escapeHtml(s) {
+            const div = document.createElement('div');
+            div.textContent = s;
+            return div.innerHTML;
+        }
+
         function appendMessage(role, text) {
             const container = document.getElementById('chatMessages');
             const id = 'msg-' + Date.now();
@@ -2145,9 +2158,10 @@
                 ? "bg-purple-600/20 p-3 rounded-lg rounded-tr-none border border-purple-500/30 ml-8"
                 : "bg-slate-800/80 p-3 rounded-lg rounded-tl-none border border-slate-700 mr-8";
 
+            const safeText = role === 'user' ? escapeHtml(text) : text;
             div.innerHTML = role === 'ai'
-                ? `<p class="text-sm text-slate-300" id="${id}">${text}</p>`
-                : `<p class="text-sm text-white">${text}</p>`;
+                ? `<p class="text-sm text-slate-300" id="${id}">${safeText}</p>`
+                : `<p class="text-sm text-white">${safeText}</p>`;
 
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
@@ -2179,6 +2193,7 @@
             };
 
             return {
+                _data_scope: "Metrics are overall or by program; demographics are counts by age and referral. There is no satisfaction or enjoyment broken down by age—only overall averages.",
                 total_responses: total,
                 program_counts: programs,
                 averages: {
@@ -2215,9 +2230,13 @@
                     };
                 })(),
                 peak_times: (() => {
+                    const withValidDate = r => {
+                        const t = r.submitted_at || r.created_at;
+                        return t && !isNaN(new Date(t).getTime());
+                    };
                     const getHour = r => new Date(r.submitted_at || r.created_at).getHours();
                     const hours = new Array(24).fill(0);
-                    allResponses.forEach(r => hours[getHour(r)]++);
+                    allResponses.filter(withValidDate).forEach(r => hours[getHour(r)]++);
                     // Return top 3 busiest hours
                     return hours.map((count, hr) => ({ hr, count }))
                         .sort((a, b) => b.count - a.count)
@@ -2227,6 +2246,7 @@
                 monthly_trends: (() => {
                     const monthly = {};
                     allResponses.forEach(r => {
+                        if (!r.created_at || isNaN(new Date(r.created_at).getTime())) return;
                         const key = new Date(r.created_at).toLocaleString('default', { month: 'short' });
                         monthly[key] = (monthly[key] || 0) + 1;
                     });
@@ -2287,8 +2307,7 @@
         style="height: 500px; max-height: 80vh;">
         <div class="bg-slate-800 p-4 flex justify-between items-center border-b border-slate-700">
             <h3 class="font-bold text-white flex items-center gap-2">
-                <span>🤖</span> Data Assistant <span
-                    class="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">Free Model</span>
+                <span>🤖</span> Data Assistant
             </h3>
             <div class="flex gap-2">
                 <button onclick="clearChat()" class="text-slate-400 hover:text-white text-xs"
@@ -2299,11 +2318,11 @@
 
         <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-900">
             <div class="bg-slate-800/80 p-3 rounded-lg rounded-tl-none border border-slate-700">
-                <p class="text-sm text-slate-300">Hi there! 👋 I can analyze your survey data. Ask me things like:</p>
+                <p class="text-sm text-slate-300">Hi! 👋 I answer only from your <strong>live survey data</strong>—no guessing. Try:</p>
                 <ul class="text-xs text-slate-400 mt-2 list-disc list-inside space-y-1">
-                    <li>"What is the general vibe today?"</li>
-                    <li>"Summarize the feedback from the yoga session."</li>
-                    <li>"Are visitors under 18 enjoying the farm?"</li>
+                    <li>"What's the general vibe from recent responses?"</li>
+                    <li>"Summarize yoga (or other program) feedback."</li>
+                    <li>"How do connection and calmness scores look?"</li>
                 </ul>
             </div>
         </div>

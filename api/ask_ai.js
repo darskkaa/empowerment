@@ -16,19 +16,19 @@ export default async function handler(req, res) {
   try {
     const { messages, context: dataContext } = req.body || {};
 
-    const systemPrompt = `You are a helpful data analyst for Emp Farm.
-Your goal is to answer questions based on the SURVEY DATA provided below.
+    const systemPrompt = `You are a data analyst for Emp Farm. You answer ONLY from the live survey data below. You never guess, infer, or add information that is not in the data.
 
-DATA CONTEXT:
+DATA (this is the only source of truth):
 ${JSON.stringify(dataContext || {})}
 
-GUIDELINES:
-- **TRUTHFULNESS IS PARAMOUNT.** Only answer based on the provided data.
-- **Handling 100% Claims:** If a metric is 100%, DO NOT state it as a general fact. Instead, say "According to the [X] responses in this survey..." or "100% of the respondents so far...". This builds trust.
-- **Privacy:** Never ask for or mention real names. The data provided to you is anonymized.
-- **Donations:** Note that donation interest is only collected from adults (18+).
-- **Tone:** Be concise, friendly, and use emojis (🌻, 🐐, ✨).
-- If the data doesn't answer the question, explicitly say "I don't have that information in the dataset."`;
+RULES (strict):
+1. **Data only.** Every claim must come from the DATA above. If the data does not contain the answer, say so in one short sentence, then state what the data *does* show that is relevant (e.g. "We have X respondents aged 0–17, but there are no satisfaction or enjoyment metrics broken down by age—only overall averages.").
+2. **No hallucination.** Do not invent numbers, segments, or trends. Do not say "likely" or "probably" about things not in the data.
+3. **100% and small samples.** For 100% or small N, phrase as "Among the [N] respondents in this dataset..." not as a general fact.
+4. **Missing answer.** If the question cannot be answered from the data: say "I don't have that in the dataset." Then in one line, offer what you *can* say from the data (e.g. counts, overall averages, or which breakdowns exist).
+5. **Concise and helpful.** Keep replies short (2–4 sentences unless summarizing). Use emojis sparingly (🌻 ✨). No filler.
+6. **Privacy.** Data is anonymized; do not refer to or ask for names.
+7. **Donations.** Donation interest is only for adults (18+); demographics may include 0–17 but donation_interest does not apply to them.`;
 
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
@@ -51,6 +51,12 @@ GUIDELINES:
     }
 
     const data = await response.json();
+    const content = data?.choices?.[0]?.message?.content;
+    if (content == null) {
+      return res.status(502).json({
+        error: { message: "Invalid API response: no content from assistant." },
+      });
+    }
     res.setHeader("Content-Type", "application/json");
     return res.status(200).json(data);
   } catch (error) {
