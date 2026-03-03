@@ -1223,6 +1223,13 @@
                     ? '<span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">CORE</span>'
                     : '<span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">CUSTOM</span>';
 
+                const editBtn = item.question_type === 'core'
+                    ? `<button type="button" onclick="openEditCoreModal('${item.core_id}')" class="text-slate-400 hover:text-blue-400 text-xs px-2 py-1" title="Edit text">Edit</button>`
+                    : `<button type="button" onclick="openEditQuestionModal('${item.question_id}')" class="text-slate-400 hover:text-blue-400 text-xs px-2 py-1" title="Edit text">Edit</button>`;
+                const deleteBtn = item.question_type === 'core'
+                    ? `<button type="button" onclick="archiveCoreQuestion('${item.core_id}')" class="text-slate-400 hover:text-red-400 text-xs px-2 py-1" title="Remove from survey">Delete</button>`
+                    : `<button type="button" onclick="deleteCustomQuestion('${item.question_id}')" class="text-slate-400 hover:text-red-400 text-xs px-2 py-1" title="Remove from survey">Delete</button>`;
+
                 li.innerHTML = `
                     <div class="flex items-center gap-3 min-w-0">
                         <span class="text-slate-400 select-none" title="Drag to reorder">${item.order_id ? '☰' : ''}</span>
@@ -1234,7 +1241,11 @@
                             <div class="text-[10px] text-slate-500 mt-0.5">Position: ${idx + 1}</div>
                         </div>
                     </div>
-                    <span class="text-[10px] text-slate-500">Drag</span>
+                    <div class="flex items-center gap-2">
+                        ${editBtn}
+                        ${deleteBtn}
+                        ${item.order_id ? '<span class="text-[10px] text-slate-500">Drag</span>' : ''}
+                    </div>
                 `;
 
                 if (item.order_id) {
@@ -1880,6 +1891,8 @@
                 if (idx !== -1 && data && data[0]) coreQuestions[idx] = data[0];
                 renderCoreQuestions();
                 closeEditCoreModal();
+                await loadSurveyQuestionOrder();
+                renderSurveyQuestionOrder();
                 showToast('Core question updated.');
             } catch (err) {
                 console.error('Error saving core question:', err);
@@ -2327,6 +2340,8 @@
 
                 renderCustomQuestions();
                 closeEditQuestionModal();
+                await loadSurveyQuestionOrder();
+                renderSurveyQuestionOrder();
                 showToast('✅ Question updated successfully!');
 
             } catch (err) {
