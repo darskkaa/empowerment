@@ -468,6 +468,14 @@
                                 <p class="text-[10px] text-slate-600 mt-1">Click "Add Question" to create one</p>
                             </div>
                         </div>
+                        <!-- ARCHIVED QUESTIONS -->
+                        <div id="archivedQuestionsSection" class="mt-6 pt-4 border-t border-slate-700/50">
+                            <h4 class="text-sm font-bold text-slate-400 mb-3">Archived questions</h4>
+                            <div id="archivedQuestionsContainer" class="flex flex-wrap gap-2">
+                                <!-- Archived questions will be inserted here -->
+                            </div>
+                            <p id="noArchivedQuestions" class="text-xs text-slate-500">No archived questions.</p>
+                        </div>
                     </div>
                 </section>
 
@@ -967,6 +975,7 @@
 
         // Custom Questions
         let customQuestions = [];
+        let archivedQuestions = [];
         // Program catalog for AI context (when is Yoga?, what programs?, etc.)
         let programCatalog = [];
 
@@ -978,6 +987,7 @@
                 const response = await fetch('/api/get_config');
                 if (response.ok) {
                     const config = await response.json();
+                    console.log('[H1] dashboard get_config: urlOk=' + !!config.SUPABASE_URL + ' keyOk=' + !!config.ANON_KEY);
                     if (config.SUPABASE_URL && config.ANON_KEY && typeof window.supabase !== 'undefined') {
                         supabaseClient = window.supabase.createClient(config.SUPABASE_URL, config.ANON_KEY);
                         supabaseClient.auth.onAuthStateChange((event, session) => {
@@ -1034,18 +1044,27 @@
                 .select('*')
                 .order('created_at', { ascending: false });
 
-            if (error) return console.error(error);
+            if (error) {
+                console.error('[H4] dashboard surveyresponses load error:', error.code, error.message);
+                return console.error(error);
+            }
             allResponses = data || [];
+            console.log('[H4] dashboard surveyresponses loaded count=' + (data && data.length));
 
             // Load program catalog for AI context (schedule, cost, description)
             try {
                 const { data: progData } = await supabaseClient.from('programcatalog').select('program_name, description, schedule_notes, cost_notes, program_category').eq('is_active', true);
                 programCatalog = progData || [];
-            } catch (e) { programCatalog = []; }
+                console.log('[H4] dashboard programcatalog loaded count=' + (programCatalog && programCatalog.length));
+            } catch (e) {
+                console.error('[H4] dashboard programcatalog error:', e);
+                programCatalog = [];
+            }
 
             renderDashboard();
             // Always load custom questions so Add Question works even when there are 0 responses
             loadCustomQuestions();
+            loadArchivedQuestions().then(() => renderArchivedQuestions());
             document.getElementById('loadingState').classList.add('hidden');
             document.getElementById('dashboardContent').classList.remove('hidden');
         }
@@ -1535,20 +1554,30 @@
             });
 
             // Render cards
-            customQuestions.forEach(q => {
+            const canReorder = customQuestions.length > 1;
+            customQuestions.forEach((q, index) => {
                 const avg = questionAverages[q.question_id];
                 const scoreClass = avg >= 2.7 ? 'text-green-400' : avg >= 2.0 ? 'text-yellow-400' : avg ? 'text-orange-400' : 'text-slate-500';
                 const responseCount = allResponses.filter(r => r.custom_responses?.[q.question_id]).length;
+
+                const moveUpBtn = canReorder && index > 0
+                    ? `<button onclick="moveCustomQuestion('${q.question_id}', 'up')" class="text-slate-500 hover:text-white text-xs p-1" title="Move up">▲</button>`
+                    : '';
+                const moveDownBtn = canReorder && index < customQuestions.length - 1
+                    ? `<button onclick="moveCustomQuestion('${q.question_id}', 'down')" class="text-slate-500 hover:text-white text-xs p-1" title="Move down">▼</button>`
+                    : '';
 
                 const card = document.createElement('div');
                 card.className = 'pbi-card p-4 text-center bg-gradient-to-br from-slate-800/50 to-slate-900/50 relative group custom-q-card';
                 card.dataset.questionId = q.question_id;
                 card.innerHTML = `
                     <div class="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                        ${moveUpBtn}
+                        ${moveDownBtn}
                         <button onclick="openEditQuestionModal('${q.question_id}')" 
                             class="text-slate-500 hover:text-blue-400 text-xs p-1" title="Edit">✏️</button>
                         <button onclick="deleteCustomQuestion('${q.question_id}')" 
-                            class="text-slate-500 hover:text-red-400 text-xs p-1" title="Archive">✕</button>
+                            class="text-slate-500 hover:text-red-400 text-xs p-1" title="Remove from survey">✕</button>
                     </div>
                     <p class="text-xs text-slate-400 mb-2 font-semibold">${q.emoji} ${q.question_text}</p>
                     <h3 class="${scoreClass} text-3xl font-bold">${avg || '--'}</h3>
@@ -1559,7 +1588,7 @@
         }
 
         async function deleteCustomQuestion(questionId) {
-            if (!confirm('Delete this question? It will no longer appear in surveys.')) return;
+            if (!confirm('Remove this question from surveys? You can restore it from Archived.')) return;
 
             try {
                 const { error } = await supabaseClient
@@ -1571,10 +1600,96 @@
 
                 customQuestions = customQuestions.filter(q => q.question_id !== questionId);
                 renderCustomQuestions();
-                showToast('🗑️ Question removed.');
+                if (typeof loadArchivedQuestions === 'function') loadArchivedQuestions().then(() => renderArchivedQuestions());
+                showToast('Question removed from surveys. You can restore it from Archived.');
             } catch (err) {
                 console.error('Error deleting question:', err);
-                alert('Failed to delete question.');
+                alert('Failed to remove question.');
+            }
+        }
+
+        async function moveCustomQuestion(questionId, direction) {
+            const index = customQuestions.findIndex(q => q.question_id === questionId);
+            if (index === -1) return;
+            const newIndex = direction === 'up' ? index - 1 : index + 1;
+            if (newIndex < 0 || newIndex >= customQuestions.length) return;
+
+            const a = customQuestions[index];
+            const b = customQuestions[newIndex];
+            try {
+                await supabaseClient
+                    .from('custom_questions')
+                    .update({ display_order: newIndex })
+                    .eq('question_id', a.question_id);
+                await supabaseClient
+                    .from('custom_questions')
+                    .update({ display_order: index })
+                    .eq('question_id', b.question_id);
+            } catch (err) {
+                console.error('Error reordering:', err);
+                alert('Failed to update order.');
+                return;
+            }
+            [customQuestions[index], customQuestions[newIndex]] = [customQuestions[newIndex], customQuestions[index]];
+            renderCustomQuestions();
+            showToast('Order updated.');
+        }
+
+        async function loadArchivedQuestions() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('custom_questions')
+                    .select('*')
+                    .eq('is_active', false)
+                    .order('created_at', { ascending: false });
+                if (error) throw error;
+                archivedQuestions = data || [];
+            } catch (err) {
+                console.error('Error loading archived questions:', err);
+                archivedQuestions = [];
+            }
+        }
+
+        function renderArchivedQuestions() {
+            const container = document.getElementById('archivedQuestionsContainer');
+            const noArchivedEl = document.getElementById('noArchivedQuestions');
+            if (!container || !noArchivedEl) return;
+
+            container.innerHTML = '';
+            if (archivedQuestions.length === 0) {
+                noArchivedEl.classList.remove('hidden');
+                return;
+            }
+            noArchivedEl.classList.add('hidden');
+            archivedQuestions.forEach(q => {
+                const chip = document.createElement('span');
+                chip.className = 'inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800/70 border border-slate-600 rounded-lg text-xs text-slate-300';
+                chip.innerHTML = `
+                    <span>${q.emoji || '✨'} ${q.question_text}</span>
+                    <button onclick="restoreCustomQuestion('${q.question_id}')" class="text-green-400 hover:text-green-300 font-medium" title="Restore to active list">Restore</button>
+                `;
+                container.appendChild(chip);
+            });
+        }
+
+        async function restoreCustomQuestion(questionId) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('custom_questions')
+                    .update({ is_active: true, display_order: customQuestions.length })
+                    .eq('question_id', questionId)
+                    .select();
+                if (error) throw error;
+                if (data && data[0]) {
+                    customQuestions.push(data[0]);
+                    archivedQuestions = archivedQuestions.filter(q => q.question_id !== questionId);
+                    renderCustomQuestions();
+                    renderArchivedQuestions();
+                    showToast('Question restored. It will appear on new surveys.');
+                }
+            } catch (err) {
+                console.error('Error restoring question:', err);
+                alert('Failed to restore question.');
             }
         }
 
@@ -2133,6 +2248,7 @@
 
             // Prepare Context (Summarize Data)
             const context = prepareDataContext();
+            console.log('[H5] ask_ai request: messagesLength=1 contextType=' + (typeof context) + ' contextKeys=' + (context && typeof context === 'object' ? Object.keys(context).join(',') : 'n/a'));
 
             try {
                 // Call Vercel API (env vars stay server-side)

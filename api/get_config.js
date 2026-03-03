@@ -18,6 +18,9 @@ export default async function handler(req, res) {
   const url = typeof supabaseUrl === "string" ? supabaseUrl.trim() : null;
   const key = typeof anonKey === "string" ? anonKey.trim() : null;
 
+  // [DEBUG H1] Config availability (no PII)
+  console.log("[H1] get_config: urlPresent=" + !!url + " keyPresent=" + !!key);
+
   res.setHeader("Content-Type", "application/json");
   res.status(200).json({
     SUPABASE_URL: url,

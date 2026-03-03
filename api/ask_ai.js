@@ -16,6 +16,10 @@ export default async function handler(req, res) {
   try {
     const { messages, context: dataContext } = req.body || {};
 
+    // [DEBUG H3/H5] Request shape (no PII)
+    console.log("[H3] ask_ai: hasApiKey=" + !!apiKey);
+    console.log("[H5] ask_ai: messagesLength=" + (messages && messages.length) + " contextType=" + (dataContext === null || dataContext === undefined ? "null" : typeof dataContext));
+
     const systemPrompt = `You are a data analyst for Emp Farm. You answer ONLY from the live survey data below. You never guess, infer, or add information that is not in the data.
 
 DATA (this is the only source of truth):
@@ -56,20 +60,23 @@ RULES (strict):
 
     if (!response.ok) {
       const err = await response.text();
+      console.log("[H3] ask_ai: OpenRouter not ok status=" + response.status + " body=" + (err && err.slice(0, 200)));
       throw new Error(`OpenRouter API Error: ${err}`);
     }
 
     const data = await response.json();
     const content = data?.choices?.[0]?.message?.content;
     if (content == null) {
+      console.log("[H3] ask_ai: response missing content");
       return res.status(502).json({
         error: { message: "Invalid API response: no content from assistant." },
       });
     }
+    console.log("[H3] ask_ai: success");
     res.setHeader("Content-Type", "application/json");
     return res.status(200).json(data);
   } catch (error) {
-    console.error("Function Error:", error);
+    console.error("[H3] ask_ai Function Error:", error);
     return res.status(500).json({ error: { message: error.message } });
   }
 }
