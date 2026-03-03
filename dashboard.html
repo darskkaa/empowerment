@@ -1520,17 +1520,60 @@
         // Response Explorer & Modal
         function renderResponseTable(data) {
             const tbody = document.getElementById('responseTableBody');
+            const missionFields = [
+                'is_present_engaged',
+                'connection_others_score',
+                'connection_nature_score',
+                'calmness_score',
+                'learning_intent_score',
+                'community_benefit_score'
+            ];
+
+            const missionAvgClass = (val) => {
+                if (val == null) return 'text-slate-600';
+                if (val >= 2.7) return 'text-green-400';
+                if (val >= 2.0) return 'text-yellow-400';
+                return 'text-orange-400';
+            };
+
+            const learningIntentBadge = (val) => {
+                if (val == null) return '<span class="text-slate-600">--</span>';
+                const v = Number(val);
+                const text = v === 3 ? 'YES' : v === 2 ? 'SOMEWHAT' : 'NO';
+                const cls = v === 3
+                    ? 'bg-green-500/10 text-green-400 border-green-500/30'
+                    : v === 2
+                        ? 'bg-yellow-500/10 text-yellow-300 border-yellow-500/30'
+                        : 'bg-orange-500/10 text-orange-300 border-orange-500/30';
+                return `<span class="px-2 py-1 rounded border ${cls} font-bold text-xs">${text}</span>`;
+            };
 
             // Sort by date (newest first)
             const sorted = [...data].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
             tbody.innerHTML = sorted.map((r, i) => {
                 const date = new Date(r.created_at).toLocaleDateString();
-                const diff = (r.mood_after_raw && r.mood_before_raw) ? (r.mood_after_raw - r.mood_before_raw).toFixed(1) : '--';
-                const boostClass = diff > 0 ? 'text-green-400' : 'text-slate-500';
+                const hasLegacyMood = r.mood_after_raw != null && r.mood_before_raw != null;
+                const legacyDiff = hasLegacyMood ? (r.mood_after_raw - r.mood_before_raw) : null;
+
+                const missionScores = missionFields.map(f => r[f]).filter(v => v != null && v !== undefined);
+                const missionAvg = missionScores.length
+                    ? (missionScores.reduce((a, b) => a + b, 0) / missionScores.length)
+                    : null;
+
+                const moodDeltaCell = hasLegacyMood
+                    ? (() => {
+                        const diffStr = legacyDiff.toFixed(1);
+                        const boostClass = legacyDiff > 0 ? 'text-green-400' : 'text-slate-500';
+                        return `<span class="${boostClass}">${legacyDiff > 0 ? '+' : ''}${diffStr}</span>`;
+                    })()
+                    : (missionAvg != null
+                        ? `<span class="${missionAvgClass(missionAvg)}">${missionAvg.toFixed(2)}</span>`
+                        : '<span class="text-slate-600">--</span>');
+
                 const skillsDisplay = (r.skills_learned_score !== null && r.skills_learned_score !== undefined)
                     ? `<span class="px-2 py-1 rounded bg-pink-500/10 text-pink-400 font-bold text-xs">${r.skills_learned_score}</span>`
-                    : '<span class="text-slate-600">--</span>';
+                    : learningIntentBadge(r.learning_intent_score);
 
                 return `
                     <tr class="hover:bg-slate-800/30 transition-colors group">
@@ -1539,11 +1582,12 @@
                             <span class="text-white block">${r.experience_type || 'General Visit'}</span>
                             ${r.participant_name ? `<span class="text-xs text-slate-500">${r.participant_name}</span>` : ''}
                         </td>
-                        <td class="p-4 text-center font-bold ${boostClass}">${diff > 0 ? '+' : ''}${diff}</td>
+                        <td class="p-4 text-center font-bold">${moodDeltaCell}</td>
                         <td class="p-4 text-center">${skillsDisplay}</td>
                         <td class="p-4 text-right">
                             <button onclick="openModal(${allResponses.indexOf(r)})" class="text-xs bg-indigo-500/10 hover:bg-indigo-500 text-indigo-400 hover:text-white px-3 py-1.5 rounded-lg transition-all border border-indigo-500/30">
                                 View Details
+                            </button>
                         </td>
                     </tr>
                 `;
