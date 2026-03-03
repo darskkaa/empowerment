@@ -403,13 +403,35 @@
                         </div>
                     </div>
 
+                    <!-- REORDER QUESTIONS (Unified: core + custom, drag & drop) -->
+                    <div class="mb-8">
+                        <div class="flex items-start justify-between gap-4 mb-3">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-lg">🧩</span>
+                                    <h4 class="text-sm font-bold text-white">Reorder Questions</h4>
+                                    <span class="text-xs text-slate-500">(Drag & drop)</span>
+                                </div>
+                                <p class="text-xs text-slate-400 mt-1">This is the exact order shown on the public survey (core + custom can be interleaved). Metrics below are computed only from saved DB answers; skipped = NULL and is excluded.</p>
+                            </div>
+                            <button id="saveSurveyOrderBtn" onclick="saveSurveyQuestionOrder()"
+                                class="px-4 py-2 bg-slate-800 text-slate-200 text-xs font-bold rounded-lg hover:bg-slate-700 transition-all border border-slate-700">
+                                Save order
+                            </button>
+                        </div>
+
+                        <div id="surveyOrderLoading" class="text-xs text-slate-500">Loading order...</div>
+                        <ul id="surveyOrderList" class="mt-3 space-y-2"></ul>
+                        <p id="surveyOrderError" class="text-xs text-red-400 mt-2 hidden">Could not load unified order. (Falling back to Core then Custom ordering.)</p>
+                    </div>
+
                     <!-- Core Questions (from core_questions_config: reorder, edit, remove) -->
                     <div class="mt-4">
                         <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center gap-2">
                                 <span class="text-lg">📋</span>
                                 <h4 class="text-sm font-bold text-white">Core Mission Questions</h4>
-                                <span class="text-xs text-slate-500">(Reorder, edit text, or remove from survey)</span>
+                                <span class="text-xs text-slate-500">(Edit text or remove from survey)</span>
                             </div>
                         </div>
                         <div id="coreQuestionsContainer" class="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -995,6 +1017,9 @@
             learning_intent: 'learning_intent_score',
             community_benefit: 'community_benefit_score'
         };
+        // Unified question order (core + custom interleaved)
+        let surveyOrderItems = []; // [{ order_id, question_type, core_id, question_id, label, emoji }]
+        let draggedSurveyOrderId = null;
         // Program catalog for AI context (when is Yoga?, what programs?, etc.)
         let programCatalog = [];
 
@@ -1081,13 +1106,302 @@
             }
 
             renderDashboard();
-            loadCoreQuestions().then(() => renderCoreQuestions());
-            loadArchivedCoreQuestions().then(() => renderArchivedCoreQuestions());
+            await loadCoreQuestions(); renderCoreQuestions();
+            await loadArchivedCoreQuestions(); renderArchivedCoreQuestions();
             // Always load custom questions so Add Question works even when there are 0 responses
-            loadCustomQuestions();
-            loadArchivedQuestions().then(() => renderArchivedQuestions());
+            await loadCustomQuestions(); // renders internally
+            await loadArchivedQuestions(); renderArchivedQuestions();
+            await loadSurveyQuestionOrder(); renderSurveyQuestionOrder();
             document.getElementById('loadingState').classList.add('hidden');
             document.getElementById('dashboardContent').classList.remove('hidden');
+        }
+
+        // ============================================
+        // UNIFIED ORDER (survey_questions_order)
+        // ============================================
+        async function loadSurveyQuestionOrder() {
+            const loadingEl = document.getElementById('surveyOrderLoading');
+            const errorEl = document.getElementById('surveyOrderError');
+            if (loadingEl) loadingEl.classList.remove('hidden');
+            if (errorEl) errorEl.classList.add('hidden');
+
+            if (!supabaseClient) {
+                surveyOrderItems = [];
+                if (loadingEl) loadingEl.textContent = 'Offline (no database connection).';
+                return;
+            }
+
+            try {
+                const { data: rows, error } = await supabaseClient
+                    .from('survey_questions_order')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('display_order');
+                if (error) throw error;
+
+                const orderRows = rows || [];
+                if (orderRows.length === 0) {
+                    // Fallback: core then custom using their config display_order
+                    surveyOrderItems = [
+                        ...coreQuestions.map(q => ({
+                            order_id: null,
+                            question_type: 'core',
+                            core_id: q.core_id,
+                            question_id: null,
+                            label: ((q.current_text && q.current_text.trim()) ? q.current_text.trim() : (q.default_text || '')),
+                            emoji: ((q.emoji && q.emoji.trim()) ? q.emoji.trim() : '✨')
+                        })),
+                        ...customQuestions.map(q => ({
+                            order_id: null,
+                            question_type: 'custom',
+                            core_id: null,
+                            question_id: q.question_id,
+                            label: q.question_text || '',
+                            emoji: (q.emoji && q.emoji.trim()) ? q.emoji.trim() : '✨'
+                        }))
+                    ];
+                    if (loadingEl) loadingEl.classList.add('hidden');
+                    if (errorEl) errorEl.classList.remove('hidden');
+                    return;
+                }
+
+                const coreIds = orderRows.filter(r => r.question_type === 'core' && r.core_id).map(r => r.core_id);
+                const customIds = orderRows.filter(r => r.question_type === 'custom' && r.question_id).map(r => r.question_id);
+
+                const [coreFetch, customFetch] = await Promise.all([
+                    coreIds.length
+                        ? supabaseClient.from('core_questions_config').select('*').in('core_id', coreIds)
+                        : Promise.resolve({ data: [], error: null }),
+                    customIds.length
+                        ? supabaseClient.from('custom_questions').select('*').in('question_id', customIds)
+                        : Promise.resolve({ data: [], error: null })
+                ]);
+                if (coreFetch.error) throw coreFetch.error;
+                if (customFetch.error) throw customFetch.error;
+
+                const coreMap = Object.fromEntries((coreFetch.data || []).map(q => [q.core_id, q]));
+                const customMap = Object.fromEntries((customFetch.data || []).map(q => [q.question_id, q]));
+
+                surveyOrderItems = orderRows.map(r => {
+                    if (r.question_type === 'core') {
+                        const q = coreMap[r.core_id];
+                        if (!q) return null;
+                        const label = (q.current_text && q.current_text.trim()) ? q.current_text.trim() : (q.default_text || '');
+                        const emoji = (q.emoji && q.emoji.trim()) ? q.emoji.trim() : '✨';
+                        return { ...r, label, emoji };
+                    }
+                    const q = customMap[r.question_id];
+                    if (!q) return null;
+                    const label = q.question_text || '';
+                    const emoji = (q.emoji && q.emoji.trim()) ? q.emoji.trim() : '✨';
+                    return { ...r, label, emoji };
+                }).filter(Boolean);
+
+                if (loadingEl) loadingEl.classList.add('hidden');
+            } catch (err) {
+                console.error('Error loading unified survey order:', err);
+                surveyOrderItems = [];
+                if (loadingEl) loadingEl.textContent = 'Could not load order.';
+                if (errorEl) errorEl.classList.remove('hidden');
+            }
+        }
+
+        function renderSurveyQuestionOrder() {
+            const listEl = document.getElementById('surveyOrderList');
+            if (!listEl) return;
+            listEl.innerHTML = '';
+
+            if (!surveyOrderItems.length) return;
+
+            surveyOrderItems.forEach((item, idx) => {
+                const li = document.createElement('li');
+                li.className = 'pbi-card px-4 py-3 flex items-center justify-between bg-slate-800/40 border border-slate-700/60 rounded-xl';
+                li.draggable = !!item.order_id;
+                li.dataset.orderId = item.order_id || '';
+
+                const typeBadge = item.question_type === 'core'
+                    ? '<span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">CORE</span>'
+                    : '<span class="text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">CUSTOM</span>';
+
+                li.innerHTML = `
+                    <div class="flex items-center gap-3 min-w-0">
+                        <span class="text-slate-400 select-none" title="Drag to reorder">${item.order_id ? '☰' : ''}</span>
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2 min-w-0">
+                                ${typeBadge}
+                                <span class="text-xs text-slate-300 truncate">${(item.emoji || '✨')} ${item.label || ''}</span>
+                            </div>
+                            <div class="text-[10px] text-slate-500 mt-0.5">Position: ${idx + 1}</div>
+                        </div>
+                    </div>
+                    <span class="text-[10px] text-slate-500">Drag</span>
+                `;
+
+                if (item.order_id) {
+                    li.addEventListener('dragstart', onSurveyOrderDragStart);
+                    li.addEventListener('dragover', onSurveyOrderDragOver);
+                    li.addEventListener('dragend', onSurveyOrderDragEnd);
+                    li.addEventListener('drop', onSurveyOrderDrop);
+                }
+
+                listEl.appendChild(li);
+            });
+        }
+
+        function onSurveyOrderDragStart(e) {
+            draggedSurveyOrderId = e.currentTarget.dataset.orderId;
+            e.dataTransfer.effectAllowed = 'move';
+            e.currentTarget.classList.add('ring-2', 'ring-green-500/40');
+        }
+
+        function onSurveyOrderDragOver(e) {
+            e.preventDefault();
+            const overId = e.currentTarget.dataset.orderId;
+            if (!draggedSurveyOrderId || !overId || draggedSurveyOrderId === overId) return;
+
+            const from = surveyOrderItems.findIndex(x => x.order_id === draggedSurveyOrderId);
+            const to = surveyOrderItems.findIndex(x => x.order_id === overId);
+            if (from === -1 || to === -1) return;
+
+            const rect = e.currentTarget.getBoundingClientRect();
+            const after = e.clientY > rect.top + rect.height / 2;
+            const insertAt = after ? to + 1 : to;
+
+            if (insertAt === from || insertAt === from + 1) return;
+
+            const [moved] = surveyOrderItems.splice(from, 1);
+            const clamped = Math.max(0, Math.min(insertAt > from ? insertAt - 1 : insertAt, surveyOrderItems.length));
+            surveyOrderItems.splice(clamped, 0, moved);
+            renderSurveyQuestionOrder();
+        }
+
+        function onSurveyOrderDrop(e) {
+            e.preventDefault();
+        }
+
+        function onSurveyOrderDragEnd(e) {
+            draggedSurveyOrderId = null;
+            e.currentTarget.classList.remove('ring-2', 'ring-green-500/40');
+        }
+
+        async function saveSurveyQuestionOrder() {
+            const btn = document.getElementById('saveSurveyOrderBtn');
+            if (!btn || !supabaseClient) return;
+            if (!surveyOrderItems.length) return;
+            // Items without order_id are fallback-only and cannot be saved
+            if (surveyOrderItems.some(x => !x.order_id)) {
+                alert('Unified order is not available yet. Run the database migration to create survey_questions_order.');
+                return;
+            }
+
+            const nowIso = new Date().toISOString();
+            btn.disabled = true;
+            const originalText = btn.textContent;
+            btn.textContent = 'Saving...';
+            try {
+                // Phase 1: move to a safe range to avoid unique conflicts
+                await Promise.all(surveyOrderItems.map((item, i) =>
+                    supabaseClient
+                        .from('survey_questions_order')
+                        .update({ display_order: 1000 + i, updated_at: nowIso })
+                        .eq('order_id', item.order_id)
+                ));
+                // Phase 2: set final 0..N order
+                await Promise.all(surveyOrderItems.map((item, i) =>
+                    supabaseClient
+                        .from('survey_questions_order')
+                        .update({ display_order: i, updated_at: nowIso })
+                        .eq('order_id', item.order_id)
+                ));
+
+                showToast('Order saved.');
+                await loadSurveyQuestionOrder();
+                renderSurveyQuestionOrder();
+            } catch (err) {
+                console.error('Error saving survey order:', err);
+                alert('Failed to save order.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
+        }
+
+        async function getNextSurveyOrderIndex() {
+            const { data, error } = await supabaseClient
+                .from('survey_questions_order')
+                .select('display_order')
+                .eq('is_active', true)
+                .order('display_order', { ascending: false })
+                .limit(1);
+            if (error) throw error;
+            const last = data && data[0] ? data[0].display_order : null;
+            return typeof last === 'number' ? last + 1 : 0;
+        }
+
+        async function deactivateSurveyOrderCore(coreId) {
+            if (!supabaseClient) return;
+            await supabaseClient
+                .from('survey_questions_order')
+                .update({ is_active: false, updated_at: new Date().toISOString() })
+                .eq('question_type', 'core')
+                .eq('core_id', coreId);
+        }
+
+        async function deactivateSurveyOrderCustom(questionId) {
+            if (!supabaseClient) return;
+            await supabaseClient
+                .from('survey_questions_order')
+                .update({ is_active: false, updated_at: new Date().toISOString() })
+                .eq('question_type', 'custom')
+                .eq('question_id', questionId);
+        }
+
+        async function ensureSurveyOrderCoreActive(coreId) {
+            if (!supabaseClient) return;
+            const { data, error } = await supabaseClient
+                .from('survey_questions_order')
+                .select('order_id, is_active')
+                .eq('question_type', 'core')
+                .eq('core_id', coreId)
+                .order('updated_at', { ascending: false })
+                .limit(1);
+            if (error) throw error;
+
+            const next = await getNextSurveyOrderIndex();
+            if (data && data[0]) {
+                await supabaseClient
+                    .from('survey_questions_order')
+                    .update({ is_active: true, display_order: next, updated_at: new Date().toISOString() })
+                    .eq('order_id', data[0].order_id);
+                return;
+            }
+            await supabaseClient
+                .from('survey_questions_order')
+                .insert([{ question_type: 'core', core_id: coreId, question_id: null, display_order: next, is_active: true }]);
+        }
+
+        async function ensureSurveyOrderCustomActive(questionId) {
+            if (!supabaseClient) return;
+            const { data, error } = await supabaseClient
+                .from('survey_questions_order')
+                .select('order_id, is_active')
+                .eq('question_type', 'custom')
+                .eq('question_id', questionId)
+                .order('updated_at', { ascending: false })
+                .limit(1);
+            if (error) throw error;
+
+            const next = await getNextSurveyOrderIndex();
+            if (data && data[0]) {
+                await supabaseClient
+                    .from('survey_questions_order')
+                    .update({ is_active: true, display_order: next, updated_at: new Date().toISOString() })
+                    .eq('order_id', data[0].order_id);
+                return;
+            }
+            await supabaseClient
+                .from('survey_questions_order')
+                .insert([{ question_type: 'custom', core_id: null, question_id: questionId, display_order: next, is_active: true }]);
         }
 
         // ============================================
@@ -1471,21 +1785,17 @@
                 const scoreClass = avg >= 2.7 ? 'text-green-400' : avg >= 2.0 ? 'text-yellow-400' : avg ? 'text-orange-400' : 'text-slate-500';
                 const text = (q.current_text && q.current_text.trim()) ? q.current_text.trim() : (q.default_text || '');
                 const emoji = (q.emoji && q.emoji.trim()) ? q.emoji.trim() : '✨';
-                const canReorder = coreQuestions.length > 1;
-                const moveUp = canReorder && index > 0 ? `<button onclick="moveCoreQuestion('${q.core_id}', 'up')" class="text-slate-500 hover:text-white text-xs p-1" title="Move up">▲</button>` : '';
-                const moveDown = canReorder && index < coreQuestions.length - 1 ? `<button onclick="moveCoreQuestion('${q.core_id}', 'down')" class="text-slate-500 hover:text-white text-xs p-1" title="Move down">▼</button>` : '';
                 const card = document.createElement('div');
                 card.className = 'pbi-card p-4 text-center bg-gradient-to-br from-slate-800/50 to-slate-900/50 relative group';
                 card.dataset.coreId = q.core_id;
                 card.innerHTML = `
                     <div class="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition">
-                        ${moveUp}${moveDown}
                         <button onclick="openEditCoreModal('${q.core_id}')" class="text-slate-500 hover:text-blue-400 text-xs p-1" title="Edit">✏️</button>
                         <button onclick="archiveCoreQuestion('${q.core_id}')" class="text-slate-500 hover:text-red-400 text-xs p-1" title="Remove from survey">✕</button>
                     </div>
                     <p class="text-xs text-slate-400 mb-2 font-semibold">${emoji} ${text}</p>
                     <h3 class="${scoreClass} text-3xl font-bold">${avg || '--'}</h3>
-                    <p class="text-[10px] text-slate-500 mt-1">${scores.length ? scores.length + ' responses' : 'No responses yet'}</p>
+                    <p class="text-[10px] text-slate-500 mt-1">${scores.length ? scores.length + ' answered' : 'No answers yet'}</p>
                 `;
                 container.appendChild(card);
             });
@@ -1529,9 +1839,11 @@
             try {
                 const { error } = await supabaseClient.from('core_questions_config').update({ is_active: false }).eq('core_id', coreId);
                 if (error) throw error;
+                await deactivateSurveyOrderCore(coreId);
                 coreQuestions = coreQuestions.filter(q => q.core_id !== coreId);
                 renderCoreQuestions();
                 loadArchivedCoreQuestions().then(() => renderArchivedCoreQuestions());
+                await loadSurveyQuestionOrder(); renderSurveyQuestionOrder();
                 showToast('Core question removed from survey.');
             } catch (err) {
                 console.error('Error archiving core question:', err);
@@ -1622,8 +1934,10 @@
                     coreQuestions.push(data[0]);
                     archivedCoreQuestions = archivedCoreQuestions.filter(q => q.core_id !== coreId);
                     await normalizeCoreDisplayOrder();
+                    await ensureSurveyOrderCoreActive(coreId);
                     renderCoreQuestions();
                     renderArchivedCoreQuestions();
+                    await loadSurveyQuestionOrder(); renderSurveyQuestionOrder();
                     showToast('Core question restored.');
                 }
             } catch (err) {
@@ -1689,8 +2003,10 @@
                 // Add to local array, normalize order, re-render
                 customQuestions.push(data[0]);
                 await normalizeCustomDisplayOrder();
+                await ensureSurveyOrderCustomActive(data[0].question_id);
                 renderCustomQuestions();
                 closeAddQuestionModal();
+                await loadSurveyQuestionOrder(); renderSurveyQuestionOrder();
 
                 // Show success feedback
                 showToast('✅ Question added! It will appear on new surveys.');
@@ -1767,26 +2083,16 @@
             });
 
             // Render cards
-            const canReorder = customQuestions.length > 1;
             customQuestions.forEach((q, index) => {
                 const avg = questionAverages[q.question_id];
                 const scoreClass = avg >= 2.7 ? 'text-green-400' : avg >= 2.0 ? 'text-yellow-400' : avg ? 'text-orange-400' : 'text-slate-500';
                 const responseCount = allResponses.filter(r => r.custom_responses?.[q.question_id]).length;
-
-                const moveUpBtn = canReorder && index > 0
-                    ? `<button onclick="moveCustomQuestion('${q.question_id}', 'up')" class="text-slate-500 hover:text-white text-xs p-1" title="Move up">▲</button>`
-                    : '';
-                const moveDownBtn = canReorder && index < customQuestions.length - 1
-                    ? `<button onclick="moveCustomQuestion('${q.question_id}', 'down')" class="text-slate-500 hover:text-white text-xs p-1" title="Move down">▼</button>`
-                    : '';
 
                 const card = document.createElement('div');
                 card.className = 'pbi-card p-4 text-center bg-gradient-to-br from-slate-800/50 to-slate-900/50 relative group custom-q-card';
                 card.dataset.questionId = q.question_id;
                 card.innerHTML = `
                     <div class="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition">
-                        ${moveUpBtn}
-                        ${moveDownBtn}
                         <button onclick="openEditQuestionModal('${q.question_id}')" 
                             class="text-slate-500 hover:text-blue-400 text-xs p-1" title="Edit">✏️</button>
                         <button onclick="deleteCustomQuestion('${q.question_id}')" 
@@ -1794,7 +2100,7 @@
                     </div>
                     <p class="text-xs text-slate-400 mb-2 font-semibold">${q.emoji} ${q.question_text}</p>
                     <h3 class="${scoreClass} text-3xl font-bold">${avg || '--'}</h3>
-                    <p class="text-[10px] text-slate-500 mt-1">${responseCount ? `${responseCount} responses` : 'No responses yet'}</p>
+                    <p class="text-[10px] text-slate-500 mt-1">${responseCount ? `${responseCount} answered` : 'No answers yet'}</p>
                 `;
                 container.appendChild(card);
             });
@@ -1811,9 +2117,11 @@
 
                 if (error) throw error;
 
+                await deactivateSurveyOrderCustom(questionId);
                 customQuestions = customQuestions.filter(q => q.question_id !== questionId);
                 renderCustomQuestions();
                 if (typeof loadArchivedQuestions === 'function') loadArchivedQuestions().then(() => renderArchivedQuestions());
+                await loadSurveyQuestionOrder(); renderSurveyQuestionOrder();
                 showToast('Question removed from surveys. You can restore it from Archived.');
             } catch (err) {
                 console.error('Error deleting question:', err);
@@ -1910,8 +2218,10 @@
                     customQuestions.push(data[0]);
                     archivedQuestions = archivedQuestions.filter(q => q.question_id !== questionId);
                     await normalizeCustomDisplayOrder();
+                    await ensureSurveyOrderCustomActive(questionId);
                     renderCustomQuestions();
                     renderArchivedQuestions();
+                    await loadSurveyQuestionOrder(); renderSurveyQuestionOrder();
                     showToast('Question restored. It will appear on new surveys.');
                 }
             } catch (err) {

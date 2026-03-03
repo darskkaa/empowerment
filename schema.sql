@@ -17,6 +17,8 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 DROP VIEW IF EXISTS vw_impact_dashboard CASCADE;
 DROP VIEW IF EXISTS vw_survey_with_programs CASCADE;
 DROP TABLE IF EXISTS surveyresponses CASCADE;
+DROP TABLE IF EXISTS custom_questions CASCADE;
+DROP TABLE IF EXISTS core_questions_config CASCADE;
 DROP TABLE IF EXISTS experiences CASCADE;
 DROP TABLE IF EXISTS constituentprofiles CASCADE;
 DROP TABLE IF EXISTS constituents CASCADE;
@@ -175,12 +177,12 @@ CREATE TABLE surveyresponses (
     experience_type           VARCHAR(150) NOT NULL,
     
     -- Standard Audit Scores (1-3)
-    is_present_engaged        INT NOT NULL CHECK (is_present_engaged BETWEEN 1 AND 3),
-    connection_others_score   INT NOT NULL CHECK (connection_others_score BETWEEN 1 AND 3),
-    connection_nature_score   INT NOT NULL CHECK (connection_nature_score BETWEEN 1 AND 3),
-    calmness_score            INT NOT NULL CHECK (calmness_score BETWEEN 1 AND 3),
-    learning_intent_score     INT NOT NULL CHECK (learning_intent_score BETWEEN 1 AND 3),
-    community_benefit_score   INT NOT NULL CHECK (community_benefit_score BETWEEN 1 AND 3),
+    is_present_engaged        INT CHECK (is_present_engaged BETWEEN 1 AND 3),
+    connection_others_score   INT CHECK (connection_others_score BETWEEN 1 AND 3),
+    connection_nature_score   INT CHECK (connection_nature_score BETWEEN 1 AND 3),
+    calmness_score            INT CHECK (calmness_score BETWEEN 1 AND 3),
+    learning_intent_score     INT CHECK (learning_intent_score BETWEEN 1 AND 3),
+    community_benefit_score   INT CHECK (community_benefit_score BETWEEN 1 AND 3),
     
     -- High Fidelity Raw Scores (1-5)
     mood_before_raw           INT,
@@ -287,6 +289,59 @@ ALTER TABLE surveyresponses ADD COLUMN IF NOT EXISTS custom_responses JSONB DEFA
 COMMENT ON COLUMN surveyresponses.custom_responses IS 'Stores responses to custom questions as {question_uuid: score(1-3)}';
 
 -- ============================================================================
+-- TABLE: core_questions_config (reorder, remove, edit text for mission block)
+-- ============================================================================
+CREATE TABLE core_questions_config (
+    core_id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    code            TEXT NOT NULL UNIQUE,
+    default_text    TEXT NOT NULL,
+    current_text    TEXT,
+    emoji           VARCHAR(10) DEFAULT '✨',
+    display_order   INT DEFAULT 0,
+    is_active       BOOLEAN DEFAULT TRUE,
+    created_at      TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at      TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+COMMENT ON TABLE core_questions_config IS 'Configurable text and order for core mission questions; code maps to surveyresponses columns';
+
+ALTER TABLE core_questions_config ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can view active core questions" ON core_questions_config
+    FOR SELECT TO anon, authenticated USING (is_active = TRUE);
+CREATE POLICY "Authenticated can manage core questions" ON core_questions_config
+    FOR ALL TO authenticated USING (true);
+GRANT SELECT ON core_questions_config TO anon, authenticated;
+GRANT ALL ON core_questions_config TO authenticated;
+
+-- ============================================================================
+-- TABLE: survey_questions_order (UNIFIED ORDER FOR CORE + CUSTOM QUESTIONS)
+-- ============================================================================
+CREATE TABLE survey_questions_order (
+    order_id      UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    question_type TEXT NOT NULL CHECK (question_type IN ('core', 'custom')),
+    core_id       UUID REFERENCES core_questions_config(core_id) ON DELETE CASCADE,
+    question_id   UUID REFERENCES custom_questions(question_id) ON DELETE CASCADE,
+    display_order INT NOT NULL,
+    is_active     BOOLEAN DEFAULT TRUE,
+    created_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at    TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    CONSTRAINT survey_questions_order_one_ref_chk CHECK (
+        (question_type = 'core' AND core_id IS NOT NULL AND question_id IS NULL)
+        OR
+        (question_type = 'custom' AND question_id IS NOT NULL AND core_id IS NULL)
+    )
+);
+
+COMMENT ON TABLE survey_questions_order IS 'Unified, interleavable order for survey questions (core + custom). Dashboard manages; public survey reads active order.';
+
+ALTER TABLE survey_questions_order ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Anyone can view active survey question order" ON survey_questions_order
+    FOR SELECT TO anon, authenticated USING (is_active = TRUE);
+CREATE POLICY "Authenticated can manage survey question order" ON survey_questions_order
+    FOR ALL TO authenticated USING (true);
+GRANT SELECT ON survey_questions_order TO anon, authenticated;
+GRANT ALL ON survey_questions_order TO authenticated;
+
+-- ============================================================================
 -- INDEXES
 -- ============================================================================
 CREATE INDEX IF NOT EXISTS idx_survey_experience_type ON surveyresponses(experience_type);
@@ -296,6 +351,42 @@ CREATE INDEX IF NOT EXISTS idx_survey_submitted ON surveyresponses(submitted_at)
 CREATE INDEX IF NOT EXISTS idx_experiences_program ON experiences(program_id);
 CREATE INDEX IF NOT EXISTS idx_experiences_date ON experiences(experience_date);
 CREATE INDEX IF NOT EXISTS idx_custom_questions_active ON custom_questions(is_active, display_order);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_custom_questions_active_order ON custom_questions (display_order) WHERE is_active = TRUE;
+CREATE INDEX IF NOT EXISTS idx_core_questions_config_active_order ON core_questions_config(is_active, display_order);
+CREATE INDEX IF NOT EXISTS idx_survey_questions_order_active_order ON survey_questions_order(is_active, display_order);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_survey_questions_order_active_display_order ON survey_questions_order(display_order) WHERE is_active = TRUE;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_survey_questions_order_active_core ON survey_questions_order(core_id) WHERE is_active = TRUE AND question_type = 'core';
+CREATE UNIQUE INDEX IF NOT EXISTS idx_survey_questions_order_active_custom ON survey_questions_order(question_id) WHERE is_active = TRUE AND question_type = 'custom';
+
+-- Seed core mission questions (idempotent)
+INSERT INTO core_questions_config (code, default_text, current_text, emoji, display_order, is_active) VALUES
+    ('present_engaged', 'Did you feel present and engaged?', NULL, '✨', 0, TRUE),
+    ('connection_others', 'Feel more connected to others?', NULL, '👥', 1, TRUE),
+    ('connection_nature', 'Feel more connected to nature?', NULL, '🌿', 2, TRUE),
+    ('calmness', 'Feel calmer or more grounded?', NULL, '🧘', 3, TRUE),
+    ('learning_intent', 'Will you use what you learned?', NULL, '🧠', 4, TRUE),
+    ('community_benefit', 'Should we have more of this?', NULL, '🏛️', 5, TRUE)
+ON CONFLICT (code) DO NOTHING;
+
+-- Seed unified question order (idempotent): core then custom
+INSERT INTO survey_questions_order (question_type, core_id, question_id, display_order, is_active)
+SELECT * FROM (
+    WITH core AS (
+        SELECT core_id, ROW_NUMBER() OVER (ORDER BY display_order, created_at) - 1 AS ord
+        FROM core_questions_config
+        WHERE is_active = TRUE
+    ),
+    core_count AS (SELECT COUNT(*)::INT AS n FROM core),
+    custom AS (
+        SELECT question_id, ROW_NUMBER() OVER (ORDER BY display_order, created_at) - 1 AS ord
+        FROM custom_questions
+        WHERE is_active = TRUE
+    )
+    SELECT 'core'::TEXT, core.core_id, NULL::UUID, core.ord::INT, TRUE FROM core
+    UNION ALL
+    SELECT 'custom'::TEXT, NULL::UUID, custom.question_id, (custom.ord + (SELECT n FROM core_count))::INT, TRUE FROM custom
+) seeded
+WHERE NOT EXISTS (SELECT 1 FROM survey_questions_order);
 
 -- ============================================================================
 -- VIEWS (WITHOUT SECURITY DEFINER - Fixed!)

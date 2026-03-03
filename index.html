@@ -755,6 +755,7 @@
         let supabaseClient = null;
         let customQuestions = []; // Loaded from database
         let coreQuestions = []; // Loaded from core_questions_config
+        let orderedQuestions = []; // Unified order from survey_questions_order (core + custom interleaved)
         let allScreens = []; // Ordered list of screen IDs for navigation
 
         // ============================================
@@ -776,6 +777,7 @@
                         console.log('✅ Supabase ready (Production Mode)');
                         await loadSurveyCoreQuestions();
                         await loadSurveyCustomQuestions();
+                        await loadSurveyOrderedQuestions();
                         buildAllScreens();
                         return;
                     }
@@ -794,6 +796,7 @@
 
             await loadSurveyCoreQuestions();
             await loadSurveyCustomQuestions();
+            await loadSurveyOrderedQuestions();
             buildAllScreens();
         }
 
@@ -814,42 +817,122 @@
                 if (error) throw error;
                 coreQuestions = rows || [];
                 console.log('✅ Loaded ' + coreQuestions.length + ' core mission questions');
-                renderSurveyCoreQuestions();
             } catch (err) {
                 console.warn('⚠️ Could not load core questions:', err);
                 coreQuestions = [];
             }
         }
 
-        function renderSurveyCoreQuestions() {
+        async function loadSurveyOrderedQuestions() {
+            // Default/fallback: core then custom
+            const fallback = () => {
+                orderedQuestions = [
+                    ...coreQuestions.map(q => ({ type: 'core', q })),
+                    ...customQuestions.map(q => ({ type: 'custom', q }))
+                ];
+            };
+
+            if (!supabaseClient) {
+                fallback();
+                renderSurveyOrderedQuestions();
+                return;
+            }
+
+            try {
+                const { data: orderRows, error } = await supabaseClient
+                    .from('survey_questions_order')
+                    .select('*')
+                    .eq('is_active', true)
+                    .order('display_order');
+                if (error) throw error;
+
+                if (!orderRows || orderRows.length === 0) {
+                    fallback();
+                    renderSurveyOrderedQuestions();
+                    return;
+                }
+
+                const coreMap = Object.fromEntries(coreQuestions.map(q => [q.core_id, q]));
+                const customMap = Object.fromEntries(customQuestions.map(q => [q.question_id, q]));
+
+                orderedQuestions = orderRows.map(r => {
+                    if (r.question_type === 'core') {
+                        const q = coreMap[r.core_id];
+                        return q ? { type: 'core', q } : null;
+                    }
+                    const q = customMap[r.question_id];
+                    return q ? { type: 'custom', q } : null;
+                }).filter(Boolean);
+
+                if (!orderedQuestions.length) fallback();
+            } catch (err) {
+                console.warn('⚠️ Could not load unified survey order. Falling back to Core then Custom.', err);
+                fallback();
+            }
+
+            renderSurveyOrderedQuestions();
+        }
+
+        function renderSurveyOrderedQuestions() {
             const container = document.getElementById('coreMissionContainer');
             if (!container) return;
+
+            // Clear any older dynamic screens (from previous versions)
+            document.querySelectorAll('[id^="custom-q-"], [id^="core-q-"], [id^="dyn-q-"]').forEach(el => el.remove());
+
             container.innerHTML = '';
-            coreQuestions.forEach((q, index) => {
-                const text = (q.current_text && q.current_text.trim()) ? q.current_text.trim() : (q.default_text || '');
-                const emoji = (q.emoji && q.emoji.trim()) ? q.emoji.trim() : '✨';
+            orderedQuestions.forEach((item, index) => {
+                const screenId = 'dyn-q-' + index;
                 const div = document.createElement('div');
                 div.className = 'screen';
-                div.id = 'core-q-' + index;
-                div.dataset.code = q.code;
-                div.innerHTML = `
-                    <h2><span aria-hidden="true">${emoji}</span> ${text}</h2>
-                    <p class="subtitle">During your experience</p>
-                    <div class="nps-row" role="radiogroup" aria-label="${q.code}">
-                        <button class="nps-btn no" data-value="1" onclick="selectMission(this, '${q.code}')"><span class="nps-emoji">👎</span><span class="nps-text">No</span></button>
-                        <button class="nps-btn maybe" data-value="2" onclick="selectMission(this, '${q.code}')"><span class="nps-emoji">🤷</span><span class="nps-text">Somewhat</span></button>
-                        <button class="nps-btn yes" data-value="3" onclick="selectMission(this, '${q.code}')"><span class="nps-emoji">✅</span><span class="nps-text">Yes</span></button>
-                    </div>
-                    <button class="skip" onclick="nextScreen()">Skip this question</button>
-                `;
+                div.id = screenId;
+
+                if (item.type === 'core') {
+                    const q = item.q;
+                    const text = (q.current_text && q.current_text.trim()) ? q.current_text.trim() : (q.default_text || '');
+                    const emoji = (q.emoji && q.emoji.trim()) ? q.emoji.trim() : '✨';
+                    div.dataset.type = 'core';
+                    div.dataset.code = q.code;
+                    div.innerHTML = `
+                        <h2><span aria-hidden="true">${emoji}</span> ${text}</h2>
+                        <p class="subtitle">During your experience</p>
+                        <div class="nps-row" role="radiogroup" aria-label="${q.code}">
+                            <button class="nps-btn no" data-value="1" onclick="selectMission(this, '${q.code}')"><span class="nps-emoji">👎</span><span class="nps-text">No</span></button>
+                            <button class="nps-btn maybe" data-value="2" onclick="selectMission(this, '${q.code}')"><span class="nps-emoji">🤷</span><span class="nps-text">Somewhat</span></button>
+                            <button class="nps-btn yes" data-value="3" onclick="selectMission(this, '${q.code}')"><span class="nps-emoji">✅</span><span class="nps-text">Yes</span></button>
+                        </div>
+                        <button class="skip" onclick="nextScreen()">Skip this question</button>
+                    `;
+                } else {
+                    const q = item.q;
+                    const emoji = (q.emoji && q.emoji.trim()) ? q.emoji.trim() : '✨';
+                    div.dataset.type = 'custom';
+                    div.dataset.questionId = q.question_id;
+                    div.innerHTML = `
+                        <h2><span class="custom-q-emoji" aria-hidden="true">${emoji}</span> ${q.question_text}</h2>
+                        <p class="subtitle">From our team</p>
+                        <div class="nps-row" role="radiogroup">
+                            <button class="nps-btn no" data-value="1" onclick="selectCustomQuestion(this, '${q.question_id}')">
+                                <span class="nps-emoji">👎</span><span class="nps-text">No</span>
+                            </button>
+                            <button class="nps-btn maybe" data-value="2" onclick="selectCustomQuestion(this, '${q.question_id}')">
+                                <span class="nps-emoji">🤷</span><span class="nps-text">Somewhat</span>
+                            </button>
+                            <button class="nps-btn yes" data-value="3" onclick="selectCustomQuestion(this, '${q.question_id}')">
+                                <span class="nps-emoji">✅</span><span class="nps-text">Yes</span>
+                            </button>
+                        </div>
+                        <button class="skip" onclick="nextScreen()">Skip this question</button>
+                    `;
+                }
+
                 container.appendChild(div);
             });
         }
 
         function buildAllScreens() {
-            const coreIds = coreQuestions.map((_, i) => 'core-q-' + i);
-            const customIds = customQuestions.map((_, i) => 'custom-q-' + i);
-            allScreens = ['screen2', 'screen3'].concat(coreIds).concat(customIds).concat(['screen10', 'screen11', 'screen12', 'screen13', 'screen14']);
+            const dynIds = orderedQuestions.map((_, i) => 'dyn-q-' + i);
+            allScreens = ['screen2', 'screen3'].concat(dynIds).concat(['screen10', 'screen11', 'screen12', 'screen13', 'screen14']);
             totalQuestions = allScreens.length;
             totalScreens = allScreens.length + 1; // +1 for screen1 (welcome)
             updateProgress();
@@ -874,10 +957,6 @@
                 if (error) throw error;
                 customQuestions = data || [];
                 console.log('✅ Loaded ' + customQuestions.length + ' custom questions');
-
-                if (customQuestions.length > 0) {
-                    renderSurveyCustomQuestions();
-                }
             } catch (err) {
                 console.warn('⚠️ Could not load custom questions:', err);
             }
@@ -1049,13 +1128,11 @@
                     learning_intent: 'learning_intent_score',
                     community_benefit: 'community_benefit_score'
                 };
-                const defaultScore = 2;
+                // Skip = NULL: only include answered mission fields (1-3). Omitted columns insert NULL.
                 const missionScores = {};
-                Object.values(CORE_CODE_TO_COLUMN).forEach(col => { missionScores[col] = defaultScore; });
-                coreQuestions.forEach(q => {
-                    if (q && q.code && CORE_CODE_TO_COLUMN[q.code] != null && (data[q.code] === 1 || data[q.code] === 2 || data[q.code] === 3)) {
-                        missionScores[CORE_CODE_TO_COLUMN[q.code]] = data[q.code];
-                    }
+                Object.entries(CORE_CODE_TO_COLUMN).forEach(([code, col]) => {
+                    const v = data[code];
+                    if (v === 1 || v === 2 || v === 3) missionScores[col] = v;
                 });
 
                 // Map to surveyresponses table columns
@@ -1064,7 +1141,7 @@
                     is_returning_visitor: data.is_returning_visitor,
                     age_range_bracket: data.age_range || 'Unknown',
 
-                    // Mission Scores (1-3 scale) from active core questions, default 2 for others
+                    // Mission Scores (1-3 scale). Skipped questions are omitted -> NULL in DB.
                     ...missionScores,
 
                     // NEW columns
