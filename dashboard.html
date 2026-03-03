@@ -502,16 +502,9 @@
                             </div>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-sm">
-                                    <thead>
+                                    <thead id="programTableThead">
                                         <tr class="border-b border-slate-700/50">
                                             <th class="text-left py-3 px-2 font-semibold text-slate-400">Program</th>
-                                            <th class="text-center py-3 px-2 font-semibold text-slate-400">✨ Present
-                                            </th>
-                                            <th class="text-center py-3 px-2 font-semibold text-slate-400">💚 Connect
-                                            </th>
-                                            <th class="text-center py-3 px-2 font-semibold text-slate-400">🧘 Calm</th>
-                                            <th class="text-center py-3 px-2 font-semibold text-slate-400">🧠 Learning
-                                            </th>
                                             <th class="text-center py-3 px-2 font-semibold text-slate-400">📊 Avg</th>
                                         </tr>
                                     </thead>
@@ -1893,6 +1886,7 @@
                 closeEditCoreModal();
                 await loadSurveyQuestionOrder();
                 renderSurveyQuestionOrder();
+                renderProgramTable();
                 showToast('Core question updated.');
             } catch (err) {
                 console.error('Error saving core question:', err);
@@ -2351,58 +2345,31 @@
         }
         function renderProgramTable() {
             const programs = {};
+            const coreList = (coreQuestions && coreQuestions.length) ? coreQuestions : [];
+            const codeToCol = CORE_CODE_TO_COLUMN || {};
 
-            // Helper: Map 1-5 scale to 1-3 scale (4-5=YES, 3=SOMEWHAT, 1-2=NO)
-            const map5to3 = (val) => val >= 4 ? 3 : val >= 3 ? 2 : 1;
-            // Helper: Map 0-100 scale to 1-3 scale (>75=YES, 40-75=SOMEWHAT, <40=NO)
-            const map100to3 = (val) => val > 75 ? 3 : val >= 40 ? 2 : 1;
+            // Helper: short label from question text (first 2-3 words)
+            const shortLabel = (q) => {
+                const text = (q.current_text && q.current_text.trim()) ? q.current_text.trim() : (q.default_text || '');
+                const words = text.split(/\s+/).filter(Boolean);
+                if (words.length <= 3) return text;
+                return words.slice(0, 3).join(' ') + (words.length > 3 ? '…' : '');
+            };
 
+            // Initialize per-program stats: one array per core question code, plus legacy
             allResponses.forEach(r => {
                 const prog = r.experience_type || 'General';
-                if (!programs[prog]) programs[prog] = {
-                    count: 0,
-                    present: [],
-                    connection: [],
-                    calm: [],
-                    learning: [],
-                    // Legacy data (for backward compatibility)
-                    before: [],
-                    after: [],
-                    nature: [],
-                    skills: []
-                };
+                if (!programs[prog]) {
+                    programs[prog] = { count: 0, before: [], after: [], nature: [], skills: [] };
+                    coreList.forEach(q => { programs[prog][q.code] = []; });
+                }
                 programs[prog].count++;
 
-                // 1. ✨ Present & Engaged
-                if (r.is_present_engaged != null) {
-                    programs[prog].present.push(r.is_present_engaged);
-                } else if (r.mood_after_raw != null) {
-                    // Fallback: Map 'Mood After' to 'Present'
-                    programs[prog].present.push(map5to3(r.mood_after_raw));
-                }
+                coreList.forEach(q => {
+                    const col = codeToCol[q.code];
+                    if (col && r[col] != null) programs[prog][q.code].push(r[col]);
+                });
 
-                // 2. 💚 Connected to Others
-                if (r.connection_others_score != null) {
-                    programs[prog].connection.push(r.connection_others_score);
-                }
-
-                // 3. 🧘 Calm & Grounded
-                if (r.calmness_score != null) {
-                    programs[prog].calm.push(r.calmness_score);
-                } else if (r.nature_connection_raw != null) {
-                    // Proxy: Nature connection -> Calm
-                    programs[prog].calm.push(map5to3(r.nature_connection_raw));
-                }
-
-                // 4. 🧠 Will Use Learning
-                if (r.learning_intent_score != null) {
-                    programs[prog].learning.push(r.learning_intent_score);
-                } else if (r.skills_learned_score != null) {
-                    // Proxy: Skills learned -> Will use learning
-                    programs[prog].learning.push(map100to3(r.skills_learned_score));
-                }
-
-                // LEGACY: Still collect old data just in case
                 if (r.mood_before_raw) programs[prog].before.push(r.mood_before_raw);
                 if (r.mood_after_raw) programs[prog].after.push(r.mood_after_raw);
                 if (r.nature_connection_raw) programs[prog].nature.push(r.nature_connection_raw);
@@ -2412,77 +2379,66 @@
             const sorted = Object.entries(programs).sort((a, b) => b[1].count - a[1].count).slice(0, 8);
             const avg = arr => arr.length ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : null;
 
-            // Score class for 1-3 scale (mission scores)
             const missionScoreClass = val => {
                 if (!val) return 'bg-slate-700 text-slate-400';
                 const n = parseFloat(val);
-                if (n >= 2.7) return 'score-5';  // YES (close to 3)
-                if (n >= 2.3) return 'score-4';  // YES/SOMEWHAT
-                if (n >= 2.0) return 'score-3';  // SOMEWHAT (2)
-                if (n >= 1.5) return 'score-2';  // SOMEWHAT/NO
-                return 'score-1';  // NO (1)
+                if (n >= 2.7) return 'score-5';
+                if (n >= 2.3) return 'score-4';
+                if (n >= 2.0) return 'score-3';
+                if (n >= 1.5) return 'score-2';
+                return 'score-1';
             };
 
+            // Build thead from coreQuestions: Program + one th per core question + Avg
+            const theadEl = document.getElementById('programTableThead');
+            if (theadEl && coreList.length > 0) {
+                const thCells = coreList.map(q => {
+                    const emoji = (q.emoji && q.emoji.trim()) ? q.emoji.trim() : '✨';
+                    const label = shortLabel(q);
+                    return `<th class="text-center py-3 px-2 font-semibold text-slate-400" title="${((q.current_text && q.current_text.trim()) ? q.current_text.trim() : (q.default_text || '')).replace(/"/g, '&quot;')}">${emoji} ${label}</th>`;
+                }).join('');
+                theadEl.innerHTML = `<tr class="border-b border-slate-700/50"><th class="text-left py-3 px-2 font-semibold text-slate-400">Program</th>${thCells}<th class="text-center py-3 px-2 font-semibold text-slate-400">📊 Avg</th></tr>`;
+            }
+
             document.getElementById('programTable').innerHTML = sorted.map(([name, stats]) => {
-                // Prefer mission scores, fall back to legacy
-                const hasMissionData = stats.present.length > 0 || stats.connection.length > 0;
+                const hasMissionData = coreList.some(q => stats[q.code] && stats[q.code].length > 0);
 
-                if (hasMissionData) {
-                    // NEW DATA: Show mission scores
-                    const present = avg(stats.present);
-                    const connection = avg(stats.connection);
-                    const calm = avg(stats.calm);
-                    const learning = avg(stats.learning);
-
-                    // Calculate overall average from all 4 shown metrics
-                    const allScores = [...stats.present, ...stats.connection, ...stats.calm, ...stats.learning];
+                if (hasMissionData && coreList.length > 0) {
+                    const avgs = coreList.map(q => avg(stats[q.code] || []));
+                    const allScores = coreList.reduce((acc, q) => acc.concat(stats[q.code] || []), []);
                     const overallAvg = allScores.length ? (allScores.reduce((a, b) => a + b, 0) / allScores.length).toFixed(2) : null;
-
-                    return `
-                        <tr class="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
-                            <td class="py-3 px-2">
-                                <span class="font-semibold text-white">${name}</span>
-                                <span class="text-xs text-slate-500 ml-1">(${stats.count})</span>
-                            </td>
-                            <td class="text-center py-3 px-2"><span class="score-badge ${missionScoreClass(present)}">${present || '--'}</span></td>
-                            <td class="text-center py-3 px-2"><span class="score-badge ${missionScoreClass(connection)}">${connection || '--'}</span></td>
-                            <td class="text-center py-3 px-2"><span class="score-badge ${missionScoreClass(calm)}">${calm || '--'}</span></td>
-                            <td class="text-center py-3 px-2"><span class="score-badge ${missionScoreClass(learning)}">${learning || '--'}</span></td>
-                            <td class="text-center py-3 px-2"><span class="score-badge ${missionScoreClass(overallAvg)}">${overallAvg || '--'}</span></td>
-                        </tr>
-                    `;
-                } else {
-                    // LEGACY DATA: Show old mood scores (backward compatibility)
-                    const before = avg(stats.before);
-                    const after = avg(stats.after);
-                    const nature = avg(stats.nature);
-                    const skills = stats.skills.length ? Math.round(stats.skills.reduce((a, b) => a + b, 0) / stats.skills.length) : '--';
-                    const boost = before && after ? (parseFloat(after) - parseFloat(before)).toFixed(1) : null;
-
-                    const legacyScoreClass = val => {
-                        if (!val) return 'bg-slate-700 text-slate-400';
-                        const n = parseFloat(val);
-                        if (n >= 4.5) return 'score-5';
-                        if (n >= 3.5) return 'score-4';
-                        if (n >= 2.5) return 'score-3';
-                        if (n >= 1.5) return 'score-2';
-                        return 'score-1';
-                    };
-
-                    return `
-                        <tr class="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
-                            <td class="py-3 px-2">
-                                <span class="font-semibold text-white">${name}</span>
-                                <span class="text-xs text-slate-500 ml-1">(${stats.count}) [legacy]</span>
-                            </td>
-                            <td class="text-center py-3 px-2"><span class="score-badge ${legacyScoreClass(before)}">${before || '--'}</span></td>
-                            <td class="text-center py-3 px-2"><span class="score-badge ${legacyScoreClass(after)}">${after || '--'}</span></td>
-                            <td class="text-center py-3 px-2"><span class="score-badge ${legacyScoreClass(nature)}">${nature || '--'}</span></td>
-                            <td class="text-center py-3 px-2 font-bold text-pink-400">${skills}</td>
-                            <td class="text-center py-3 px-2 font-bold ${boost && parseFloat(boost) > 0 ? 'text-green-400' : 'text-slate-500'}">${boost ? (parseFloat(boost) > 0 ? '+' : '') + boost : '--'}</td>
-                        </tr>
-                    `;
+                    const cells = avgs.map(v => `<td class="text-center py-3 px-2"><span class="score-badge ${missionScoreClass(v)}">${v || '--'}</span></td>`).join('');
+                    return `<tr class="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
+                        <td class="py-3 px-2"><span class="font-semibold text-white">${name}</span><span class="text-xs text-slate-500 ml-1">(${stats.count})</span></td>
+                        ${cells}
+                        <td class="text-center py-3 px-2"><span class="score-badge ${missionScoreClass(overallAvg)}">${overallAvg || '--'}</span></td>
+                    </tr>`;
                 }
+
+                // Legacy: no mission data; same column count as header (Program + N core + Avg)
+                const legacyCells = coreList.length > 0
+                    ? coreList.map(() => '<td class="text-center py-3 px-2 text-slate-500">--</td>').join('')
+                    : '';
+                const before = avg(stats.before);
+                const after = avg(stats.after);
+                const nature = avg(stats.nature);
+                const skills = stats.skills.length ? Math.round(stats.skills.reduce((a, b) => a + b, 0) / stats.skills.length) : '--';
+                const boost = before && after ? (parseFloat(after) - parseFloat(before)).toFixed(1) : null;
+                const legacyScoreClass = val => {
+                    if (!val) return 'bg-slate-700 text-slate-400';
+                    const n = parseFloat(val);
+                    if (n >= 4.5) return 'score-5';
+                    if (n >= 3.5) return 'score-4';
+                    if (n >= 2.5) return 'score-3';
+                    if (n >= 1.5) return 'score-2';
+                    return 'score-1';
+                };
+                const legacyAvg = (before && after) ? ((parseFloat(before) + parseFloat(after)) / 2).toFixed(1) : null;
+                return `<tr class="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
+                    <td class="py-3 px-2"><span class="font-semibold text-white">${name}</span><span class="text-xs text-slate-500 ml-1">(${stats.count}) [legacy]</span></td>
+                    ${legacyCells}
+                    <td class="text-center py-3 px-2"><span class="score-badge ${missionScoreClass(legacyAvg)}">${legacyAvg || '--'}</span></td>
+                </tr>`;
             }).join('');
         }
 
